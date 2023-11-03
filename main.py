@@ -13,27 +13,32 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
 
 class Character(pygame.sprite.Sprite):
-    PLAYER_WIDTH, PLAYER_HEIGHT = 40, 60
 
     def __init__(self, x, y, image, group_all_sprite):
         super().__init__(group_all_sprite)
+        self.PLAYER_WIDTH, self.PLAYER_HEIGHT = 40, 60
+
         self.x = x
         self.y = y
         self.image = pygame.transform.scale(pygame.image.load(image), (PLAYER_WIDTH, PLAYER_HEIGHT))
-
-    def draw(self):
-        screen.blit(self.image, (self.x, self.y))
+        self.rect = (x, y, x + self.PLAYER_WIDTH, y + self.PLAYER_HEIGHT)
+        self.speed = 1
 
     def update(self, *args, **kwargs):
-        self.draw()
+        pass
+
+    def move_left(self):
+        self.x -= self.speed
+        self.rect = (self.x, self.y, self.x + self.PLAYER_WIDTH, self.y + self.PLAYER_HEIGHT)
+        print(self.x)
 
 
-class MainHero(Character, pygame.sprite.Sprite):
+class MainHero(Character):
     def __init__(self, x, y, image, group_all_sprite):
         super().__init__(x, y, image, group_all_sprite)
 
     def update(self, *args, **kwargs):
-        self.draw()
+        pass
 
 
 class Enemy(Character):
@@ -59,10 +64,16 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_LEFT]:
+        main_hero.move_left()
+
     screen.blit(background_image, (0, 0))
 
-    pygame.display.flip()
-
     all_sprites.update()
+    all_sprites.draw(screen)
+
+    pygame.display.flip()
 
 pygame.quit()
