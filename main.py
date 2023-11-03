@@ -25,20 +25,20 @@ class Character(pygame.sprite.Sprite):
         self.speed = 1
 
     def update(self, *args, **kwargs):
-        pass
+        self.rect = (self.x, self.y, self.x + self.PLAYER_WIDTH, self.y + self.PLAYER_HEIGHT)
+
 
     def move_left(self):
         self.x -= self.speed
-        self.rect = (self.x, self.y, self.x + self.PLAYER_WIDTH, self.y + self.PLAYER_HEIGHT)
-        print(self.x)
+
+    def move_right(self):
+        self.x += self.speed
+
 
 
 class MainHero(Character):
     def __init__(self, x, y, image, group_all_sprite):
         super().__init__(x, y, image, group_all_sprite)
-
-    def update(self, *args, **kwargs):
-        pass
 
 
 class Enemy(Character):
