@@ -11,7 +11,8 @@ FPS = 60
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
+# класс персонаж - Character - наследуется от класса спрайт для того, чтобы его можно было
+#
 class Character(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image, group_all_sprite):
