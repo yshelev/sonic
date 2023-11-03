@@ -1,1 +1,1 @@
-asdimport game, settings, pygame
+import game, settings, pygame
