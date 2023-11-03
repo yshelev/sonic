@@ -59,6 +59,7 @@ class Character(pygame.sprite.Sprite):
                 self.y = 0
         else:
             self.y = SCREEN_HEIGHT - self.height
+            self.is_jumping = False
 
     def get_is_jumping(self):
         return self.is_jumping
