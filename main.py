@@ -11,8 +11,10 @@ FPS = 60
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+
 # класс персонаж - Character - наследуется от класса спрайт для того, чтобы его можно было
-#
+# присоединить к группе спрайтов и работать уже с этой группе, а не с каждым элеметом группы
+# по отдельности
 class Character(pygame.sprite.Sprite):
 
     def __init__(self, x, y, image, group_all_sprite):
@@ -28,13 +30,11 @@ class Character(pygame.sprite.Sprite):
     def update(self, *args, **kwargs):
         self.rect = (self.x, self.y, self.x + self.PLAYER_WIDTH, self.y + self.PLAYER_HEIGHT)
 
-
     def move_left(self):
         self.x -= self.speed
 
     def move_right(self):
         self.x += self.speed
-
 
 
 class MainHero(Character):
