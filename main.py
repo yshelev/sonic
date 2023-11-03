@@ -11,6 +11,9 @@ FPS = 60
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
+bg_music = pygame.mixer.Sound('Music/Bg_Music.mp3')
+bg_music.play(-1)
+bg_music.set_volume(0.1)
 
 # класс персонаж - Character - наследуется от класса спрайт для того, чтобы его можно было
 # присоединить к группе спрайтов и работать уже с этой группе, а не с каждым элеметом группы
