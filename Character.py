@@ -83,3 +83,4 @@ class Character(pygame.sprite.Sprite):
 
     def set_moving_right(self, moving_right):
         self.moving_right = moving_right
+#ы
