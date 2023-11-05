@@ -2,7 +2,7 @@ import pygame
 
 from MainHero import MainHero
 from Enemy import Enemy
-from Settings import SCREEN_WIDTH, SCREEN_HEIGHT, FPS
+from Settings import *
 
 pygame.init()
 
@@ -24,16 +24,37 @@ pygame.display.set_caption("иуиу сониИИК")
 background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                           (SCREEN_WIDTH, SCREEN_HEIGHT))
 
+# running_sonick_right = [
+#     pygame.image.load(f"data/Sonic Sprites/tile00{i}.png")
+#     if i < 10 else
+#     pygame.image.load(f"data/Sonic Sprites/tile0{i}.png")
+#     for i in range(24, 28)
+# ]
 running_sonick_right = [
     pygame.image.load(f"data/Sonic Sprites/tile00{i}.png")
     if i < 10 else
     pygame.image.load(f"data/Sonic Sprites/tile0{i}.png")
     for i in range(8, 14)
 ]
+running_sonick_right_sphere = [
+    pygame.image.load(f"data/Sonic Sprites/tile00{i}.png")
+    if i < 10 else
+    pygame.image.load(f"data/Sonic Sprites/tile0{i}.png")
+    for i in range(32, 37)
+]
+
+
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 
-main_hero = MainHero(100, 100, pygame.image.load(f"data/Sonic Sprites/tile001.png"), running_sonick_right, all_sprites)
+main_hero = MainHero(
+    100,
+    100,
+    pygame.image.load(f"data/Sonic Sprites/tile001.png"),
+    running_sonick_right,
+    running_sonick_right_sphere,
+    all_sprites
+)
 
 running = True
 while running:
@@ -46,15 +67,16 @@ while running:
     if keys[pygame.K_SPACE] and not main_hero.get_is_jumping():
         main_hero.set_speed_y(-10)
         main_hero.set_is_jumping(True)
-    if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-        main_hero.move_left()
-    else:
-        main_hero.set_moving_left(False)
+    if not((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            main_hero.move_left()
+        else:
+            main_hero.set_moving_left(False)
 
-    if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-        main_hero.move_right()
-    else:
-        main_hero.set_moving_right(False)
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            main_hero.move_right()
+        else:
+            main_hero.set_moving_right(False)
 
     if main_hero.get_is_jumping():
         main_hero.jump()
