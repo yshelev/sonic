@@ -61,7 +61,7 @@ class MainHero(Character):
         if not(self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
             self.x += self.additional_speed
             if self.additional_speed > 0:
-                self.additional_speed = \
+                self.additional_speed =\
                     0 if self.additional_speed - self.boost <= 0 else self.additional_speed - self.boost
             elif self.additional_speed < 0:
                 self.additional_speed =\
