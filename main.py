@@ -8,7 +8,6 @@ pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-
 # bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')
 # bg_music.play(-1)
 # bg_music.set_volume(0.1)
@@ -43,7 +42,6 @@ running_sonick_right_sphere = [
     for i in range(32, 37)
 ]
 
-
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 
@@ -67,7 +65,7 @@ while running:
     if keys[pygame.K_SPACE] and not main_hero.get_is_jumping():
         main_hero.set_speed_y(-10)
         main_hero.set_is_jumping(True)
-    if not((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
+    if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             main_hero.move_left()
         else:
@@ -77,6 +75,9 @@ while running:
             main_hero.move_right()
         else:
             main_hero.set_moving_right(False)
+    else:
+        main_hero.set_moving_right(True)
+        main_hero.set_moving_left(True)
 
     if main_hero.get_is_jumping():
         main_hero.jump()
