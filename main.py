@@ -20,20 +20,43 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 # по отдельности
 class Character(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, image, group_all_sprite):
+    def __init__(self, x, y, start_image, images, group_all_sprite):
         super().__init__(group_all_sprite)
-        self.width, self.height = 40, 60
+        self.moving_left = False
+        self.moving_right = False
+        print(str(images))
+        self.right_frames = list(map(lambda image: pygame.transform.scale(image, (100, 100)), images))
+
+        self.left_frames = list(map(lambda image: pygame.transform.flip(image, True, False), self.right_frames))
+        self.width, self.height = 100, 100
         self.x = x
         self.y = y
-        self.image = pygame.transform.scale(pygame.image.load(image), (self.width, self.height))
+
+        self.start_image_right = pygame.transform.scale(start_image, (self.width, self.height))
+        self.start_image_left = pygame.transform.flip(self.start_image_right, True, False)
+        self.start_image = self.start_image_right
+        self.image = self.start_image
         self.rect = (x, y, x + self.width, y + self.height)
-        self.speed_x = 50
+        self.speed_x = 5
         self.speed_y = -10
         self.image_right_move = self.image
         self.is_jumping = False
+        self.cur_frame = 0
         self.image_left_move = pygame.transform.flip(self.image, True, False)
 
     def update(self, *args, **kwargs):
+        self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
+        if self.moving_right and self.moving_left:
+            self.image = self.start_image
+        if self.moving_left:
+            self.image = self.left_frames[self.cur_frame]
+            self.start_image = self.start_image_left
+        elif self.moving_right:
+            self.image = self.right_frames[self.cur_frame]
+            self.start_image = self.start_image_right
+        else:
+            self.image = self.start_image
+        self.image = pygame.transform.scale(self.image, (20, 20))
         self.rect = (self.x, self.y, self.x + self.width, self.y + self.height)
 
     def move_left(self):
@@ -70,26 +93,42 @@ class Character(pygame.sprite.Sprite):
     def set_speed_y(self, speed_y):
         self.speed_y = speed_y
 
+    def set_moving_left(self, moving_left):
+        self.moving_left = moving_left
+
+    def set_moving_right(self, moving_right):
+        self.moving_right = moving_right
+
 
 class MainHero(Character):
-    def __init__(self, x, y, image, group_all_sprite):
-        super().__init__(x, y, image, group_all_sprite)
+    def __init__(self, x, y, start_image, images, group_all_sprite):
+        super().__init__(x, y, start_image, images, group_all_sprite)
 
 
 class Enemy(Character):
-    def __init__(self, x, y, image, group_all_sprite):
-        super().__init__(x, y, image, group_all_sprite)
+    def __init__(self, x, y, start_image, images, group_all_sprite):
+        super().__init__(x, y, start_image, images, group_all_sprite)
 
 
 pygame.display.set_caption("иуиу сониИИК")
 
-background_image = pygame.image.load("data/background_greenhill.jpg")
-background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+                                          (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+running_sonick_right = \
+    [
+        pygame.image.load(f"data/Sonic Sprites/tile00{i}.png")
+        if i < 10 else
+        pygame.image.load(f"data/Sonic Sprites/tile0{i}.png")
+        for i in range(8, 14)
+    ]
+
+# running_sonick_left = list(map(lambda x: pygame.transform.flip(x, True, False), running_sonick_right))
 
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
 
-main_hero = MainHero(100, 100, "data/sonic.png", all_sprites)
+main_hero = MainHero(100, 100, pygame.image.load(f"data/Sonic Sprites/tile001.png"), running_sonick_right, all_sprites)
 
 running = True
 while running:
@@ -104,8 +143,17 @@ while running:
         main_hero.set_is_jumping(True)
     if keys[pygame.K_LEFT] or keys[pygame.K_a]:
         main_hero.move_left()
+        main_hero.set_moving_left(True)
+    else:
+        main_hero.set_moving_left(False)
+
     if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
         main_hero.move_right()
+        main_hero.set_moving_right(True)
+    else:
+        main_hero.set_moving_right(False)
+
+
 
     if main_hero.get_is_jumping():
         main_hero.jump()
