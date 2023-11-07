@@ -10,8 +10,9 @@ class MainHero(Character):
         self.boost = 0.1
         self.can_kill = False
         self.can_jump = True
-        self.jump_cooldown = 80
+        self.jump_cooldown = 300
         self.jump_cooldown_count = 0
+        self.number_of_rings = 100
 
     def move_left(self):
         self.moving_left = True
@@ -20,7 +21,7 @@ class MainHero(Character):
             self.x -= self.speed_x - self.additional_speed
         else:
             self.x = 0
-        self.rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_right(self):
         self.moving_right = True
@@ -29,7 +30,7 @@ class MainHero(Character):
             self.x += (self.speed_x + self.additional_speed)
         else:
             self.x = SCREEN_WIDTH - self.width
-        self.rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def update(self, *args, **kwargs):
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
@@ -67,7 +68,7 @@ class MainHero(Character):
                 self.image = self.start_image
             if abs(self.additional_speed) < 5:
                 self.cur_frame_jump = 0
-        self.rect = (self.x, self.y, self.x + self.width, self.y + self.height)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
             self.x += self.additional_speed
@@ -86,3 +87,6 @@ class MainHero(Character):
 
     def get_can_jump(self):
         return self.can_jump
+
+    def get_number_of_rings(self):
+        return self.number_of_rings
