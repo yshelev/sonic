@@ -2,13 +2,14 @@ import pygame
 
 from MainHero import MainHero
 from Enemy import Enemy
+from Ring import Ring
 from Settings import *
 
 pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-# bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')
+# bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')ЫЫ
 # bg_music.play(-1)
 # bg_music.set_volume(0.1)
 
@@ -41,13 +42,21 @@ running_sonick_right_sphere = [
     for i in range(32, 37)
 ]
 
+rings_sprites = pygame.image.load("data/RINGSsonic.png")
+
+first_image = pygame.transform.scale(rings_sprites, (rings_sprites.get_height(), rings_sprites.get_height()))
+
+
 clock = pygame.time.Clock()
 all_sprites = pygame.sprite.Group()
+
+ring = Ring(400, 400, first_image, all_sprites)
+
 
 main_hero = MainHero(
     100,
     100,
-    pygame.image.load(f"data/Sonic Sprites/tile001.png"),
+    pygame.image.load(f"data/Sonic Sprites/tile001.1.png"),
     running_sonick_right,
     running_sonick_right_sphere,
     all_sprites
