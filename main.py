@@ -91,8 +91,8 @@ while running:
 
     rings_sprites_count += 1
     screen.blit(background_image, (0, 0))
-    screen.blit(rings_sprites[0], (100, 100))
-    # screen.blit(rings_sprites[rings_sprites_count // 6 % 8], (100, 100))
+    # screen.blit(rings_sprites[0], (100, 100))
+    screen.blit(rings_sprites[rings_sprites_count // 6 % 8], (100, 100))
     screen.blit(text_surface, (120, 90))
 
     all_sprites.update()

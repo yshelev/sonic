@@ -10,7 +10,7 @@ class MainHero(Character):
         self.boost = 0.1
         self.can_kill = False
         self.can_jump = True
-        self.jump_cooldown = 300
+        self.jump_cooldown = 120
         self.jump_cooldown_count = 0
         self.number_of_rings = 50
 
