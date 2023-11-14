@@ -12,7 +12,7 @@ class MainHero(Character):
         self.can_jump = True
         self.jump_cooldown = 300
         self.jump_cooldown_count = 0
-        self.number_of_rings = 100
+        self.number_of_rings = 50
 
     def move_left(self):
         self.moving_left = True
