@@ -56,7 +56,7 @@ ring = Ring(400, 400, first_image, all_sprites)
 main_hero = MainHero(
     100,
     100,
-    pygame.image.load(f"data/Sonic Sprites/tile001.1.png"),
+    pygame.image.load(f"data/Sonic Sprites/tile001.png"),
     running_sonick_right,
     running_sonick_right_sphere,
     all_sprites
