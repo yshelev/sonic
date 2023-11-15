@@ -50,7 +50,6 @@ class MainHero(Character):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def update(self, *args, **kwargs) -> None:
-        print(self.can_jump)
         can_move_left, can_move_right = self.can_move_x()
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
         self.cur_frame_jump = min(self.cur_frame_jump + 1, len(self.left_jump_frames) - 1)
