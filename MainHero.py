@@ -66,8 +66,6 @@ class MainHero(Character):
                     self.can_kill = False
             else:
                 self.image = self.start_image
-            if abs(self.additional_speed) < 5:
-                self.cur_frame_jump = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):

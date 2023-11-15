@@ -16,7 +16,7 @@ my_font = pygame.font.SysFont('Bauhaus 93', 30)
 # bg_music.set_volume(0.1)
 
 
-pygame.display.set_caption("иуиу сониИИК")
+pygame.display.set_caption("[ezrf")
 
 background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                           (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -58,7 +58,6 @@ main_hero = MainHero(
     all_sprites
 )
 
-text_surface = my_font.render(str(main_hero.get_number_of_rings()), True, (255, 255, 255))
 
 
 running = True
@@ -93,6 +92,7 @@ while running:
     screen.blit(background_image, (0, 0))
     # screen.blit(rings_sprites[0], (100, 100))
     screen.blit(rings_sprites[rings_sprites_count // 6 % 8], (100, 100))
+    text_surface = my_font.render(str(main_hero.get_number_of_rings()), True, (255, 255, 255))
     screen.blit(text_surface, (120, 90))
 
     all_sprites.update()

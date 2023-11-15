@@ -8,8 +8,7 @@ class Character(pygame.sprite.Sprite):
         super().__init__(group_all_sprite)
         self.moving_left = False
         self.moving_right = False
-        self.width, self.height = 50, 50
-
+        self.width, self.height = 500, 500
         self.right_frames = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)), images))
 
         self.left_frames = list(map(lambda image: pygame.transform.flip(image, True, False), self.right_frames))
