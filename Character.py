@@ -4,11 +4,11 @@ from Settings import SCREEN_HEIGHT, SCREEN_WIDTH, GRAVITY
 
 class Character(pygame.sprite.Sprite):
 
-    def __init__(self, x, y, start_image, images, jump_images, group_all_sprite):
+    def __init__(self, x, y, start_image, images, jump_images, group_all_sprite) -> None:
         super().__init__(group_all_sprite)
         self.moving_left = False
         self.moving_right = False
-        self.width, self.height = 500, 500
+        self.width, self.height = 100, 100
         self.right_frames = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)), images))
 
         self.left_frames = list(map(lambda image: pygame.transform.flip(image, True, False), self.right_frames))
@@ -33,7 +33,7 @@ class Character(pygame.sprite.Sprite):
         ))
         self.cur_frame_jump = 0
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs) -> None:
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
 
         if self.is_jumping:
@@ -57,10 +57,13 @@ class Character(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def move_left(self):
+    def move_left(self) -> None:
         self.moving_left = True
         if self.x - self.speed_x >= 0:
-            self.x -= self.speed_x
+            if self.x + self.width + self.speed_x <= SCREEN_WIDTH:
+                self.x -= self.speed_x
+            else:
+                self.x = SCREEN_WIDTH - self.width
         else:
             self.x = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -68,7 +71,10 @@ class Character(pygame.sprite.Sprite):
     def move_right(self):
         self.moving_right = True
         if self.x + self.width + self.speed_x <= SCREEN_WIDTH:
-            self.x += self.speed_x
+            if self.x - self.speed_x >= 0:
+                self.x += self.speed_x
+            else:
+                self.x = 0
         else:
             self.x = SCREEN_WIDTH - self.width
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
@@ -78,9 +84,10 @@ class Character(pygame.sprite.Sprite):
         self.is_jumping = True
 
     def jump(self):
+        can_move_top, can_move_bottom = self.can_move_y()
         self.speed_y += GRAVITY
-        if self.speed_y + self.y + self.height < SCREEN_HEIGHT:
-            if self.speed_y + self.y + self.height > 0:
+        if can_move_bottom:
+            if can_move_top:
                 if self.y + self.speed_y > 0:
                     self.y += self.speed_y
                 else:
@@ -90,18 +97,25 @@ class Character(pygame.sprite.Sprite):
             self.is_jumping = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def get_is_jumping(self):
+    def get_is_jumping(self) -> bool:
         return self.is_jumping
 
-    def set_is_jumping(self, is_jumping):
+    def set_is_jumping(self, is_jumping) -> None:
         self.is_jumping = is_jumping
 
-    def set_speed_y(self, speed_y):
+    def set_speed_y(self, speed_y) -> None:
         self.speed_y = speed_y
 
-    def set_moving_left(self, moving_left):
+    def set_moving_left(self, moving_left) -> None:
         self.moving_left = moving_left
 
-    def set_moving_right(self, moving_right):
+    def set_moving_right(self, moving_right) -> None:
         self.moving_right = moving_right
+
+    def can_move_x(self) -> (bool, bool):
+        return self.x - self.speed_x >= 0, self.x + self.width + self.speed_x <= SCREEN_WIDTH
+
+    def can_move_y(self) -> (bool, bool):
+        return self.speed_y + self.y + self.height > 0, self.speed_y + self.y + self.height < SCREEN_HEIGHT
+
 # ы

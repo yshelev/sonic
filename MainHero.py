@@ -4,7 +4,7 @@ import pygame
 
 
 class MainHero(Character):
-    def __init__(self, x, y, start_image, images, jump_images, group_all_sprite):
+    def __init__(self, x, y, start_image, images, jump_images, group_all_sprite) -> None:
         super().__init__(x, y, start_image, images, jump_images, group_all_sprite)
         self.additional_speed = 0
         self.boost = 0.1
@@ -14,25 +14,44 @@ class MainHero(Character):
         self.jump_cooldown_count = 0
         self.number_of_rings = 50
 
-    def move_left(self):
+    def start_jump(self):
+        self.speed_y = -10
+        self.is_jumping = True
+        self.can_jump = False
+
+    def move_left(self) -> None:
+        can_move_left, can_move_right = self.can_move_x()
         self.moving_left = True
         self.additional_speed -= self.boost
-        if self.x - self.speed_x + self.additional_speed >= 0:
-            self.x -= self.speed_x - self.additional_speed
+        if can_move_left:
+            if can_move_right:
+                self.x -= self.speed_x - self.additional_speed
+            else:
+                self.x = SCREEN_WIDTH - self.width - 10
+                self.additional_speed = 0
         else:
             self.x = 0
+            self.additional_speed = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def move_right(self):
+    def move_right(self) -> None:
+        can_move_left, can_move_right = self.can_move_x()
         self.moving_right = True
         self.additional_speed += self.boost
-        if self.x + self.width + self.speed_x <= SCREEN_WIDTH:
-            self.x += (self.speed_x + self.additional_speed)
+        if can_move_right:
+            if can_move_left:
+                self.x += (self.speed_x + self.additional_speed)
+            else:
+                self.x = 10
+                self.additional_speed = 0
         else:
             self.x = SCREEN_WIDTH - self.width
+            self.additional_speed = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def update(self, *args, **kwargs):
+    def update(self, *args, **kwargs) -> None:
+        print(self.can_jump)
+        can_move_left, can_move_right = self.can_move_x()
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
         self.cur_frame_jump = min(self.cur_frame_jump + 1, len(self.left_jump_frames) - 1)
         if not self.can_jump:
@@ -69,22 +88,30 @@ class MainHero(Character):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
-            self.x += self.additional_speed
+            if can_move_right and self.additional_speed > 0:
+                self.x += self.additional_speed
+            elif can_move_left and self.additional_speed < 0:
+                self.x += self.additional_speed
+            else:
+                self.additional_speed = 0
             if self.additional_speed > 0:
                 self.additional_speed = \
                     0 if self.additional_speed - self.boost <= 0 else self.additional_speed - self.boost
             elif self.additional_speed < 0:
                 self.additional_speed = \
                     0 if self.additional_speed + self.boost >= 0 else self.additional_speed + self.boost
-            if not self.is_jumping:
+            if not self.is_jumping and abs(self.additional_speed) < 5:
                 self.image = self.start_image
+            elif self.additional_speed < 0:
+                self.image = self.left_jump_frames[self.cur_frame_jump]
+            elif self.additional_speed > 0:
+                self.image = self.right_jump_frames[self.cur_frame_jump]
 
-    def set_is_jumping(self, is_jumping):
+    def set_is_jumping(self, is_jumping) -> None:
         self.is_jumping = is_jumping
-        self.can_jump = False
 
-    def get_can_jump(self):
+    def get_can_jump(self) -> bool:
         return self.can_jump
 
-    def get_number_of_rings(self):
+    def get_number_of_rings(self) -> int:
         return self.number_of_rings
