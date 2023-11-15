@@ -69,8 +69,7 @@ while running:
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_SPACE] and not main_hero.get_is_jumping() and main_hero.get_can_jump():
-        main_hero.set_speed_y(-10)
-        main_hero.set_is_jumping(True)
+        main_hero.start_jump()
     if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             main_hero.move_left()

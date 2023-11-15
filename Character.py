@@ -73,13 +73,18 @@ class Character(pygame.sprite.Sprite):
             self.x = SCREEN_WIDTH - self.width
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
+    def start_jump(self):
+        self.speed_y = -10
+        self.is_jumping = True
+
     def jump(self):
         self.speed_y += GRAVITY
         if self.speed_y + self.y + self.height < SCREEN_HEIGHT:
-            if self.y + self.speed_y > 0:
-                self.y += self.speed_y
-            else:
-                self.y = 0
+            if self.speed_y + self.y + self.height > 0:
+                if self.y + self.speed_y > 0:
+                    self.y += self.speed_y
+                else:
+                    self.y = 0
         else:
             self.y = SCREEN_HEIGHT - self.height
             self.is_jumping = False
