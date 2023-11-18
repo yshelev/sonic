@@ -5,21 +5,30 @@ from Enemy import Enemy
 from Ring import Ring
 from Settings import *
 
+
+def play_music():
+    bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')
+    bg_music.set_volume(0.1)
+    bg_music.play(-1)
+
+
+def draw_num_of_rings():
+    global rings_sprites_count
+    rings_sprites_count += 1
+    screen.blit(rings_sprites[rings_sprites_count // 6 % 8], (5, 5))
+    my_font = pygame.font.SysFont('Bauhaus 93', 30)
+    text_surface = my_font.render("X" + str(main_hero.get_number_of_rings()), True, (255, 255, 255))
+    screen.blit(text_surface, (20, 0))
+
+
 pygame.init()
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
-my_font = pygame.font.SysFont('Bauhaus 93', 30)
-
-# bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')ЫЫ
-# bg_music.play(-1)
-# bg_music.set_volume(0.1)
-
-
 pygame.display.set_caption("[ezrf")
 
 background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
-                                          (SCREEN_WIDTH, SCREEN_HEIGHT))
+                                          (SCREEN_WIDTH * 2, SCREEN_HEIGHT))
 
 # running_sonick_right = [
 #     pygame.image.load(f"data/Sonic Sprites/tile00{i}.png")
@@ -58,8 +67,7 @@ main_hero = MainHero(
     all_sprites
 )
 
-
-
+# play_music()
 running = True
 while running:
     clock.tick(FPS)
@@ -87,16 +95,12 @@ while running:
     if main_hero.get_is_jumping():
         main_hero.jump()
 
-    rings_sprites_count += 1
-    screen.blit(background_image, (0, 0))
+    screen.blit(background_image, (0, 0, SCREEN_WIDTH - 100, SCREEN_HEIGHT - 100))
     # screen.blit(rings_sprites[0], (100, 100))
-    screen.blit(rings_sprites[rings_sprites_count // 6 % 8], (100, 100))
-    text_surface = my_font.render(str(main_hero.get_number_of_rings()), True, (255, 255, 255))
-    screen.blit(text_surface, (120, 90))
 
     all_sprites.update()
+    draw_num_of_rings()
     all_sprites.draw(screen)
-
     pygame.display.flip()
 
 pygame.quit()
