@@ -4,7 +4,16 @@ import pygame
 
 
 class MainHero(Character):
-    def __init__(self, x, y, start_image, images, jump_images, group_all_sprite) -> None:
+    def __init__(
+        self,
+        x: int,
+        y: int,
+        start_image: pygame.image,
+        images: list[pygame.image],
+        jump_images: list[pygame.image],
+        group_all_sprite: pygame.sprite.Group
+    ) -> None:
+
         super().__init__(x, y, start_image, images, jump_images, group_all_sprite)
         self.additional_speed = 0
         self.boost = 0.1
@@ -14,8 +23,8 @@ class MainHero(Character):
         self.jump_cooldown_count = 0
         self.number_of_rings = 50
 
-    def start_jump(self):
-        self.speed_y = -10
+    def start_jump(self) -> None:
+        self.speed_y = -600
         self.is_jumping = True
         self.can_jump = False
 
@@ -40,7 +49,7 @@ class MainHero(Character):
         self.additional_speed += self.boost
         if can_move_right:
             if can_move_left:
-                self.x += (self.speed_x + self.additional_speed)
+                self.x += ((self.speed_x + self.additional_speed) / FPS)
             else:
                 self.x = 10
                 self.additional_speed = 0
@@ -88,9 +97,9 @@ class MainHero(Character):
 
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
             if can_move_right and self.additional_speed > 0:
-                self.x += self.additional_speed
+                self.x += self.additional_speed / FPS
             elif can_move_left and self.additional_speed < 0:
-                self.x += self.additional_speed
+                self.x += self.additional_speed / FPS
             else:
                 self.additional_speed = 0
             if self.additional_speed > 0:
@@ -106,7 +115,10 @@ class MainHero(Character):
             elif self.additional_speed > 0:
                 self.image = self.right_jump_frames[self.cur_frame_jump]
 
-    def set_is_jumping(self, is_jumping) -> None:
+    def set_is_jumping(
+            self,
+            is_jumping: bool
+    ) -> None:
         self.is_jumping = is_jumping
 
     def get_can_jump(self) -> bool:

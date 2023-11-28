@@ -1,5 +1,8 @@
+import pygame
+
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
-GRAVITY = 0.5
+GRAVITY = 30
 FPS = 60
-#ы
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+
