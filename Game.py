@@ -3,14 +3,17 @@ import pygame
 from MainHero import MainHero
 from Enemy import Enemy
 from Ring import Ring
+from Tiles import Tiles
 from Settings import *
 
 
 class Game:
     def __init__(self) -> None:
         pygame.init()
-        pygame.display.set_caption("[ezrf")
-
+        pygame.display.set_caption("пупупу")
+        self.all_sprites = pygame.sprite.Group()
+        self.tile_group = pygame.sprite.Group()
+        tile = Tiles(100, 100, 100, 100, pygame.image.load("data/background_greenhill.jpg"), self.tile_group, self.all_sprites)
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH * 2, SCREEN_HEIGHT))
         running_sonick_right_sprites = [
@@ -33,7 +36,6 @@ class Game:
         self.rings_sprites_count = 0
 
         self.clock = pygame.time.Clock()
-        self.all_sprites = pygame.sprite.Group()
 
         self.main_hero = MainHero(
             100,
