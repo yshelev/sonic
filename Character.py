@@ -94,7 +94,6 @@ class Character(pygame.sprite.Sprite):
         self.is_jumping = True
 
     def jump(self):
-        print(self.speed_y)
         can_move_top, can_move_bottom = self.can_move_y()
         self.speed_y += GRAVITY / FPS
         if can_move_bottom:
@@ -134,5 +133,3 @@ class Character(pygame.sprite.Sprite):
 
     def can_move_y(self) -> (bool, bool):
         return self.speed_y / FPS + self.y + self.height > 0, self.speed_y / FPS + self.y + self.height < SCREEN_HEIGHT
-
-# ы

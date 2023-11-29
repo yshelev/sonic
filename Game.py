@@ -15,20 +15,20 @@ class Game:
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
         running_sonic_right_sprites = [
-            pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
-            if i < 20 else
-            pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
-            for i in range(8 * 2, 11 * 2)
+            pygame.image.load(f"data/Sonic Sprites/tile00{i // 5}.png")
+            if i < 50 else
+            pygame.image.load(f"data/Sonic Sprites/tile0{i // 5}.png")
+            for i in range(8 * 5, 11 * 5)
         ]
         running_sonic_right_sphere_sprites = [
-            pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
-            if i < 10 else
-            pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
-            for i in range(32 * 2, 37 * 2)
+            pygame.image.load(f"data/Sonic Sprites/tile00{i // 3}.png")
+            if i < 30 else
+            pygame.image.load(f"data/Sonic Sprites/tile0{i // 3}.png")
+            for i in range(32 * 3, 37 * 3)
         ]
         fast_running_sonic_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
-            if i < 10 else
+            if i < 20 else
             pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
             for i in range(24 * 2, 28 * 2)
         ]
@@ -41,7 +41,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
         self.all_tiles_sprites = pygame.sprite.Group()
-        Tiles(100, 100, 100, 100, pygame.image.load("data/background_greenhill.jpg"), self.all_tiles_sprites,
+        Tiles(100, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
               self.all_sprites)
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -53,7 +53,7 @@ class Game:
             self.all_sprites
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
-        self.background_image_speed_x = 0.01
+        self.background_image_speed_x = 0.6
         # self.play_music()
         self.game_loop()
 
@@ -70,57 +70,23 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
 
-            keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
-                self.main_hero.start_jump()
-            if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
-                if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                    self.main_hero.move_left()
-                else:
-                    self.main_hero.set_moving_left(False)
+            self.movement_of_main_character()
 
-                if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                    self.main_hero.move_right()
-                else:
-                    self.main_hero.set_moving_right(False)
-            else:
-                self.main_hero.set_moving_right(True)
-                self.main_hero.set_moving_left(True)
-
-            if self.main_hero.get_is_jumping():
-                self.main_hero.jump()
-
-            screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
-            screen.blit(self.background_image, (self.background_image_x, 0))
-            if self.main_hero.get_additional_speed() > 0:
-                if (self.background_image_x - self.background_image_speed_x) > 0:
-                    self.background_image_x -= self.background_image_speed_x * self.main_hero.get_additional_speed()
-                else:
-                    self.background_image_x = SCREEN_WIDTH
-            elif self.main_hero.get_additional_speed() < 0:
-                if (self.background_image_x + self.background_image_speed_x) < SCREEN_WIDTH:
-                    if self.background_image_x + self.background_image_speed_x > 0:
-                        self.background_image_x += self.background_image_speed_x * -self.main_hero.get_additional_speed()
-                else:
-                    self.background_image_x = 0
+            self.background_image_movement()
 
             self.all_sprites.update()
-            self.draw_num_of_rings()
-            self.draw_lines()
-            self.all_sprites.draw(screen)
+
+            self.draw()
+
             pygame.display.flip()
 
         self.quit()
 
     def draw_lines(self):
-        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
-                         (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3), 10)
-        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3),
-                         (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2), 10)
-        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2),
-                         (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2), 10)
-        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2),
-                         (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), 10)
+        pygame.draw.line(screen, "green", LEFT_INVISIBLE_LINE[0], LEFT_INVISIBLE_LINE[1], 10)
+        pygame.draw.line(screen, "green", RIGHT_INVISIBLE_LINE[0], RIGHT_INVISIBLE_LINE[1], 10)
+        pygame.draw.line(screen, "green", TOP_INVISIBLE_LINE[0], TOP_INVISIBLE_LINE[1], 10)
+        pygame.draw.line(screen, "green", BOTTOM_INVISIBLE_LINE[0], BOTTOM_INVISIBLE_LINE[1], 10)
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count += 1
@@ -130,3 +96,57 @@ class Game:
 
     def quit(self) -> None:
         pygame.quit()
+
+    def movement_of_main_character(self) -> None:
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
+            self.main_hero.start_jump()
+        if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
+            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+                output_code, movement_sprites_speed = self.main_hero.move_left()
+                if output_code == OK:
+                    pass
+                elif output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
+                    for i in self.all_tiles_sprites:
+                        i.move_x(movement_sprites_speed)
+            else:
+                self.main_hero.set_moving_left(False)
+
+            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+                output_code, movement_sprites_speed = self.main_hero.move_right()
+                if output_code == OK:
+                    pass
+                elif output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
+                    for i in self.all_tiles_sprites:
+                        i.move_x(-movement_sprites_speed)
+            else:
+                self.main_hero.set_moving_right(False)
+        else:
+            self.main_hero.set_moving_right(True)
+            self.main_hero.set_moving_left(True)
+
+        if self.main_hero.get_is_jumping():
+            self.main_hero.jump()
+
+    def background_image_movement(self):
+        if self.main_hero.get_additional_speed() > 0:
+            if (self.background_image_x - self.background_image_speed_x) > 0:
+                self.background_image_x -= (self.background_image_speed_x * self.main_hero.get_additional_speed() / FPS)
+            else:
+                self.background_image_x = SCREEN_WIDTH
+        elif self.main_hero.get_additional_speed() < 0:
+            if (self.background_image_x + self.background_image_speed_x) < SCREEN_WIDTH:
+                if self.background_image_x + self.background_image_speed_x > 0:
+                    self.background_image_x += (
+                            self.background_image_speed_x * -self.main_hero.get_additional_speed() / FPS)
+            else:
+                self.background_image_x = 0
+
+    def draw(self):
+        screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
+        screen.blit(self.background_image, (self.background_image_x, 0))
+
+        self.draw_num_of_rings()
+        self.draw_lines()
+        self.all_sprites.draw(screen)
+        self.main_hero.movement_by_inertia()
