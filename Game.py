@@ -11,22 +11,27 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
         pygame.display.set_caption("[ezrf")
-
+        self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
-        running_sonick_right_sprites = [
+        running_sonic_right_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
             if i < 20 else
             pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
             for i in range(8 * 2, 11 * 2)
         ]
-        running_sonick_right_sphere_sprites = [
+        running_sonic_right_sphere_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
             if i < 10 else
             pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
             for i in range(32 * 2, 37 * 2)
         ]
-
+        fast_running_sonic_sprites = [
+            pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
+            if i < 10 else
+            pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
+            for i in range(24 * 2, 28 * 2)
+        ]
         self.rings_sprites = [
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
@@ -39,11 +44,12 @@ class Game:
         Tiles(100, 100, 100, 100, pygame.image.load("data/background_greenhill.jpg"), self.all_tiles_sprites,
               self.all_sprites)
         self.main_hero = MainHero(
-            100,
-            100,
+            SCREEN_WIDTH // 2,
+            SCREEN_HEIGHT // 2,
             pygame.image.load(f"data/Sonic Sprites/tile001.png"),
-            running_sonick_right_sprites,
-            running_sonick_right_sphere_sprites,
+            running_sonic_right_sprites,
+            running_sonic_right_sphere_sprites,
+            fast_running_sonic_sprites,
             self.all_sprites
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
@@ -86,7 +92,6 @@ class Game:
 
             screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
             screen.blit(self.background_image, (self.background_image_x, 0))
-            # screen.blit(self.rings_sprites[0], (100, 100))
             if self.main_hero.get_additional_speed() > 0:
                 if (self.background_image_x - self.background_image_speed_x) > 0:
                     self.background_image_x -= self.background_image_speed_x * self.main_hero.get_additional_speed()
@@ -101,16 +106,26 @@ class Game:
 
             self.all_sprites.update()
             self.draw_num_of_rings()
+            self.draw_lines()
             self.all_sprites.draw(screen)
             pygame.display.flip()
 
         self.quit()
 
+    def draw_lines(self):
+        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
+                         (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3), 10)
+        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3),
+                         (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2), 10)
+        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2),
+                         (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2), 10)
+        pygame.draw.line(screen, "green", (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2),
+                         (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3), 10)
+
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count += 1
         screen.blit(self.rings_sprites[self.rings_sprites_count // 6 % 8], (5, 5))
-        my_font = pygame.font.SysFont('Bauhaus 93', 30)
-        text_surface = my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
+        text_surface = self.my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 0))
 
     def quit(self) -> None:
