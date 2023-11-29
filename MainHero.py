@@ -83,7 +83,6 @@ class MainHero(Character):
 
         if (can_move_right + can_move_left) < 2:
             exit_code = exit_codes["sonic_movement"].index(STOPPED_BY_WALL_OUTSIDE)
-        # TODO условия столкновения со стеной
 
         if can_move_right:
             if can_move_left:
