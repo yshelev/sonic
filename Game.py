@@ -1,6 +1,7 @@
 import pygame
 
 from MainHero import MainHero
+from Tiles import Tiles
 from Enemy import Enemy
 from Ring import Ring
 from Settings import *
@@ -12,7 +13,7 @@ class Game:
         pygame.display.set_caption("[ezrf")
 
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
-                                                       (SCREEN_WIDTH * 2, SCREEN_HEIGHT))
+                                                       (SCREEN_WIDTH, SCREEN_HEIGHT))
         running_sonick_right_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
             if i < 20 else
@@ -20,10 +21,10 @@ class Game:
             for i in range(8 * 2, 11 * 2)
         ]
         running_sonick_right_sphere_sprites = [
-            pygame.image.load(f"data/Sonic Sprites/tile00{i}.png")
+            pygame.image.load(f"data/Sonic Sprites/tile00{i // 2}.png")
             if i < 10 else
-            pygame.image.load(f"data/Sonic Sprites/tile0{i}.png")
-            for i in range(32, 37)
+            pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
+            for i in range(32 * 2, 37 * 2)
         ]
 
         self.rings_sprites = [
@@ -34,7 +35,9 @@ class Game:
 
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
-
+        self.all_tiles_sprites = pygame.sprite.Group()
+        Tiles(100, 100, 100, 100, pygame.image.load("data/background_greenhill.jpg"), self.all_tiles_sprites,
+              self.all_sprites)
         self.main_hero = MainHero(
             100,
             100,
@@ -43,6 +46,8 @@ class Game:
             running_sonick_right_sphere_sprites,
             self.all_sprites
         )
+        self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
+        self.background_image_speed_x = 0.01
         # self.play_music()
         self.game_loop()
 
@@ -79,8 +84,20 @@ class Game:
             if self.main_hero.get_is_jumping():
                 self.main_hero.jump()
 
-            screen.blit(self.background_image, (0, 0))
+            screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
+            screen.blit(self.background_image, (self.background_image_x, 0))
             # screen.blit(self.rings_sprites[0], (100, 100))
+            if self.main_hero.get_additional_speed() > 0:
+                if (self.background_image_x - self.background_image_speed_x) > 0:
+                    self.background_image_x -= self.background_image_speed_x * self.main_hero.get_additional_speed()
+                else:
+                    self.background_image_x = SCREEN_WIDTH
+            elif self.main_hero.get_additional_speed() < 0:
+                if (self.background_image_x + self.background_image_speed_x) < SCREEN_WIDTH:
+                    if self.background_image_x + self.background_image_speed_x > 0:
+                        self.background_image_x += self.background_image_speed_x * -self.main_hero.get_additional_speed()
+                else:
+                    self.background_image_x = 0
 
             self.all_sprites.update()
             self.draw_num_of_rings()

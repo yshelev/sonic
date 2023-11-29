@@ -120,6 +120,12 @@ class Character(pygame.sprite.Sprite):
     def set_moving_left(self, moving_left) -> None:
         self.moving_left = moving_left
 
+    def get_moving_left(self) -> bool:
+        return self.moving_left
+
+    def get_moving_right(self) -> bool:
+        return self.moving_right
+
     def set_moving_right(self, moving_right) -> None:
         self.moving_right = moving_right
 

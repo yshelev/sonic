@@ -17,13 +17,15 @@ class MainHero(Character):
         super().__init__(x, y, start_image, images, jump_images, group_all_sprite)
         self.additional_speed = 0
         self.boost = 300
+        self.stop_boost = 900
         self.can_kill = False
         self.number_of_rings = 50
 
     def move_left(self) -> None:
         can_move_left, can_move_right = self.can_move_x()
         self.moving_left = True
-        self.additional_speed -= self.boost / FPS
+        self.additional_speed = self.additional_speed - self.boost / FPS \
+            if self.additional_speed < 0 else self.additional_speed - self.stop_boost / FPS
         if can_move_left:
             if can_move_right:
                 self.x -= (self.speed_x - self.additional_speed) / FPS
@@ -38,7 +40,8 @@ class MainHero(Character):
     def move_right(self) -> None:
         can_move_left, can_move_right = self.can_move_x()
         self.moving_right = True
-        self.additional_speed += self.boost / FPS
+        self.additional_speed = self.additional_speed + self.boost / FPS \
+            if self.additional_speed > 0 else self.additional_speed + self.stop_boost / FPS
         if can_move_right:
             if can_move_left:
                 self.x += (self.speed_x + self.additional_speed) / FPS
@@ -92,10 +95,10 @@ class MainHero(Character):
                 self.additional_speed = 0
             if self.additional_speed > 0:
                 self.additional_speed = \
-                    0 if self.additional_speed - self.boost / FPS <= 0 else self.additional_speed - self.boost / FPS
+                    0 if self.additional_speed - self.stop_boost / FPS <= 0 else self.additional_speed - self.stop_boost / FPS
             elif self.additional_speed < 0:
                 self.additional_speed = \
-                    0 if self.additional_speed + self.boost / FPS >= 0 else self.additional_speed + self.boost / FPS
+                    0 if self.additional_speed + self.stop_boost / FPS >= 0 else self.additional_speed + self.stop_boost / FPS
             if not self.is_jumping and abs(self.additional_speed) / FPS < 5:
                 self.image = self.start_image
             elif self.additional_speed < 0:
@@ -108,6 +111,10 @@ class MainHero(Character):
             is_jumping: bool
     ) -> None:
         self.is_jumping = is_jumping
+
+    def get_additional_speed(self) -> int:
+        return self.additional_speed
+
 
     def get_number_of_rings(self) -> int:
         return self.number_of_rings
