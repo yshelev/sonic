@@ -43,7 +43,7 @@ class Game:
             running_sonick_right_sphere_sprites,
             self.all_sprites
         )
-        self.play_music()
+        # self.play_music()
         self.game_loop()
 
     def play_music(self) -> None:
@@ -60,7 +60,7 @@ class Game:
                     running = False
 
             keys = pygame.key.get_pressed()
-            if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping() and self.main_hero.get_can_jump():
+            if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
                 self.main_hero.start_jump()
             if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
                 if keys[pygame.K_LEFT] or keys[pygame.K_a]:

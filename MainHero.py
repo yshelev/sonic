@@ -5,36 +5,28 @@ import pygame
 
 class MainHero(Character):
     def __init__(
-        self,
-        x: int,
-        y: int,
-        start_image: pygame.image,
-        images: list[pygame.image],
-        jump_images: list[pygame.image],
-        group_all_sprite: pygame.sprite.Group
+            self,
+            x: int,
+            y: int,
+            start_image: pygame.image,
+            images: list[pygame.image],
+            jump_images: list[pygame.image],
+            group_all_sprite: pygame.sprite.Group
     ) -> None:
 
         super().__init__(x, y, start_image, images, jump_images, group_all_sprite)
         self.additional_speed = 0
-        self.boost = 0.1
+        self.boost = 300
         self.can_kill = False
-        self.can_jump = True
-        self.jump_cooldown = 120
-        self.jump_cooldown_count = 0
         self.number_of_rings = 50
-
-    def start_jump(self) -> None:
-        self.speed_y = -600
-        self.is_jumping = True
-        self.can_jump = False
 
     def move_left(self) -> None:
         can_move_left, can_move_right = self.can_move_x()
         self.moving_left = True
-        self.additional_speed -= self.boost
+        self.additional_speed -= self.boost / FPS
         if can_move_left:
             if can_move_right:
-                self.x -= self.speed_x - self.additional_speed
+                self.x -= (self.speed_x - self.additional_speed) / FPS
             else:
                 self.x = SCREEN_WIDTH - self.width - 10
                 self.additional_speed = 0
@@ -46,10 +38,10 @@ class MainHero(Character):
     def move_right(self) -> None:
         can_move_left, can_move_right = self.can_move_x()
         self.moving_right = True
-        self.additional_speed += self.boost
+        self.additional_speed += self.boost / FPS
         if can_move_right:
             if can_move_left:
-                self.x += ((self.speed_x + self.additional_speed) / FPS)
+                self.x += (self.speed_x + self.additional_speed) / FPS
             else:
                 self.x = 10
                 self.additional_speed = 0
@@ -62,10 +54,6 @@ class MainHero(Character):
         can_move_left, can_move_right = self.can_move_x()
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
         self.cur_frame_jump = min(self.cur_frame_jump + 1, len(self.left_jump_frames) - 1)
-        if not self.can_jump:
-            self.jump_cooldown_count = (self.jump_cooldown_count + 1) % self.jump_cooldown
-            if self.jump_cooldown_count == 0:
-                self.can_jump = True
 
         if self.is_jumping:
             if self.moving_left:
@@ -76,7 +64,7 @@ class MainHero(Character):
             if self.moving_right and self.moving_left:
                 self.image = self.start_image
             elif self.moving_left:
-                if abs(self.additional_speed) > 5:
+                if abs(self.additional_speed) / FPS > 7.5:
                     self.image = self.left_jump_frames[self.cur_frame_jump]
                     self.can_kill = True
                 else:
@@ -84,7 +72,7 @@ class MainHero(Character):
                     self.start_image = self.start_image_left
                     self.can_kill = False
             elif self.moving_right:
-                if abs(self.additional_speed) > 5:
+                if abs(self.additional_speed) / FPS > 7.5:
                     self.image = self.right_jump_frames[self.cur_frame_jump]
                     self.can_kill = True
                 else:
@@ -104,11 +92,11 @@ class MainHero(Character):
                 self.additional_speed = 0
             if self.additional_speed > 0:
                 self.additional_speed = \
-                    0 if self.additional_speed - self.boost <= 0 else self.additional_speed - self.boost
+                    0 if self.additional_speed - self.boost / FPS <= 0 else self.additional_speed - self.boost / FPS
             elif self.additional_speed < 0:
                 self.additional_speed = \
-                    0 if self.additional_speed + self.boost >= 0 else self.additional_speed + self.boost
-            if not self.is_jumping and abs(self.additional_speed) < 5:
+                    0 if self.additional_speed + self.boost / FPS >= 0 else self.additional_speed + self.boost / FPS
+            if not self.is_jumping and abs(self.additional_speed) / FPS < 5:
                 self.image = self.start_image
             elif self.additional_speed < 0:
                 self.image = self.left_jump_frames[self.cur_frame_jump]
@@ -120,9 +108,6 @@ class MainHero(Character):
             is_jumping: bool
     ) -> None:
         self.is_jumping = is_jumping
-
-    def get_can_jump(self) -> bool:
-        return self.can_jump
 
     def get_number_of_rings(self) -> int:
         return self.number_of_rings

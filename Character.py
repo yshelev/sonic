@@ -5,13 +5,13 @@ from Settings import *
 class Character(pygame.sprite.Sprite):
 
     def __init__(
-            self,
-            x: int,
-            y: int,
-            start_image: pygame.image,
-            images: list[pygame.image],
-            jump_images: list[pygame.image],
-            group_all_sprite: pygame.sprite.Group
+        self,
+        x: int,
+        y: int,
+        start_image: pygame.image,
+        images: list[pygame.image],
+        jump_images: list[pygame.image],
+        group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(group_all_sprite)
         self.moving_left = False
@@ -28,8 +28,8 @@ class Character(pygame.sprite.Sprite):
         self.start_image = self.start_image_right
         self.image = self.start_image
         self.rect = pygame.Rect(x, y, self.width, self.height)
-        self.speed_x = 3
-        self.speed_y = -10
+        self.speed_x = 6
+        self.speed_y = 0
         self.is_jumping = False
         self.cur_frame = 0
 
@@ -67,8 +67,9 @@ class Character(pygame.sprite.Sprite):
 
     def move_left(self) -> None:
         self.moving_left = True
-        if self.x - self.speed_x >= 0:
-            if self.x + self.width + self.speed_x <= SCREEN_WIDTH:
+        can_move_right, can_move_left = self.can_move_x()
+        if can_move_left:
+            if can_move_right:
                 self.x -= self.speed_x / FPS
             else:
                 self.x = SCREEN_WIDTH - self.width
@@ -78,8 +79,9 @@ class Character(pygame.sprite.Sprite):
 
     def move_right(self) -> None:
         self.moving_right = True
-        if self.x + self.width + self.speed_x <= SCREEN_WIDTH:
-            if self.x - self.speed_x >= 0:
+        can_move_right, can_move_left = self.can_move_x()
+        if can_move_right:
+            if can_move_left:
                 self.x += self.speed_x / FPS
             else:
                 self.x = 0
@@ -92,12 +94,13 @@ class Character(pygame.sprite.Sprite):
         self.is_jumping = True
 
     def jump(self):
+        print(self.speed_y)
         can_move_top, can_move_bottom = self.can_move_y()
-        self.speed_y += GRAVITY
+        self.speed_y += GRAVITY / FPS
         if can_move_bottom:
             if can_move_top:
-                if self.y + self.speed_y > 0:
-                    self.y += self.speed_y / FPS
+                if self.y + self.speed_y / FPS > 0:
+                    self.y += (self.speed_y / FPS)
                 else:
                     self.y = 0
         else:
