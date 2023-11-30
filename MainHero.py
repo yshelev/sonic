@@ -31,15 +31,12 @@ class MainHero(Character):
 
     def move_left(self, tiles) -> (int, float):
         """
-        вернет 0 если соник двигается внутри квадрата
-        вернет 1 если соник уперся в обычную стенку
-        вернет 2 если соник уперся в невидимую стенку
+
         """
         can_move_left, can_move_right = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_left = True
-        self.additional_speed = self.additional_speed - self.boost / FPS \
-            if self.additional_speed < 0 else self.additional_speed - self.stop_boost / FPS
+        self.additional_speed -= self.boost / FPS
 
         if (can_move_right + can_move_left) < 2:
             move_code = exit_codes["sonic_movement"].index(STOPPED_BY_WALL_OUTSIDE)
@@ -51,7 +48,6 @@ class MainHero(Character):
             move_code = exit_codes["sonic_movement"].index(OK)
         ec = exit_codes["sonic_movement"][move_code]
         if ec == OK:
-            print(f"{can_move_left=}, {can_move_right=}, {can_move_invisible_right=}, {can_move_invisible_left=}, {self.move_direction()}, {self.rect.x=}, {self.rect.y=}")
 
             self.x -= (self.speed_x - self.additional_speed) / FPS
         elif ec != STOPPED_BY_LEFT_INVISIBLE_WALL:
@@ -59,22 +55,19 @@ class MainHero(Character):
                 self.x -= (self.speed_x - self.additional_speed) / FPS
         elif ec == STOPPED_BY_WALL_OUTSIDE:
             self.additional_speed = 0
-        else:
-            self.additional_speed -= self.boost / FPS
+        if self.move_direction() == RIGHT:
+            self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return exit_codes["sonic_movement"][move_code], self.speed_x - self.additional_speed
 
     def move_right(self, tiles: pygame.sprite.Group) -> (int, float):
         """
-        вернет 0 если соник двигается внутри квадрата
-        вернет 1 если соник уперся в обычную стенку
-        вернет 2 если соник уперся в невидимую стенку
+
         """
         can_move_left, can_move_right = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_right = True
-        self.additional_speed = self.additional_speed + self.boost / FPS \
-            if self.additional_speed > 0 else self.additional_speed + self.stop_boost / FPS
+        self.additional_speed += self.boost / FPS
 
         if (can_move_right + can_move_left) < 2:
             move_code = exit_codes["sonic_movement"].index(STOPPED_BY_WALL_OUTSIDE)
@@ -95,17 +88,19 @@ class MainHero(Character):
                 self.x += (self.speed_x + self.additional_speed) / FPS
         elif ec == STOPPED_BY_WALL_OUTSIDE:
             self.additional_speed = 0
-        else:
-            self.additional_speed += self.boost / FPS
+        if self.move_direction() == LEFT:
+            self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return exit_codes["sonic_movement"][move_code], self.speed_x + self.additional_speed
 
     def update(self, *args, **kwargs) -> None:
-
         self.update_counters()
         self.drawing()
 
     def movement_by_inertia(self, tiles) -> (int, float):
+        """
+        инерция(тормозит быстро)
+        """
         can_move_left, can_move_right = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
@@ -126,11 +121,9 @@ class MainHero(Character):
             else:
                 self.additional_speed = 0
             if self.additional_speed > 0:
-                self.additional_speed = \
-                    0 if self.additional_speed - self.stop_boost / FPS <= 0 else self.additional_speed - self.stop_boost / FPS
+                self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
             elif self.additional_speed < 0:
-                self.additional_speed = \
-                    0 if self.additional_speed + self.stop_boost / FPS >= 0 else self.additional_speed + self.stop_boost / FPS
+                self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
             if not self.is_jumping and abs(self.additional_speed) / FPS < 5:
                 self.image = self.start_image
                 self.cur_fast_frame = 0
