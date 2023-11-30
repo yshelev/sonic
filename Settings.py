@@ -18,12 +18,16 @@ OK = "OK"
 STOPPED_BY_RIGHT_INVISIBLE_WALL = "stopped by right invisible wall"
 STOPPED_BY_LEFT_INVISIBLE_WALL = "stopped by left invisible wall"
 STOPPED_BY_WALL_OUTSIDE = "stopped by wall outside"
+MOVING = "sonic_is_moving"
+LEFT = 'left'
+RIGHT = 'right'
 exit_codes = {
     "sonic_movement": [
         OK,
         STOPPED_BY_RIGHT_INVISIBLE_WALL,
         STOPPED_BY_LEFT_INVISIBLE_WALL,
         STOPPED_BY_WALL_OUTSIDE,
+        MOVING,
     ],
 }
 

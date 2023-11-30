@@ -41,8 +41,8 @@ class Game:
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
         self.all_tiles_sprites = pygame.sprite.Group()
-        Tiles(100, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
-              self.all_sprites)
+        # Tiles(100, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
+        #       self.all_sprites)
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
             SCREEN_HEIGHT // 2,
@@ -71,13 +71,9 @@ class Game:
                     running = False
 
             self.movement_of_main_character()
-
             self.background_image_movement()
-
             self.all_sprites.update()
-
             self.draw()
-
             pygame.display.flip()
 
         self.quit()
@@ -87,6 +83,9 @@ class Game:
         pygame.draw.line(screen, "green", RIGHT_INVISIBLE_LINE[0], RIGHT_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", TOP_INVISIBLE_LINE[0], TOP_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", BOTTOM_INVISIBLE_LINE[0], BOTTOM_INVISIBLE_LINE[1], 10)
+        pygame.draw.rect(screen, "black", (self.main_hero.rect.x - (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS, self.main_hero.rect.y, self.main_hero.width + (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS, self.main_hero.rect.height))
+        # pygame.draw.rect(screen, "red", (self.main_hero.rect.x, self.main_hero.rect.y, self.main_hero.width + (self.main_hero.speed_x + self.main_hero.additional_speed) / FPS, self.main_hero.rect.height))
+
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count += 1
@@ -103,22 +102,20 @@ class Game:
             self.main_hero.start_jump()
         if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-                output_code, movement_sprites_speed = self.main_hero.move_left()
+                output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
                 if output_code == OK:
                     pass
                 elif output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
-                    for i in self.all_tiles_sprites:
-                        i.move_x(movement_sprites_speed)
+                    for tile in self.all_tiles_sprites:
+                        tile.move_x(movement_sprites_speed)
             else:
                 self.main_hero.set_moving_left(False)
 
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
-                output_code, movement_sprites_speed = self.main_hero.move_right()
-                if output_code == OK:
-                    pass
-                elif output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
-                    for i in self.all_tiles_sprites:
-                        i.move_x(-movement_sprites_speed)
+                output_code, movement_sprites_speed = self.main_hero.move_right(self.all_tiles_sprites)
+                if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
+                    for tile in self.all_tiles_sprites:
+                        tile.move_x(-movement_sprites_speed)
             else:
                 self.main_hero.set_moving_right(False)
         else:
@@ -127,6 +124,16 @@ class Game:
 
         if self.main_hero.get_is_jumping():
             self.main_hero.jump()
+
+        output_code, movement_sprites_speed = self.main_hero.movement_by_inertia(self.all_tiles_sprites)
+        if exit_codes["sonic_movement"][output_code] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
+                                                         STOPPED_BY_LEFT_INVISIBLE_WALL]:
+            if self.main_hero.get_additional_speed() > 0:
+                for tile in self.all_tiles_sprites:
+                    tile.move_x(-movement_sprites_speed)
+            else:
+                for tile in self.all_tiles_sprites:
+                    tile.move_x(-movement_sprites_speed)
 
     def background_image_movement(self):
         if self.main_hero.get_additional_speed() > 0:
@@ -149,4 +156,3 @@ class Game:
         self.draw_num_of_rings()
         self.draw_lines()
         self.all_sprites.draw(screen)
-        self.main_hero.movement_by_inertia()

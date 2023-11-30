@@ -65,9 +65,9 @@ class Character(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def move_left(self) -> None:
+    def move_left(self, tiles) -> None:
         self.moving_left = True
-        can_move_right, can_move_left = self.can_move_x()
+        can_move_right, can_move_left = self.can_move_x(tiles)
         if can_move_left:
             if can_move_right:
                 self.x -= self.speed_x / FPS
@@ -77,9 +77,9 @@ class Character(pygame.sprite.Sprite):
             self.x = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def move_right(self) -> None:
+    def move_right(self, tiles) -> None:
         self.moving_right = True
-        can_move_right, can_move_left = self.can_move_x()
+        can_move_left, can_move_right = self.can_move_x(tiles)
         if can_move_right:
             if can_move_left:
                 self.x += self.speed_x / FPS
@@ -128,8 +128,9 @@ class Character(pygame.sprite.Sprite):
     def set_moving_right(self, moving_right) -> None:
         self.moving_right = moving_right
 
-    def can_move_x(self) -> (bool, bool):
-        return self.x - self.speed_x / FPS >= 0, self.x + self.width + self.speed_x / FPS <= SCREEN_WIDTH
+    def can_move_x(self, tiles_sprites) -> (bool, bool):
+        return (self.x - self.speed_x / FPS >= 0 and not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
+                self.x + self.width + self.speed_x / FPS <= SCREEN_WIDTH and not(any(self.rect.move(self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
 
     def can_move_y(self) -> (bool, bool):
         return self.speed_y / FPS + self.y + self.height > 0, self.speed_y / FPS + self.y + self.height < SCREEN_HEIGHT
