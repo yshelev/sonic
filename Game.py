@@ -74,11 +74,12 @@ class Game:
                     run = False
 
             success, video_image = video.read()
-            video_surf = pygame.image.frombuffer(
-                video_image.tobytes(),
-                video_image.shape[1::-1],
-                "BGR"
-            )
+            if success:
+                video_surf = pygame.image.frombuffer(
+                    video_image.tobytes(),
+                    video_image.shape[1::-1],
+                    "BGR"
+                )
             window.blit(video_surf, (0, 0))
             pygame.display.flip()
         self.game_loop(flag)
@@ -104,7 +105,7 @@ class Game:
 
         self.quit()
 
-    def draw_lines(self):
+    def draw_lines(self) -> None:
         pygame.draw.line(screen, "green", LEFT_INVISIBLE_LINE[0], LEFT_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", RIGHT_INVISIBLE_LINE[0], RIGHT_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", TOP_INVISIBLE_LINE[0], TOP_INVISIBLE_LINE[1], 10)
@@ -163,7 +164,7 @@ class Game:
                 for tile in self.all_tiles_sprites:
                     tile.move_x(-movement_sprites_speed, self.main_hero)
 
-    def background_image_movement(self):
+    def background_image_movement(self) -> None:
         if self.main_hero.get_additional_speed() > 0:
             if (self.background_image_x - self.background_image_speed_x) > 0:
                 self.background_image_x -= (self.background_image_speed_x * self.main_hero.get_additional_speed() / FPS)
@@ -177,7 +178,7 @@ class Game:
             else:
                 self.background_image_x = 0
 
-    def draw(self):
+    def draw(self) -> None:
         screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
         screen.blit(self.background_image, (self.background_image_x, 0))
 
