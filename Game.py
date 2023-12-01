@@ -41,8 +41,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
         self.all_tiles_sprites = pygame.sprite.Group()
-        # Tiles(100, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
-        #       self.all_sprites)
+        Tiles(800, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
+              self.all_sprites)
+        Tiles(100, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
+              self.all_sprites)
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
             SCREEN_HEIGHT // 2,
@@ -56,6 +58,7 @@ class Game:
         self.background_image_speed_x = 0.6
         # self.play_music()
         self.game_loop()
+
 
     def play_music(self) -> None:
         bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')
@@ -107,7 +110,7 @@ class Game:
                     pass
                 elif output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_tiles_sprites:
-                        tile.move_x(movement_sprites_speed)
+                        tile.move_x(movement_sprites_speed, self.main_hero)
             else:
                 self.main_hero.set_moving_left(False)
 
@@ -115,7 +118,7 @@ class Game:
                 output_code, movement_sprites_speed = self.main_hero.move_right(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_tiles_sprites:
-                        tile.move_x(-movement_sprites_speed)
+                        tile.move_x(-movement_sprites_speed, self.main_hero)
             else:
                 self.main_hero.set_moving_right(False)
         else:
@@ -130,10 +133,10 @@ class Game:
                                                          STOPPED_BY_LEFT_INVISIBLE_WALL]:
             if self.main_hero.get_additional_speed() > 0:
                 for tile in self.all_tiles_sprites:
-                    tile.move_x(-movement_sprites_speed)
+                    tile.move_x(-movement_sprites_speed, self.main_hero)
             else:
                 for tile in self.all_tiles_sprites:
-                    tile.move_x(-movement_sprites_speed)
+                    tile.move_x(-movement_sprites_speed, self.main_hero)
 
     def background_image_movement(self):
         if self.main_hero.get_additional_speed() > 0:

@@ -17,16 +17,19 @@ TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
 OK = "OK"
 STOPPED_BY_RIGHT_INVISIBLE_WALL = "stopped by right invisible wall"
 STOPPED_BY_LEFT_INVISIBLE_WALL = "stopped by left invisible wall"
-STOPPED_BY_WALL_OUTSIDE = "stopped by wall outside"
+STOPPED_BY_LEFT_WALL_OUTSIDE = "stopped by right wall outside"
+STOPPED_BY_RIGHT_WALL_OUTSIDE = "stopped by left wall outside"
 MOVING = "sonic_is_moving"
 LEFT = 'left'
 RIGHT = 'right'
+STAY = 'stay'
 exit_codes = {
     "sonic_movement": [
         OK,
         STOPPED_BY_RIGHT_INVISIBLE_WALL,
         STOPPED_BY_LEFT_INVISIBLE_WALL,
-        STOPPED_BY_WALL_OUTSIDE,
+        STOPPED_BY_RIGHT_WALL_OUTSIDE,
+        STOPPED_BY_LEFT_WALL_OUTSIDE,
         MOVING,
     ],
 }
