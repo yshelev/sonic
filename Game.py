@@ -1,4 +1,4 @@
-import pygame
+import cv2
 
 from MainHero import MainHero
 from Tiles import Tiles
@@ -56,17 +56,40 @@ class Game:
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
         self.background_image_speed_x = 0.6
-        # self.play_music()
-        self.game_loop()
+        self.start_video_loop()
 
+    def start_video_loop(self) -> None:
+        video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
+        success, video_image = video.read()
+        video_fps = video.get(cv2.CAP_PROP_FPS)
+
+        window = pygame.display.set_mode(video_image.shape[1::-1])
+        flag = True
+        run = True
+        while success * run == 1:
+            self.clock.tick(video_fps)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    flag = False
+                    run = False
+
+            success, video_image = video.read()
+            video_surf = pygame.image.frombuffer(
+                video_image.tobytes(),
+                video_image.shape[1::-1],
+                "BGR"
+            )
+            window.blit(video_surf, (0, 0))
+            pygame.display.flip()
+        self.game_loop(flag)
 
     def play_music(self) -> None:
-        bg_music = pygame.mixer.Sound('data/Bg_Music.mp3')
+        bg_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
         bg_music.set_volume(0.1)
         bg_music.play(-1)
 
-    def game_loop(self) -> None:
-        running = True
+    def game_loop(self, flag: bool) -> None:
+        running = flag
         while running:
             self.clock.tick(FPS)
             for event in pygame.event.get():
@@ -86,9 +109,11 @@ class Game:
         pygame.draw.line(screen, "green", RIGHT_INVISIBLE_LINE[0], RIGHT_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", TOP_INVISIBLE_LINE[0], TOP_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", BOTTOM_INVISIBLE_LINE[0], BOTTOM_INVISIBLE_LINE[1], 10)
-        pygame.draw.rect(screen, "black", (self.main_hero.rect.x - (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS, self.main_hero.rect.y, self.main_hero.width + (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS, self.main_hero.rect.height))
+        pygame.draw.rect(screen, "black", (
+        self.main_hero.rect.x - (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS, self.main_hero.rect.y,
+        self.main_hero.width + (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS,
+        self.main_hero.rect.height))
         # pygame.draw.rect(screen, "red", (self.main_hero.rect.x, self.main_hero.rect.y, self.main_hero.width + (self.main_hero.speed_x + self.main_hero.additional_speed) / FPS, self.main_hero.rect.height))
-
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count += 1
