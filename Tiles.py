@@ -20,3 +20,11 @@ class Tiles(pygame.sprite.Sprite):
     def can_move_x(self, speed: float, mh: MainHero) -> (bool, bool):
         return not self.rect.move(-speed / FPS, 0).colliderect(mh.rect), not self.rect.move(speed / FPS, 0).colliderect(mh.rect)
 
+    def move_y(self, speed: float, mh: MainHero) -> None:
+        can_move_top, can_move_bottom = self.can_move_x(-speed, mh)
+        if can_move_top and can_move_bottom:
+            self.rect = self.rect.move(0, -speed / FPS)
+
+    def can_move_y(self, speed: float, mh: MainHero) -> (bool, bool):
+        return not self.rect.move(0, speed / FPS).colliderect(mh.rect), not self.rect.move(0, speed / FPS).colliderect(mh.rect)
+

@@ -41,9 +41,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
         self.all_tiles_sprites = pygame.sprite.Group()
-        Tiles(800, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
+        Tiles(SCREEN_WIDTH // 3, SCREEN_HEIGHT // 4 * 4, 300, 100, pygame.image.load("data/GROUND/Platform.png"),
+              self.all_tiles_sprites,
               self.all_sprites)
-        Tiles(100, SCREEN_HEIGHT // 2, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
+        Tiles(0, SCREEN_HEIGHT // 8, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
               self.all_sprites)
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -59,29 +60,29 @@ class Game:
         self.start_video_loop()
 
     def start_video_loop(self) -> None:
-        video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
-        success, video_image = video.read()
-        video_fps = video.get(cv2.CAP_PROP_FPS)
-
-        window = pygame.display.set_mode(video_image.shape[1::-1])
+        # video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
+        # success, video_image = video.read()
+        # video_fps = video.get(cv2.CAP_PROP_FPS)
+        #
+        # window = pygame.display.set_mode(video_image.shape[1::-1])
         flag = True
-        run = True
-        while success * run == 1:
-            self.clock.tick(video_fps)
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    flag = False
-                    run = False
-
-            success, video_image = video.read()
-            if success:
-                video_surf = pygame.image.frombuffer(
-                    video_image.tobytes(),
-                    video_image.shape[1::-1],
-                    "BGR"
-                )
-            window.blit(video_surf, (0, 0))
-            pygame.display.flip()
+        # run = True
+        # while success * run == 1:
+        #     self.clock.tick(video_fps)
+        #     for event in pygame.event.get():
+        #         if event.type == pygame.QUIT:
+        #             flag = False
+        #             run = False
+        #
+        #     success, video_image = video.read()
+        #     if success:
+        #         video_surf = pygame.image.frombuffer(
+        #             video_image.tobytes(),
+        #             video_image.shape[1::-1],
+        #             "BGR"
+        #         )
+        #     window.blit(video_surf, (0, 0))
+        #     pygame.display.flip()
         self.game_loop(flag)
 
     def play_music(self) -> None:
@@ -106,15 +107,29 @@ class Game:
         self.quit()
 
     def draw_lines(self) -> None:
-        pygame.draw.line(screen, "green", LEFT_INVISIBLE_LINE[0], LEFT_INVISIBLE_LINE[1], 10)
-        pygame.draw.line(screen, "green", RIGHT_INVISIBLE_LINE[0], RIGHT_INVISIBLE_LINE[1], 10)
         pygame.draw.line(screen, "green", TOP_INVISIBLE_LINE[0], TOP_INVISIBLE_LINE[1], 10)
-        pygame.draw.line(screen, "green", BOTTOM_INVISIBLE_LINE[0], BOTTOM_INVISIBLE_LINE[1], 10)
-        pygame.draw.rect(screen, "black", (
-        self.main_hero.rect.x - (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS, self.main_hero.rect.y,
-        self.main_hero.width + (self.main_hero.speed_x - self.main_hero.additional_speed) / FPS,
-        self.main_hero.rect.height))
-        # pygame.draw.rect(screen, "red", (self.main_hero.rect.x, self.main_hero.rect.y, self.main_hero.width + (self.main_hero.speed_x + self.main_hero.additional_speed) / FPS, self.main_hero.rect.height))
+        pygame.draw.line(screen, "purple", BOTTOM_INVISIBLE_LINE[0], BOTTOM_INVISIBLE_LINE[1], 10)
+        pygame.draw.rect(screen, "yellow", (
+            BOTTOM_INVISIBLE_LINE[0][0],
+            BOTTOM_INVISIBLE_LINE[0][1],
+            BOTTOM_INVISIBLE_LINE[1][0] - BOTTOM_INVISIBLE_LINE[0][0],
+            5
+        ), 10)
+        pygame.draw.rect(screen, "blue", (
+            TOP_INVISIBLE_LINE[0][0],
+            TOP_INVISIBLE_LINE[0][1],
+            TOP_INVISIBLE_LINE[1][0] - TOP_INVISIBLE_LINE[0][0],
+            5
+        ), 10)
+        pygame.draw.rect(screen, "black", (self.main_hero.x,
+                                           self.main_hero.y - self.main_hero.speed_y / FPS,
+                                           self.main_hero.width,
+                                           self.main_hero.height + self.main_hero.speed_y / FPS))
+        pygame.draw.rect(screen, "red", (self.main_hero.x,
+                                         self.main_hero.y,
+                                         self.main_hero.width,
+                                         self.main_hero.height + self.main_hero.speed_y / FPS)
+                         )
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count += 1
@@ -128,13 +143,11 @@ class Game:
     def movement_of_main_character(self) -> None:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
-            self.main_hero.start_jump()
+            self.main_hero.start_jump(self.all_tiles_sprites)
         if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
                 output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
-                if output_code == OK:
-                    pass
-                elif output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
+                if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_tiles_sprites:
                         tile.move_x(movement_sprites_speed, self.main_hero)
             else:
@@ -152,7 +165,9 @@ class Game:
             self.main_hero.set_moving_left(True)
 
         if self.main_hero.get_is_jumping():
-            self.main_hero.jump()
+            jump_speed_tiles = self.main_hero.jump(self.all_tiles_sprites)
+            for tile in self.all_tiles_sprites:
+                tile.move_y(jump_speed_tiles, self.main_hero)
 
         output_code, movement_sprites_speed = self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         if exit_codes["sonic_movement"][output_code] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,

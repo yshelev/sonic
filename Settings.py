@@ -3,7 +3,7 @@ import pygame
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
 FPS = 60
-GRAVITY = 1800
+GRAVITY = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 LEFT_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
                        (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2))
@@ -23,6 +23,8 @@ MOVING = "sonic_is_moving"
 LEFT = 'left'
 RIGHT = 'right'
 STAY = 'stay'
+TOP = 'top'
+BOT = 'bot'
 exit_codes = {
     "sonic_movement": [
         OK,
