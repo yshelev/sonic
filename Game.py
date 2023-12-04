@@ -135,7 +135,7 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
 
-            running = self.movement_of_main_character()
+            running = self.movement_of_main_character() * running
             self.background_image_movement()
             self.all_sprites.update(self.all_tiles_sprites)
             self.draw()
@@ -209,12 +209,9 @@ class Game:
         output_code, movement_sprites_speed = self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         if exit_codes["sonic_movement"][output_code] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
                                                          STOPPED_BY_LEFT_INVISIBLE_WALL]:
-            if self.main_hero.get_additional_speed() > 0:
-                for tile in self.all_sprites_wo_mh:
-                    tile.move_x(-movement_sprites_speed, self.main_hero)
-            else:
-                for tile in self.all_sprites_wo_mh:
-                    tile.move_x(-movement_sprites_speed, self.main_hero)
+            for tile in self.all_sprites_wo_mh:
+                tile.move_x(-movement_sprites_speed, self.main_hero)
+                print(tile)
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
             self.main_hero.get_damage()
         if pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
@@ -223,14 +220,13 @@ class Game:
             rings.kill()
         if pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
             enemies = pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites)
-            if self.main_hero.get_is_jumping():
-                enemies.kill()
-            else:
-                self.main_hero.get_damage()
+            self.main_hero.collide_enemy(enemies)
         running = True
         if not self.main_hero.is_alive():
             running = False
         for i in self.all_enemy_sprites:
+            if i.get_is_jumping():
+                i.jump(self.all_tiles_sprites)
             i.moveself_x(self.all_tiles_sprites)
 
         return running

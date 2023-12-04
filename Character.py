@@ -82,14 +82,10 @@ class Character(pygame.sprite.Sprite):
         if can_move_right:
             if can_move_left:
                 self.x += self.speed_x / FPS
-            else:
-                self.x = 0
-        else:
-            self.x = SCREEN_WIDTH - self.width
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def start_jump(self, tiles_sprites) -> None:
-        self.speed_y = 0
+        self.speed_y = -600
         self.is_jumping = True
         self.jump(tiles_sprites)
 
@@ -98,12 +94,8 @@ class Character(pygame.sprite.Sprite):
         self.speed_y += GRAVITY / FPS
         if can_move_bottom:
             if can_move_top:
-                if self.y + self.speed_y / FPS > 0:
-                    self.y += (self.speed_y / FPS)
-                else:
-                    self.y = 0
+                self.y += (self.speed_y / FPS)
         else:
-            self.y = SCREEN_HEIGHT - self.height
             self.is_jumping = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -133,5 +125,5 @@ class Character(pygame.sprite.Sprite):
                 not(any(self.rect.move(self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
 
     def can_move_y(self, tiles_sprites) -> (bool, bool):
-        return (not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
-                not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
+        return (not(any(self.rect.move(0, self.speed_y / FPS).colliderect(i) for i in tiles_sprites)),
+                not(any(self.rect.move(0, self.speed_y / FPS).colliderect(i) for i in tiles_sprites)))

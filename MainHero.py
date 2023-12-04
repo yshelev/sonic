@@ -69,7 +69,7 @@ class MainHero(Character):
             self.x += (self.speed_x + self.additional_speed) / FPS
         elif ec != STOPPED_BY_RIGHT_INVISIBLE_WALL:
             self.x += (self.speed_x + self.additional_speed) / FPS * can_move_right * (direction in [RIGHT, STAY])
-        if ec in [STOPPED_BY_RIGHT_WALL_OUTSIDE, ]:
+        if ec == STOPPED_BY_RIGHT_WALL_OUTSIDE:
             self.x = point_x[0]
             self.additional_speed = 0
         if direction == LEFT:
@@ -300,3 +300,9 @@ class MainHero(Character):
 
     def is_alive(self):
         return self.number_of_rings > 0
+
+    def collide_enemy(self, enemies):
+        if self.speed_y > 0:
+            enemies.kill()
+        else:
+            self.get_damage()
