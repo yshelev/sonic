@@ -3,7 +3,8 @@ import cv2
 from MainHero import MainHero
 from Tiles import Tiles
 from Enemy import Enemy
-from Ring import Ring
+from Rings import Rings
+from Spikes import Spikes
 from Settings import *
 
 
@@ -32,20 +33,46 @@ class Game:
             pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
             for i in range(24 * 2, 28 * 2)
         ]
-        self.rings_sprites = [
+        self.rings_sprites_for_draw = [
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
         ]
+        self.rings_sprites = [
+            pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (100, 100))
+            for i in range(1, 9)
+        ]
+        self.enemy_images = [pygame.transform.scale(pygame.image.load(f'data/ENEMY/BUG {i // 3}.png'), (1000, 1000))
+                             for i in range(3, 12)
+                             ]
         self.rings_sprites_count = 0
 
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
+        self.all_spikes_sprites = pygame.sprite.Group()
         self.all_tiles_sprites = pygame.sprite.Group()
-        Tiles(SCREEN_WIDTH // 3, SCREEN_HEIGHT // 4 * 4, 300, 100, pygame.image.load("data/GROUND/Platform.png"),
-              self.all_tiles_sprites,
-              self.all_sprites)
-        Tiles(0, SCREEN_HEIGHT // 8, 300, 100, pygame.image.load("data/GROUND/Platform.png"), self.all_tiles_sprites,
-              self.all_sprites)
+        self.all_sprites_wo_mh = pygame.sprite.Group()
+        self.all_rings_sprites = pygame.sprite.Group()
+        self.all_enemy_sprites = pygame.sprite.Group()
+        for i in range(-50, 51):
+            Tiles(i * 300, SCREEN_HEIGHT - 100, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
+                  self.all_tiles_sprites,
+                  self.all_sprites,
+                  self.all_sprites_wo_mh)
+            if i % 10 == 0:
+                Spikes(i * 300, SCREEN_HEIGHT - 150, 100, 50, pygame.image.load("data/OBJECTS/SPIKES.png"),
+                       self.all_spikes_sprites,
+                       self.all_sprites,
+                       self.all_sprites_wo_mh)
+            if i % 20 == 0:
+                Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
+                      self.all_rings_sprites,
+                      self.all_sprites,
+                      self.all_sprites_wo_mh)
+            if i % 10 == 0:
+                Enemy(i * 300 + 150, SCREEN_HEIGHT // 2, self.enemy_images[0], self.enemy_images, self.enemy_images,
+                      self.all_enemy_sprites,
+                      self.all_sprites,
+                      self.all_sprites_wo_mh)
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
             SCREEN_HEIGHT // 2,
@@ -98,9 +125,9 @@ class Game:
                 if event.type == pygame.QUIT:
                     running = False
 
-            self.movement_of_main_character()
+            running = self.movement_of_main_character()
             self.background_image_movement()
-            self.all_sprites.update()
+            self.all_sprites.update(self.all_tiles_sprites)
             self.draw()
             pygame.display.flip()
 
@@ -133,14 +160,14 @@ class Game:
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count += 1
-        screen.blit(self.rings_sprites[self.rings_sprites_count // 6 % 8], (5, 5))
+        screen.blit(self.rings_sprites_for_draw[self.rings_sprites_count // 6 % 8], (5, 5))
         text_surface = self.my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 0))
 
     def quit(self) -> None:
         pygame.quit()
 
-    def movement_of_main_character(self) -> None:
+    def movement_of_main_character(self) -> bool:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
             self.main_hero.start_jump(self.all_tiles_sprites)
@@ -148,7 +175,7 @@ class Game:
             if keys[pygame.K_LEFT] or keys[pygame.K_a]:
                 output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
-                    for tile in self.all_tiles_sprites:
+                    for tile in self.all_sprites_wo_mh:
                         tile.move_x(movement_sprites_speed, self.main_hero)
             else:
                 self.main_hero.set_moving_left(False)
@@ -156,7 +183,7 @@ class Game:
             if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
                 output_code, movement_sprites_speed = self.main_hero.move_right(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
-                    for tile in self.all_tiles_sprites:
+                    for tile in self.all_sprites_wo_mh:
                         tile.move_x(-movement_sprites_speed, self.main_hero)
             else:
                 self.main_hero.set_moving_right(False)
@@ -166,18 +193,37 @@ class Game:
 
         if self.main_hero.get_is_jumping():
             jump_speed_tiles = self.main_hero.jump(self.all_tiles_sprites)
-            for tile in self.all_tiles_sprites:
+            for tile in self.all_sprites_wo_mh:
                 tile.move_y(jump_speed_tiles, self.main_hero)
 
         output_code, movement_sprites_speed = self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         if exit_codes["sonic_movement"][output_code] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
                                                          STOPPED_BY_LEFT_INVISIBLE_WALL]:
             if self.main_hero.get_additional_speed() > 0:
-                for tile in self.all_tiles_sprites:
+                for tile in self.all_sprites_wo_mh:
                     tile.move_x(-movement_sprites_speed, self.main_hero)
             else:
-                for tile in self.all_tiles_sprites:
+                for tile in self.all_sprites_wo_mh:
                     tile.move_x(-movement_sprites_speed, self.main_hero)
+        if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
+            self.main_hero.get_damage()
+        if pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
+            rings = pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites)
+            self.main_hero.add_rings()
+            rings.kill()
+        if pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
+            enemies = pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites)
+            if self.main_hero.get_is_jumping():
+                enemies.kill()
+            else:
+                self.main_hero.get_damage()
+        running = True
+        if not self.main_hero.is_alive():
+            running = False
+        for i in self.all_enemy_sprites:
+            i.moveself_x(self.all_tiles_sprites)
+
+        return running
 
     def background_image_movement(self) -> None:
         if self.main_hero.get_additional_speed() > 0:
@@ -198,5 +244,5 @@ class Game:
         screen.blit(self.background_image, (self.background_image_x, 0))
 
         self.draw_num_of_rings()
-        self.draw_lines()
+        # self.draw_lines()
         self.all_sprites.draw(screen)

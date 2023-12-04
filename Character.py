@@ -11,9 +11,9 @@ class Character(pygame.sprite.Sprite):
         start_image: pygame.image,
         images: list[pygame.image],
         jump_images: list[pygame.image],
-        group_all_sprite: pygame.sprite.Group
+        *group_all_sprite: pygame.sprite.Group
     ) -> None:
-        super().__init__(group_all_sprite)
+        super().__init__(*group_all_sprite)
         self.moving_left = False
         self.moving_right = False
         self.width, self.height = 100, 100
@@ -63,7 +63,6 @@ class Character(pygame.sprite.Sprite):
                 self.image = self.start_image
             self.cur_frame_jump = 0
         self.image = pygame.transform.scale(self.image, (self.width, self.height))
-        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_left(self, tiles) -> None:
         self.moving_left = True
@@ -90,7 +89,7 @@ class Character(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def start_jump(self, tiles_sprites) -> None:
-        self.speed_y = -1200
+        self.speed_y = 0
         self.is_jumping = True
         self.jump(tiles_sprites)
 
@@ -130,9 +129,9 @@ class Character(pygame.sprite.Sprite):
         self.moving_right = moving_right
 
     def can_move_x(self, tiles_sprites) -> (bool, bool):
-        return (self.x - self.speed_x / FPS >= 0 and not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
-                self.x + self.width + self.speed_x / FPS <= SCREEN_WIDTH and not(any(self.rect.move(self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
+        return (not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
+                not(any(self.rect.move(self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
 
     def can_move_y(self, tiles_sprites) -> (bool, bool):
-        return (self.speed_y / FPS + self.y + self.height > 0 and not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
-                self.speed_y / FPS + self.y + self.height < SCREEN_HEIGHT and not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
+        return (not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
+                not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))

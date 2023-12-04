@@ -114,7 +114,6 @@ class MainHero(Character):
         return move_code, self.additional_speed
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
-        print(f"{self.y=}")
 
         self.is_jumping = True
         self.speed_y += GRAVITY / FPS
@@ -178,11 +177,6 @@ class MainHero(Character):
             self.x, self.y - (self.speed_y + GRAVITY) / FPS, self.width,
             self.height + (self.speed_y + GRAVITY) / FPS
         ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites))
-        if not cmt:
-            print(i  for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites) if pygame.rect.Rect(
-            self.x, self.y - (self.speed_y + GRAVITY) / FPS, self.width,
-            self.height + (self.speed_y + GRAVITY) / FPS
-        ).colliderect(i))
         return cmb, cmt, [i.rect.y - self.rect.w for i in filter(lambda i: i.rect.y > self.rect.y + self.rect.w, tiles_sprites) if pygame.rect.Rect(
             self.x, self.y, self.width,
             self.height + (GRAVITY + self.speed_y) / FPS
@@ -295,3 +289,14 @@ class MainHero(Character):
         else:
             move_code = exit_codes["sonic_movement"].index(OK)
         return move_code
+
+    def get_damage(self):
+        self.number_of_rings -= 10
+        if self.number_of_rings <= 0:
+            self.kill()
+
+    def add_rings(self):
+        self.number_of_rings += 1
+
+    def is_alive(self):
+        return self.number_of_rings > 0
