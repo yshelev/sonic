@@ -43,7 +43,6 @@ class Character(pygame.sprite.Sprite):
 
     def update(self, *args, **kwargs) -> None:
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
-
         if self.is_jumping:
             self.cur_frame_jump = min(self.cur_frame_jump + 1, len(self.left_jump_frames) - 1)
             if self.moving_left:
@@ -70,10 +69,6 @@ class Character(pygame.sprite.Sprite):
         if can_move_left:
             if can_move_right:
                 self.x -= self.speed_x / FPS
-            else:
-                self.x = SCREEN_WIDTH - self.width
-        else:
-            self.x = 0
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_right(self, tiles) -> None:

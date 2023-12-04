@@ -35,7 +35,6 @@ class Enemy(Character):
     def start_jump(self, tiles_sprites) -> None:
         super().start_jump(tiles_sprites)
 
-
     def jump(self, tiles_sprites):
         super().jump(tiles_sprites)
 
@@ -51,8 +50,7 @@ class Enemy(Character):
             self.speed_x *= -1
             self.movement_cooldown = random.randint(1000, 1500)
             self.movement_counter = 0
+
     def moveself_x(self, tiles_sprite):
         self.move_right(tiles_sprite) if self.speed_x > 0 else self.move_left(tiles_sprite)
 
-    def __repr__(self):
-        return "QWEOQEW"

@@ -83,6 +83,7 @@ class Game:
             self.all_sprites
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
+        self.background_image_slow = 4
         self.background_image_speed_x = 0.6
         self.start_video_loop()
 
@@ -206,12 +207,15 @@ class Game:
             for tile in self.all_sprites_wo_mh:
                 tile.move_y(jump_speed_tiles, self.main_hero)
 
-        output_code, movement_sprites_speed = self.main_hero.movement_by_inertia(self.all_tiles_sprites)
-        if exit_codes["sonic_movement"][output_code] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
+        output_code_x, movement_sprites_speed_x, output_code_y, movement_sprites_speed_y = self.main_hero.movement_by_inertia(self.all_tiles_sprites)
+        if exit_codes["sonic_movement_x"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
                                                          STOPPED_BY_LEFT_INVISIBLE_WALL]:
             for tile in self.all_sprites_wo_mh:
-                tile.move_x(-movement_sprites_speed, self.main_hero)
-                print(tile)
+                tile.move_x(-movement_sprites_speed_x, self.main_hero)
+        if exit_codes["sonic_movement_y"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
+                                                         STOPPED_BY_LEFT_INVISIBLE_WALL]:
+            for tile in self.all_sprites_wo_mh:
+                tile.move_y(-movement_sprites_speed_y, self.main_hero)
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
             self.main_hero.get_damage()
         if pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
@@ -234,14 +238,14 @@ class Game:
     def background_image_movement(self) -> None:
         if self.main_hero.get_additional_speed() > 0:
             if (self.background_image_x - self.background_image_speed_x) > 0:
-                self.background_image_x -= (self.background_image_speed_x * self.main_hero.get_additional_speed() / FPS)
+                self.background_image_x -= (self.background_image_speed_x * self.main_hero.get_additional_speed() / (FPS * self.background_image_slow))
             else:
                 self.background_image_x = SCREEN_WIDTH
         elif self.main_hero.get_additional_speed() < 0:
             if (self.background_image_x + self.background_image_speed_x) < SCREEN_WIDTH:
                 if self.background_image_x + self.background_image_speed_x > 0:
                     self.background_image_x += (
-                            self.background_image_speed_x * -self.main_hero.get_additional_speed() / FPS)
+                            self.background_image_speed_x * -self.main_hero.get_additional_speed() / (FPS * self.background_image_slow))
             else:
                 self.background_image_x = 0
 

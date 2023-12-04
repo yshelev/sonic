@@ -27,6 +27,7 @@ class MainHero(Character):
         self.boost = 300
         self.stop_boost = self.boost * 3
         self.number_of_rings = 50
+        self.is_falling = False
 
     def move_left(self, tiles) -> (int, float):
         """
@@ -36,9 +37,10 @@ class MainHero(Character):
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_left = True
         self.additional_speed -= self.boost / FPS
-        self.rect = self.rect.move(self.x - int(point_x[0]) if point_x else 0, 0)
-        move_code = self.get_move_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
-        ec = exit_codes["sonic_movement"][move_code]
+
+        move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
+
+        ec = exit_codes["sonic_movement_x"][move_code]
         direction = self.move_direction()[0]
         if ec == OK:
             self.x -= (self.speed_x - self.additional_speed) / FPS
@@ -50,7 +52,7 @@ class MainHero(Character):
         if direction == RIGHT:
             self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        return exit_codes["sonic_movement"][move_code], self.speed_x - self.additional_speed
+        return exit_codes["sonic_movement_x"][move_code], self.speed_x - self.additional_speed
 
     def move_right(self, tiles: pygame.sprite.Group) -> (int, float):
         """
@@ -61,9 +63,9 @@ class MainHero(Character):
         self.moving_right = True
         self.additional_speed += self.boost / FPS
 
-        move_code = self.get_move_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
+        move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
 
-        ec = exit_codes["sonic_movement"][move_code]
+        ec = exit_codes["sonic_movement_x"][move_code]
         direction = self.move_direction()[0]
         if ec == OK:
             self.x += (self.speed_x + self.additional_speed) / FPS
@@ -75,18 +77,22 @@ class MainHero(Character):
         if direction == LEFT:
             self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        return exit_codes["sonic_movement"][move_code], self.speed_x + self.additional_speed
+        return exit_codes["sonic_movement_x"][move_code], self.speed_x + self.additional_speed
 
     def movement_by_inertia(self, tiles) -> (int, float):
         """
         инерция(тормозит быстро)
         """
+        can_move_bottom, can_move_top, point_y = self.can_move_y(tiles)
         can_move_left, can_move_right, point_x = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
+        can_move_invisible_bottom, can_move_invisible_top = self.can_move_invisible_wall_y()
+        direction_x = self.move_direction()[0]
+        direction_y = self.move_direction()[1]
+
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
-            move_code = self.get_move_code(can_move_left, can_move_right, can_move_invisible_left,
-                                           can_move_invisible_right)
-            direction = self.move_direction()[0]
+            move_code_x = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left,
+                                               can_move_invisible_right)
 
             if can_move_right and self.additional_speed > 0:
                 if can_move_invisible_right:
@@ -96,22 +102,29 @@ class MainHero(Character):
                     self.x += self.additional_speed / FPS
             else:
                 self.additional_speed = 0
-            if direction == RIGHT:
+            if direction_x == RIGHT:
                 self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
-            elif direction == LEFT:
+            elif direction_x == LEFT:
                 self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
             if not self.is_jumping and abs(self.additional_speed) / FPS < 5:
                 self.image = self.start_image
                 self.cur_fast_frame = 0
             if not self.is_jumping:
-                if direction == LEFT:
+                if direction_x == LEFT:
                     self.image = self.fast_left_frames[self.cur_fast_frame]
-                elif direction == RIGHT:
+                elif direction_x == RIGHT:
                     self.image = self.fast_left_frames[self.cur_fast_frame]
         else:
-            move_code = exit_codes["sonic_movement"].index(MOVING)
+            move_code_x = exit_codes["sonic_movement_x"].index(MOVING)
 
-        return move_code, self.additional_speed
+        move_code_y = self.get_move_y_code(can_move_top, can_move_bottom, can_move_invisible_top, can_move_invisible_bottom)
+
+        mc = exit_codes["sonic_movement_y"][move_code_y]
+
+        if mc != STOPPED_BY_BOT_WALL_OUTSIDE:
+            self.jump(tiles)
+
+        return move_code_x, self.additional_speed, move_code_y, self.speed_y
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
 
@@ -123,7 +136,8 @@ class MainHero(Character):
         direction = self.move_direction()[1]
         if can_move_bottom:
             if can_move_top:
-                if (can_invisible_move_top * (direction in [TOP, STAY]) + can_invisible_move_bottom * (direction in [BOT, STAY])) >= 1:
+                if (can_invisible_move_top * (direction in [TOP, STAY]) + can_invisible_move_bottom * (
+                        direction in [BOT, STAY])) >= 1:
                     self.y += self.speed_y / FPS
                 else:
                     output = self.speed_y
@@ -131,9 +145,9 @@ class MainHero(Character):
             self.y = point_y[0]
             self.speed_y = 0
             self.is_jumping = False
+            self.is_falling = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return output
-
 
     def drawing(self) -> None:
         if self.is_jumping:
@@ -141,7 +155,7 @@ class MainHero(Character):
                 self.image = self.left_jump_frames[self.cur_frame_jump]
             else:
                 self.image = self.right_jump_frames[self.cur_frame_jump]
-        else:
+        elif not self.is_falling:
             if self.speed_y == 0:
                 self.cur_frame_jump = 0
             if self.moving_right and self.moving_left:
@@ -160,6 +174,8 @@ class MainHero(Character):
                     self.start_image = self.start_image_right
             else:
                 self.image = self.start_image
+        else:
+            self.image = self.start_image
 
     def update_counters(self) -> None:
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
@@ -169,18 +185,19 @@ class MainHero(Character):
             self.cur_frame_jump = min(self.cur_frame_jump + 1 * self.is_jumping, len(self.left_jump_frames) - 1)
 
     def can_move_y(self, tiles_sprites: pygame.sprite.Group) -> (bool, bool, list[int]):
-        cmb = not any(pygame.rect.Rect(
+        return not any(pygame.rect.Rect(
             self.x, self.y, self.width,
             self.height + (GRAVITY + self.speed_y) / FPS
-        ).colliderect(i) for i in filter(lambda i: i.rect.y > self.rect.y, tiles_sprites))
-        cmt = not any(pygame.rect.Rect(
+        ).colliderect(i) for i in filter(lambda i: i.rect.y > self.rect.y, tiles_sprites)), not any(pygame.rect.Rect(
             self.x, self.y - (self.speed_y + GRAVITY) / FPS, self.width,
-            self.height + (self.speed_y + GRAVITY) / FPS
-        ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites))
-        return cmb, cmt, [i.rect.y - self.rect.w for i in filter(lambda i: i.rect.y > self.rect.y + self.rect.w, tiles_sprites) if pygame.rect.Rect(
-            self.x, self.y, self.width,
-            self.height + (GRAVITY + self.speed_y) / FPS
-        ).colliderect(i)]
+                    self.height + (self.speed_y + GRAVITY) / FPS
+        ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites)), [i.rect.y - self.rect.w for
+                                                                                             i
+                                                                                             in filter(
+                lambda i: i.rect.y > self.rect.y + self.rect.w, tiles_sprites) if pygame.rect.Rect(
+                self.x, self.y, self.width,
+                self.height + (GRAVITY + self.speed_y) / FPS
+            ).colliderect(i)]
 
     def can_move_invisible_wall_y(self) -> (bool, bool):
         return (not pygame.Rect(
@@ -235,8 +252,11 @@ class MainHero(Character):
                                      self.width,
                                      self.rect.height).colliderect(i.rect) * (direction in [RIGHT, STAY])
                     for i in filter(lambda i: i.rect.x > self.rect.x, tiles_sprites))),
-                [min(i.rect.x - self.rect.w + 1, RIGHT_INVISIBLE_LINE[0][0]) if i.rect.x + i.rect.w > self.rect.x else max(
-                    i.rect.x + i.rect.w, LEFT_INVISIBLE_LINE[0][0] + 5) if self.rect.x + self.rect.w > i.rect.x else None for i in tiles_sprites if
+                [min(i.rect.x - self.rect.w + 1,
+                     RIGHT_INVISIBLE_LINE[0][0]) if i.rect.x + i.rect.w > self.rect.x else max(
+                    i.rect.x + i.rect.w,
+                    LEFT_INVISIBLE_LINE[0][0] + 5) if self.rect.x + self.rect.w > i.rect.x else None for i in
+                 tiles_sprites if
                  pygame.rect.Rect(self.rect.x, self.rect.y,
                                   self.width + (self.speed_x + self.additional_speed) / FPS,
                                   self.rect.height).colliderect(i.rect) or
@@ -264,6 +284,7 @@ class MainHero(Character):
     def set_y(self, y):
         self.y = y
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+
     def reset_speed(self) -> None:
         self.additional_speed = 0
 
@@ -272,22 +293,40 @@ class MainHero(Character):
         self.drawing()
         self.rect = pygame.rect.Rect(self.x, self.y, self.width, self.height)
 
-    def get_move_code(self,
-                      ml: bool,
-                      mr: bool,
-                      iml: bool,
-                      imr: bool
-                      ) -> int:
+    def get_move_x_code(self,
+                        ml: bool,
+                        mr: bool,
+                        iml: bool,
+                        imr: bool
+                        ) -> int:
         if not mr:
-            move_code = exit_codes["sonic_movement"].index(STOPPED_BY_RIGHT_WALL_OUTSIDE)
+            move_code = exit_codes["sonic_movement_x"].index(STOPPED_BY_RIGHT_WALL_OUTSIDE)
         elif not ml:
-            move_code = exit_codes["sonic_movement"].index(STOPPED_BY_LEFT_WALL_OUTSIDE)
+            move_code = exit_codes["sonic_movement_x"].index(STOPPED_BY_LEFT_WALL_OUTSIDE)
         elif not iml:
-            move_code = exit_codes["sonic_movement"].index(STOPPED_BY_LEFT_INVISIBLE_WALL)
+            move_code = exit_codes["sonic_movement_x"].index(STOPPED_BY_LEFT_INVISIBLE_WALL)
         elif not imr:
-            move_code = exit_codes["sonic_movement"].index(STOPPED_BY_RIGHT_INVISIBLE_WALL)
+            move_code = exit_codes["sonic_movement_x"].index(STOPPED_BY_RIGHT_INVISIBLE_WALL)
         else:
-            move_code = exit_codes["sonic_movement"].index(OK)
+            move_code = exit_codes["sonic_movement_x"].index(OK)
+        return move_code
+
+    def get_move_y_code(self,
+                        mt: bool,
+                        mb: bool,
+                        imt: bool,
+                        imb: bool
+                        ) -> int:
+        if not mt:
+            move_code = exit_codes["sonic_movement_y"].index(STOPPED_BY_TOP_WALL_OUTSIDE)
+        elif not mb:
+            move_code = exit_codes["sonic_movement_y"].index(STOPPED_BY_BOT_WALL_OUTSIDE)
+        elif not imt:
+            move_code = exit_codes["sonic_movement_y"].index(STOPPED_BY_TOP_INVISIBLE_WALL)
+        elif not imb:
+            move_code = exit_codes["sonic_movement_y"].index(STOPPED_BY_BOT_INVISIBLE_WALL)
+        else:
+            move_code = exit_codes["sonic_movement_y"].index(OK)
         return move_code
 
     def get_damage(self):
