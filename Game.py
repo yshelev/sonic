@@ -89,17 +89,22 @@ class Game:
     def start_video_loop(self) -> None:
         # video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
         # success, video_image = video.read()
-        # video_fps = video.get(cv2.CAP_PROP_FPS)
+        # fps = video.get(cv2.CAP_PROP_FPS)
         #
         # window = pygame.display.set_mode(video_image.shape[1::-1])
+        # clock = pygame.time.Clock()
         flag = True
-        # run = True
-        # while success * run == 1:
-        #     self.clock.tick(video_fps)
+        # pygame.mixer.init()
+        # pygame.mixer.music.load('data/MUSIC/INTRO_MUSIC.mp3')
+        # pygame.mixer.music.play(-1)
+        #
+        # run = success
+        # while run:
+        #     clock.tick(fps)
         #     for event in pygame.event.get():
         #         if event.type == pygame.QUIT:
-        #             flag = False
         #             run = False
+        #             flag = False
         #
         #     success, video_image = video.read()
         #     if success:
@@ -108,9 +113,14 @@ class Game:
         #             video_image.shape[1::-1],
         #             "BGR"
         #         )
+        #     else:
+        #         run = False
         #     window.blit(video_surf, (0, 0))
         #     pygame.display.flip()
+        #
+        # pygame.mixer.music.stop()
         self.game_loop(flag)
+        # self.play_music()
 
     def play_music(self) -> None:
         bg_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')

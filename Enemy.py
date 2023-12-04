@@ -22,7 +22,7 @@ class Enemy(Character):
         self.jump_cooldown = random.randint(100, 1000)
         self.movement_counter = 0
         self.jump_counter = 0
-        self.speed_x = 600
+        self.speed_x = 600 * random.choice([-1, 1])
     def move_x(self, speed: float, mh: MainHero) -> None:
         self.rect = self.rect.move(speed / FPS, 0)
 
