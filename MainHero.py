@@ -88,7 +88,6 @@ class MainHero(Character):
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         can_move_invisible_bottom, can_move_invisible_top = self.can_move_invisible_wall_y()
         direction_x = self.move_direction()[0]
-        direction_y = self.move_direction()[1]
 
         if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
             move_code_x = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left,
