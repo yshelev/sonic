@@ -41,7 +41,7 @@ class Game:
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (100, 100))
             for i in range(1, 9)
         ]
-        self.enemy_images = [pygame.transform.scale(pygame.image.load(f'data/ENEMY/BUG {i // 3}.png'), (1000, 1000))
+        self.enemy_images = [pygame.transform.scale(pygame.image.load(f'data/ENEMY/BUG {i // 3}.2.png'), (1000, 1000))
                              for i in range(3, 12)
                              ]
         self.rings_sprites_count = 0
@@ -58,14 +58,19 @@ class Game:
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
-            if i % 10 == 0:
-                Tiles(i * 300, SCREEN_HEIGHT - 150, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
-                      self.all_tiles_sprites,
-                      self.all_sprites,
-                      self.all_sprites_wo_mh)
-            if i % 20 == 0:
-                Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
-                      self.all_rings_sprites,
+            # if i % 10 == 0:
+            #     Tiles(i * 300, SCREEN_HEIGHT - 150, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
+            #           self.all_tiles_sprites,
+            #           self.all_sprites,
+            #           self.all_sprites_wo_mh)
+            # if i % 20 == 0:
+            #     Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
+            #           self.all_rings_sprites,
+            #           self.all_sprites,
+            #           self.all_sprites_wo_mh)
+            if i == 0:
+                Enemy(i * 300 + 150, SCREEN_HEIGHT - 200, self.enemy_images[0], self.enemy_images, self.enemy_images,
+                      self.all_enemy_sprites,
                       self.all_sprites,
                       self.all_sprites_wo_mh)
 
@@ -141,20 +146,7 @@ class Game:
         self.quit()
 
     def draw_lines(self) -> None:
-        pygame.draw.line(screen, "green", TOP_INVISIBLE_LINE[0], TOP_INVISIBLE_LINE[1], 10)
-        pygame.draw.line(screen, "purple", BOTTOM_INVISIBLE_LINE[0], BOTTOM_INVISIBLE_LINE[1], 10)
-        pygame.draw.rect(screen, "yellow", (
-            BOTTOM_INVISIBLE_LINE[0][0],
-            BOTTOM_INVISIBLE_LINE[0][1],
-            BOTTOM_INVISIBLE_LINE[1][0] - BOTTOM_INVISIBLE_LINE[0][0],
-            5
-        ), 10)
-        pygame.draw.rect(screen, "blue", (
-            TOP_INVISIBLE_LINE[0][0],
-            TOP_INVISIBLE_LINE[0][1],
-            TOP_INVISIBLE_LINE[1][0] - TOP_INVISIBLE_LINE[0][0],
-            5
-        ), 10)
+        pygame.draw.rect(screen, "black", (100, 479, 10, 10))
         pygame.draw.rect(screen, "black", (self.main_hero.x,
                                            self.main_hero.y - self.main_hero.speed_y / FPS,
                                            self.main_hero.width,
@@ -166,8 +158,8 @@ class Game:
                          )
 
     def draw_num_of_rings(self) -> None:
-        self.rings_sprites_count += 1
-        screen.blit(self.rings_sprites_for_draw[self.rings_sprites_count // 6 % 8], (5, 5))
+        self.rings_sprites_count = (self.rings_sprites_count + 1) % 48
+        screen.blit(self.rings_sprites_for_draw[self.rings_sprites_count // 6], (5, 5))
         text_surface = self.my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 0))
 
@@ -183,7 +175,7 @@ class Game:
                 output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_sprites_wo_mh:
-                        tile.move_x(movement_sprites_speed, self.main_hero)
+                        tile.move_x(movement_sprites_speed, self.main_hero, self.all_tiles_sprites)
             else:
                 self.main_hero.set_moving_left(False)
 
@@ -191,7 +183,7 @@ class Game:
                 output_code, movement_sprites_speed = self.main_hero.move_right(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_sprites_wo_mh:
-                        tile.move_x(-movement_sprites_speed, self.main_hero)
+                        tile.move_x(-movement_sprites_speed, self.main_hero, self.all_tiles_sprites)
             else:
                 self.main_hero.set_moving_right(False)
         else:
@@ -201,18 +193,18 @@ class Game:
         if self.main_hero.get_is_jumping():
             jump_speed_tiles = self.main_hero.jump(self.all_tiles_sprites)
             for tile in self.all_sprites_wo_mh:
-                tile.move_y(jump_speed_tiles, self.main_hero)
+                tile.move_y(jump_speed_tiles, self.main_hero, self.all_tiles_sprites)
 
-        output_code_x, movement_sprites_speed_x, output_code_y, movement_sprites_speed_y = self.main_hero.movement_by_inertia(
-            self.all_tiles_sprites)
+        output_code_x, movement_sprites_speed_x, output_code_y, movement_sprites_speed_y =\
+            self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         if exit_codes["sonic_movement_x"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
                                                              STOPPED_BY_LEFT_INVISIBLE_WALL]:
             for tile in self.all_sprites_wo_mh:
-                tile.move_x(-movement_sprites_speed_x, self.main_hero)
-        if exit_codes["sonic_movement_y"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
-                                                             STOPPED_BY_LEFT_INVISIBLE_WALL]:
+                tile.move_x(-movement_sprites_speed_x, self.main_hero, self.all_tiles_sprites)
+        if exit_codes["sonic_movement_y"][output_code_y] in [STOPPED_BY_TOP_INVISIBLE_WALL,
+                                                             STOPPED_BY_BOT_INVISIBLE_WALL]:
             for tile in self.all_sprites_wo_mh:
-                tile.move_y(-movement_sprites_speed_y, self.main_hero)
+                tile.move_y(movement_sprites_speed_y, self.main_hero, self.all_tiles_sprites)
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
             self.main_hero.get_damage()
         if pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
@@ -226,6 +218,7 @@ class Game:
         if not self.main_hero.is_alive():
             running = False
         for i in self.all_enemy_sprites:
+            i.check(self.all_tiles_sprites)
             if i.get_is_jumping():
                 i.jump(self.all_tiles_sprites)
             i.moveself_x(self.all_tiles_sprites)
@@ -253,5 +246,5 @@ class Game:
         screen.blit(self.background_image, (self.background_image_x, 0))
 
         self.draw_num_of_rings()
-        # self.draw_lines()
+        self.draw_lines()
         self.all_sprites.draw(screen)

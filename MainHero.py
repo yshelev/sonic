@@ -47,7 +47,7 @@ class MainHero(Character):
         elif ec != STOPPED_BY_LEFT_INVISIBLE_WALL:
             self.x -= (self.speed_x - self.additional_speed) / FPS * can_move_left * (direction in [STAY, LEFT])
         if ec == STOPPED_BY_LEFT_WALL_OUTSIDE:
-            self.x = point_x[0]
+            self.x = point_x[0] if point_x else self.x
             self.additional_speed = 0
         if direction == RIGHT:
             self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
@@ -72,7 +72,7 @@ class MainHero(Character):
         elif ec != STOPPED_BY_RIGHT_INVISIBLE_WALL:
             self.x += (self.speed_x + self.additional_speed) / FPS * can_move_right * (direction in [RIGHT, STAY])
         if ec == STOPPED_BY_RIGHT_WALL_OUTSIDE:
-            self.x = point_x[0]
+            self.x = point_x[0] if point_x else self.x
             self.additional_speed = 0
         if direction == LEFT:
             self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
@@ -123,7 +123,7 @@ class MainHero(Character):
         if mc != STOPPED_BY_BOT_WALL_OUTSIDE:
             self.jump(tiles)
 
-        return move_code_x, self.additional_speed, move_code_y, self.speed_y
+        return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
 
@@ -141,7 +141,7 @@ class MainHero(Character):
                 else:
                     output = self.speed_y
         else:
-            self.y = point_y[0]
+            self.y = point_y[0] if point_y else self.y
             self.speed_y = 0
             self.is_jumping = False
             self.is_falling = False

@@ -65,18 +65,20 @@ class Character(pygame.sprite.Sprite):
 
     def move_left(self, tiles) -> None:
         self.moving_left = True
+        self.moving_right =False
         can_move_right, can_move_left = self.can_move_x(tiles)
-        if can_move_left:
-            if can_move_right:
-                self.x -= self.speed_x / FPS
+        if can_move_left * can_move_right == 1:
+            self.x += self.speed_x / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_right(self, tiles) -> None:
         self.moving_right = True
+        self.moving_left = False
         can_move_left, can_move_right = self.can_move_x(tiles)
-        if can_move_right:
-            if can_move_left:
-                self.x += self.speed_x / FPS
+        if can_move_right * can_move_left == 1:
+            self.x += self.speed_x / FPS
+        else:
+            self.moving_right = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def start_jump(self, tiles_sprites) -> None:
