@@ -1,3 +1,5 @@
+import sys
+
 import cv2
 
 from MainHero import MainHero
@@ -6,6 +8,8 @@ from Enemy import Enemy
 from Rings import Rings
 from Spikes import Spikes
 from Settings import *
+from button import Button
+from menu import Menu
 
 
 class Game:
@@ -88,6 +92,120 @@ class Game:
         self.background_image_speed_x = 0.6
         self.start_video_loop()
 
+
+    def get_font(self, size):
+        return pygame.font.Font("menu_objects/menu_font.ttf", size)
+
+    def play(self):
+        while True:
+            PLAY_MOUSE_POS = pygame.mouse.get_pos()
+
+            screen.blit(self.background_image, (0, 0))
+
+            PLAY_TEXT = self.get_font(60).render("Выберите персонажа", True, "#b68f40")
+            PLAY_RECT = PLAY_TEXT.get_rect(center=(600, 120))
+            screen.blit(PLAY_TEXT, PLAY_RECT)
+
+            PLAY_SONIC = Button(image=pygame.image.load("menu_objects/options_rect.png"), pos=(600, 320),
+                                text_input="Соник", font=self.get_font(70), base_color="White", hovering_color="Blue")
+
+            PLAY_SONIC.changeColor(PLAY_MOUSE_POS)
+            PLAY_SONIC.update(screen)
+
+            PLAY_TAILS = Button(image=pygame.image.load("menu_objects/options_rect.png"), pos=(600, 500),
+                                text_input="Тейлз", font=self.get_font(70), base_color="White", hovering_color="Orange")
+
+            PLAY_TAILS.changeColor(PLAY_MOUSE_POS)
+            PLAY_TAILS.update(screen)
+
+            PLAY_BACK = Button(image=pygame.image.load("menu_objects/back_rect.png"), pos=(600, 700),
+                               text_input="Назад", font=self.get_font(40), base_color="White", hovering_color="Green")
+
+            PLAY_BACK.changeColor(PLAY_MOUSE_POS)
+            PLAY_BACK.update(screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
+                        self.main_menu()
+                    if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
+                        self.game_loop(True)
+
+            pygame.display.update()
+
+    def options(self):
+        while True:
+            OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
+
+            screen.blit(self.background_image, (0, 0))
+
+            PLAY_TEXT = self.get_font(60).render("Настройки", True, "#b68f40")
+            PLAY_RECT = PLAY_TEXT.get_rect(center=(600, 120))
+            screen.blit(PLAY_TEXT, PLAY_RECT)
+
+            OPTIONS_BACK = Button(image=pygame.image.load("menu_objects/back_rect.png"), pos=(600, 700),
+                                  text_input="Назад", font=self.get_font(40), base_color="White",
+                                  hovering_color="Green")
+
+            OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
+            OPTIONS_BACK.update(screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
+                        self.main_menu()
+
+            pygame.display.update()
+
+    def main_menu(self):
+        while True:
+            screen.blit(self.background_image, (0, 0))
+
+            MENU_MOUSE_POS = pygame.mouse.get_pos()
+
+            MENU_TEXT = self.get_font(100).render("Меню", True, "#b68f40")
+            MENU_RECT = MENU_TEXT.get_rect(center=(600, 120))
+
+            PLAY_BUTTON = Button(image=pygame.image.load("menu_objects/play_rect.png"), pos=(600, 270),
+                                 text_input="Играть", font=self.get_font(70), base_color="#d7fcd4",
+                                 hovering_color="White")
+            OPTIONS_BUTTON = Button(image=pygame.image.load("menu_objects/options_rect.png"), pos=(600, 420),
+                                    text_input="Настройки", font=self.get_font(70), base_color="#d7fcd4",
+                                    hovering_color="White")
+            QUIT_BUTTON = Button(image=pygame.image.load("menu_objects/quit_rect.png"), pos=(600, 570),
+                                 text_input="Выход", font=self.get_font(70), base_color="#d7fcd4",
+                                 hovering_color="White")
+
+            screen.blit(MENU_TEXT, MENU_RECT)
+
+            for button in [PLAY_BUTTON, OPTIONS_BUTTON, QUIT_BUTTON]:
+                button.changeColor(MENU_MOUSE_POS)
+                button.update(screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    sys.exit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        self.play()
+                    if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        self.options()
+                    if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
+                        pygame.quit()
+                        sys.exit()
+
+            pygame.display.update()
+
+    def game_loop_lvl_2(self):
+        print("im here")
+
     def start_video_loop(self) -> None:
         # video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
         # success, video_image = video.read()
@@ -113,7 +231,7 @@ class Game:
         #         video_surf = pygame.image.frombuffer(
         #             video_image.tobytes(),
         #             video_image.shape[1::-1],
-        #             "BGR"
+        #             "background_imageR"
         #         )
         #     else:
         #         run = False
@@ -121,13 +239,13 @@ class Game:
         #     pygame.display.flip()
         #
         # pygame.mixer.music.stop()
-        self.game_loop(flag)
+        self.main_menu()
         # self.play_music()
 
     def play_music(self) -> None:
-        bg_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
-        bg_music.set_volume(0.1)
-        bg_music.play(-1)
+        background_image_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
+        background_image_music.set_volume(0.1)
+        background_image_music.play(-1)
 
     def game_loop(self, flag: bool) -> None:
         running = flag
