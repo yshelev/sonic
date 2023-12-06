@@ -93,7 +93,7 @@ class Game:
 
 
     def get_font(self, size):
-        return pygame.font.Font("menu_objects/menu_font.ttf", size)
+        return pygame.font.Font("menu_objects/minecraft.ttf", size)
 
     def play(self):
         while True:
