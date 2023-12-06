@@ -9,7 +9,6 @@ from Rings import Rings
 from Spikes import Spikes
 from Settings import *
 from button import Button
-from menu import Menu
 
 
 class Game:
