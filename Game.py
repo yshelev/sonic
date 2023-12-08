@@ -93,7 +93,7 @@ class Game:
 
 
     def get_font(self, size):
-        return pygame.font.Font("menu_objects/minecraft.ttf", size)
+        return pygame.font.Font("data/menu_objects/minecraft.ttf", size)
 
     def play(self):
         while True:
@@ -105,19 +105,19 @@ class Game:
             PLAY_RECT = PLAY_TEXT.get_rect(center=(600, 120))
             screen.blit(PLAY_TEXT, PLAY_RECT)
 
-            PLAY_SONIC = Button(image=pygame.image.load("menu_objects/options_rect.png"), pos=(600, 320),
+            PLAY_SONIC = Button(image=pygame.image.load("data/menu_objects/options_rect.png"), pos=(600, 320),
                                 text_input="Соник", font=self.get_font(70), base_color="White", hovering_color="Blue")
 
             PLAY_SONIC.changeColor(PLAY_MOUSE_POS)
             PLAY_SONIC.update(screen)
 
-            PLAY_TAILS = Button(image=pygame.image.load("menu_objects/options_rect.png"), pos=(600, 500),
+            PLAY_TAILS = Button(image=pygame.image.load("data/menu_objects/options_rect.png"), pos=(600, 500),
                                 text_input="Тейлз", font=self.get_font(70), base_color="White", hovering_color="Orange")
 
             PLAY_TAILS.changeColor(PLAY_MOUSE_POS)
             PLAY_TAILS.update(screen)
 
-            PLAY_BACK = Button(image=pygame.image.load("menu_objects/back_rect.png"), pos=(600, 700),
+            PLAY_BACK = Button(image=pygame.image.load("data/menu_objects/back_rect.png"), pos=(600, 700),
                                text_input="Назад", font=self.get_font(40), base_color="White", hovering_color="Green")
 
             PLAY_BACK.changeColor(PLAY_MOUSE_POS)
@@ -147,7 +147,7 @@ class Game:
             PLAY_RECT = PLAY_TEXT.get_rect(center=(600, 120))
             screen.blit(PLAY_TEXT, PLAY_RECT)
 
-            OPTIONS_BACK = Button(image=pygame.image.load("menu_objects/back_rect.png"), pos=(600, 700),
+            OPTIONS_BACK = Button(image=pygame.image.load("data/menu_objects/back_rect.png"), pos=(600, 700),
                                   text_input="Назад", font=self.get_font(40), base_color="White",
                                   hovering_color="Green")
 
@@ -173,13 +173,13 @@ class Game:
             MENU_TEXT = self.get_font(100).render("Меню", True, "#b68f40")
             MENU_RECT = MENU_TEXT.get_rect(center=(600, 120))
 
-            PLAY_BUTTON = Button(image=pygame.image.load("menu_objects/play_rect.png"), pos=(600, 270),
+            PLAY_BUTTON = Button(image=pygame.image.load("data/menu_objects/play_rect.png"), pos=(600, 270),
                                  text_input="Играть", font=self.get_font(70), base_color="#d7fcd4",
                                  hovering_color="White")
-            OPTIONS_BUTTON = Button(image=pygame.image.load("menu_objects/options_rect.png"), pos=(600, 420),
+            OPTIONS_BUTTON = Button(image=pygame.image.load("data/menu_objects/options_rect.png"), pos=(600, 420),
                                     text_input="Настройки", font=self.get_font(70), base_color="#d7fcd4",
                                     hovering_color="White")
-            QUIT_BUTTON = Button(image=pygame.image.load("menu_objects/quit_rect.png"), pos=(600, 570),
+            QUIT_BUTTON = Button(image=pygame.image.load("data/menu_objects/quit_rect.png"), pos=(600, 570),
                                  text_input="Выход", font=self.get_font(70), base_color="#d7fcd4",
                                  hovering_color="White")
 
@@ -244,9 +244,15 @@ class Game:
         # self.play_music()
 
     def play_music(self) -> None:
-        background_image_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
-        background_image_music.set_volume(0.1)
-        background_image_music.play(-1)
+        background_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
+        background_music.set_volume(0.1)
+        background_music.play(-1)
+
+
+
+
+
+
 
     def game_loop(self, flag: bool) -> None:
         running = flag

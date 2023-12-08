@@ -24,6 +24,9 @@ class Enemy(Character):
         self.movement_counter = 0
         self.jump_counter = 0
         self.speed_x = 180 * random.choice([-1, 1])
+        self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/enemy_death.mp3')
+
+
 
     def move_x(self, speed: float, mh: MainHero, tiles) -> None:
         if self.can_move_x(tiles):
@@ -66,6 +69,13 @@ class Enemy(Character):
             self.movement_counter = 0
         super().update()
 
+    def kill(self):
+        self.play_enemy_death()
+        super().kill()
+
+    def play_enemy_death(self) -> None:
+        self.enemy_death_sound.set_volume(0.1)
+        self.enemy_death_sound.play(-1)
     def moveself_x(self, tiles_sprite):
         self.move_right(tiles_sprite) if self.speed_x > 0 else self.move_left(tiles_sprite) if self.speed_x < 0 else \
             None

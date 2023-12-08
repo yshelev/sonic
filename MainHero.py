@@ -28,6 +28,8 @@ class MainHero(Character):
         self.stop_boost = self.boost * 3
         self.number_of_rings = 50
         self.is_falling = False
+        self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
+        self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
 
     def move_left(self, tiles) -> (int, float):
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
@@ -118,6 +120,15 @@ class MainHero(Character):
             self.jump(tiles)
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
+
+    def start_jump(self, tiles_sprites) -> None:
+        super().start_jump(tiles_sprites)
+        self.play_sound_start_jump()
+
+    def play_sound_start_jump(self) -> None:
+        self.jump_sound.set_volume(0.1)
+        self.jump_sound.play(-1)
+
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
         self.is_jumping = True
@@ -333,6 +344,7 @@ class MainHero(Character):
             self.kill()
 
     def add_rings(self):
+        self.play_collect_ring()
         self.number_of_rings += 1
 
     def is_alive(self):
@@ -341,5 +353,11 @@ class MainHero(Character):
     def collide_enemy(self, enemies):
         if self.speed_y > 0:
             enemies.kill()
+            return True
         else:
             self.get_damage()
+            return False
+
+    def play_collect_ring(self) -> None:
+        self.enemy_death_sound.set_volume(0.1)
+        self.enemy_death_sound.play(-1)
