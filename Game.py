@@ -16,6 +16,10 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
         pygame.display.set_caption("[ezrf")
+        self.init_level()
+        self.start_video_loop()
+
+    def init_level(self):
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -135,7 +139,6 @@ class Game:
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
         self.background_image_slow = 4
         self.background_image_speed_x = 0.6
-        self.start_video_loop()
 
 
     def get_font(self, size):
@@ -177,8 +180,10 @@ class Game:
                     if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                         self.main_menu()
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
+                        self.init_level()
                         self.game_loop(True)
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
+                        self.init_level()
                         self.game_loop_level2()
 
             pygame.display.update()
@@ -241,6 +246,7 @@ class Game:
                     sys.exit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
+
                         self.play()
                     if OPTIONS_BUTTON.checkForInput(MENU_MOUSE_POS):
                         self.options()
@@ -351,7 +357,6 @@ class Game:
             self.draw()
             pygame.display.flip()
 
-        self.quit()
 
     def draw_lines(self) -> None:
         pygame.draw.rect(screen, "black", (100, 479, 10, 10))
