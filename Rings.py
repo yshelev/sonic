@@ -16,12 +16,5 @@ class Rings(Tiles):
         self.counter = (self.counter + 1) % 48
         self.image = self.images[self.counter // 6 % 8]
 
-    def move_x(self, speed: float, mh: MainHero) -> None:
-
-        self.rect = self.rect.move(speed / FPS, 0)
-
-
-    def move_y(self, speed: float, mh: MainHero) -> None:
-        self.rect = self.rect.move(0, -speed / FPS)
 
 

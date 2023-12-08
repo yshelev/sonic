@@ -61,16 +61,16 @@ class Game:
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
-            # if i % 10 == 0:
-            #     Tiles(i * 300, SCREEN_HEIGHT - 150, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
-            #           self.all_tiles_sprites,
-            #           self.all_sprites,
-            #           self.all_sprites_wo_mh)
-            # if i % 20 == 0:
-            #     Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
-            #           self.all_rings_sprites,
-            #           self.all_sprites,
-            #           self.all_sprites_wo_mh)
+            if i % 10 == 0:
+                Tiles(i * 300, SCREEN_HEIGHT - 400, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
+                      self.all_tiles_sprites,
+                      self.all_sprites,
+                      self.all_sprites_wo_mh)
+            if i % 20 == 0:
+                Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
+                      self.all_rings_sprites,
+                      self.all_sprites,
+                      self.all_sprites_wo_mh)
             if i == 0:
                 Enemy(i * 300 + 150, SCREEN_HEIGHT - 200, self.enemy_images[0], self.enemy_images, self.enemy_images,
                       self.all_enemy_sprites,
@@ -132,6 +132,8 @@ class Game:
                         self.main_menu()
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         self.game_loop(True)
+                    if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
+                        self.game_loop_lvl_2()
 
             pygame.display.update()
 
@@ -287,8 +289,8 @@ class Game:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
             self.main_hero.start_jump(self.all_tiles_sprites)
-        if not ((keys[pygame.K_LEFT] or keys[pygame.K_a]) and (keys[pygame.K_RIGHT] or keys[pygame.K_d])):
-            if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (keys[pygame.K_RIGHT] or keys[button_settings["right"]])):
+            if keys[pygame.K_LEFT] or keys[button_settings["left"]]:
                 output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_sprites_wo_mh:
@@ -296,7 +298,7 @@ class Game:
             else:
                 self.main_hero.set_moving_left(False)
 
-            if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            if keys[pygame.K_RIGHT] or keys[button_settings["right"]]:
                 output_code, movement_sprites_speed = self.main_hero.move_right(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_sprites_wo_mh:
@@ -363,5 +365,5 @@ class Game:
         screen.blit(self.background_image, (self.background_image_x, 0))
 
         self.draw_num_of_rings()
-        self.draw_lines()
+        # self.draw_lines()
         self.all_sprites.draw(screen)

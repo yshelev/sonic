@@ -33,7 +33,7 @@ class MainHero(Character):
         """
 
         """
-        can_move_left, can_move_right, point_x = self.can_move_x(tiles)
+        can_move_left, can_move_right, _ = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_left = True
         self.additional_speed -= self.boost / FPS
@@ -47,7 +47,6 @@ class MainHero(Character):
         elif ec != STOPPED_BY_LEFT_INVISIBLE_WALL:
             self.x -= (self.speed_x - self.additional_speed) / FPS * can_move_left * (direction in [STAY, LEFT])
         if ec == STOPPED_BY_LEFT_WALL_OUTSIDE:
-            self.x = point_x[0] if point_x else self.x
             self.additional_speed = 0
         if direction == RIGHT:
             self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
@@ -56,7 +55,6 @@ class MainHero(Character):
 
     def move_right(self, tiles: pygame.sprite.Group) -> (int, float):
         """
-
         """
         can_move_left, can_move_right, point_x = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
@@ -72,7 +70,6 @@ class MainHero(Character):
         elif ec != STOPPED_BY_RIGHT_INVISIBLE_WALL:
             self.x += (self.speed_x + self.additional_speed) / FPS * can_move_right * (direction in [RIGHT, STAY])
         if ec == STOPPED_BY_RIGHT_WALL_OUTSIDE:
-            self.x = point_x[0] if point_x else self.x
             self.additional_speed = 0
         if direction == LEFT:
             self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
@@ -126,25 +123,30 @@ class MainHero(Character):
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
-
         self.is_jumping = True
         self.speed_y += GRAVITY / FPS
         can_move_bottom, can_move_top, point_y = self.can_move_y(tiles_sprites)
         can_invisible_move_bottom, can_invisible_move_top = self.can_move_invisible_wall_y()
         output = 0
         direction = self.move_direction()[1]
-        if can_move_bottom:
-            if can_move_top:
+        if direction in [BOT, STAY]:
+            if can_move_bottom:
                 if (can_invisible_move_top * (direction in [TOP, STAY]) + can_invisible_move_bottom * (
                         direction in [BOT, STAY])) >= 1:
                     self.y += self.speed_y / FPS
                 else:
                     output = self.speed_y
+            else:
+                self.y = point_y[0] if point_y else self.y
+                self.speed_y = 0
+                self.is_jumping = False
+                self.is_falling = False
         else:
-            self.y = point_y[0] if point_y else self.y
-            self.speed_y = 0
-            self.is_jumping = False
-            self.is_falling = False
+            if (can_invisible_move_top * (direction in [TOP, STAY]) + can_invisible_move_bottom * (
+                    direction in [BOT, STAY])) >= 1:
+                self.y += self.speed_y / FPS
+            else:
+                output = self.speed_y
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return output
 
@@ -190,10 +192,10 @@ class MainHero(Character):
         ).colliderect(i) for i in filter(lambda i: i.rect.y > self.rect.y, tiles_sprites)), not any(pygame.rect.Rect(
             self.x, self.y - (self.speed_y + GRAVITY) / FPS, self.width,
                     self.height + (self.speed_y + GRAVITY) / FPS
-        ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites)), [i.rect.y - self.rect.w for
+        ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites)), [i.rect.y - self.rect.w - 2 for
                                                                                              i
                                                                                              in filter(
-                lambda i: i.rect.y > self.rect.y + self.rect.w, tiles_sprites) if pygame.rect.Rect(
+                lambda i: i.rect.y > self.rect.y, tiles_sprites) if pygame.rect.Rect(
                 self.x, self.y, self.width,
                 self.height + (GRAVITY + self.speed_y) / FPS
             ).colliderect(i)]
@@ -251,10 +253,10 @@ class MainHero(Character):
                                      self.width,
                                      self.rect.height).colliderect(i.rect) * (direction in [RIGHT, STAY])
                     for i in filter(lambda i: i.rect.x > self.rect.x, tiles_sprites))),
-                [min(i.rect.x - self.rect.w + 1,
-                     RIGHT_INVISIBLE_LINE[0][0]) if i.rect.x + i.rect.w > self.rect.x else max(
-                    i.rect.x + i.rect.w,
-                    LEFT_INVISIBLE_LINE[0][0] + 5) if self.rect.x + self.rect.w > i.rect.x else None for i in
+                [min(i.rect.x - self.rect.w - 1,
+                     RIGHT_INVISIBLE_LINE[0][0] - 1) if i.rect.x + i.rect.w > self.rect.x else max(
+                    i.rect.x + i.rect.w + 1,
+                    LEFT_INVISIBLE_LINE[0][0] + 1) if self.rect.x + self.rect.w > i.rect.x else None for i in
                  tiles_sprites if
                  pygame.rect.Rect(self.rect.x, self.rect.y,
                                   self.width + (self.speed_x + self.additional_speed) / FPS,

@@ -8,11 +8,16 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 LEFT_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
                        (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2))
 RIGHT_INVISIBLE_LINE = ((SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3),
-                         (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2))
+                        (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2))
 BOTTOM_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2),
                          (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3 * 2))
 TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
-                         (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3))
+                      (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3))
+
+button_settings = {
+    "left": pygame.K_q,
+    "right": pygame.K_e
+}
 
 OK = "OK"
 STOPPED_BY_RIGHT_INVISIBLE_WALL = "stopped by right invisible wall"
@@ -48,4 +53,3 @@ exit_codes = {
         MOVING,
     ],
 }
-
