@@ -30,9 +30,6 @@ class MainHero(Character):
         self.is_falling = False
 
     def move_left(self, tiles) -> (int, float):
-        """
-
-        """
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_left = True

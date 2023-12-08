@@ -12,22 +12,3 @@ class Spikes(Tiles):
 
     def move_y(self, speed: float, mh: MainHero, tiles) -> None:
         self.rect = self.rect.move(0, -speed / FPS)
-
-
-
-
-
-
-
-
-
-
-
-
-
-settings = {
-    "volume": 0.1,
-    "open_levels": [
-        0, 1, 2
-    ],
-}
