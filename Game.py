@@ -7,6 +7,7 @@ from Tiles import Tiles
 from Enemy import Enemy
 from Rings import Rings
 from Spikes import Spikes
+from Plane_Level import *
 from Settings import *
 from button import Button
 
@@ -18,6 +19,9 @@ class Game:
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.background_image_level2 = pygame.transform.scale(pygame.image.load("data/background_sky.png"),
+                                                              (SCREEN_WIDTH, SCREEN_HEIGHT))
         running_sonic_right_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 5}.png")
             if i < 50 else
@@ -49,13 +53,42 @@ class Game:
                              ]
         self.rings_sprites_count = 0
 
+        self.plane_sprites = [pygame.image.load(f"data/Plane Sprites/plane_image{i}.png") for i in range(1, 5)]
+        self.fly_sprites = [pygame.image.load(f"data/Plane Sprites/FLY_BUG{i}.png") for i in range(1, 5)]
+        self.cloud_sprites = [pygame.image.load(f"data/Plane Sprites/Sprite-{i}.png") for i in range(1, 8)]
+        self.rings_sprites = [
+            pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
+            for i in range(1, 9)
+        ]
+        self.upgrade_image = pygame.image.load(f"data/Plane Sprites/health.png")
+        self.rings_sprites_count = 0
+
+        self.last_enemy = 0
+        self.last_shot = 0
+        self.last_ring = 0
+        self.last_cloud = 0
+        self.ring_sound = pygame.mixer.Sound('data/sounds/level 2/ring_sound.mp3')
+        self.boom_sound = pygame.mixer.Sound('data/sounds/level 2/boom.mp3')
+        self.ot_vinta = pygame.mixer.Sound('data/MUSIC/ot_vinta.mp3')
+        self.ring_sound.set_volume(0.1)
+        self.boom_sound.set_volume(0.1)
+        self.ot_vinta.set_volume(0.3)
+        self.ot_vinta_len = 200
+        self.timer = 0
+        self.score = 0
+
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
-        self.all_spikes_sprites = pygame.sprite.Group()
-        self.all_tiles_sprites = pygame.sprite.Group()
-        self.all_sprites_wo_mh = pygame.sprite.Group()
+        self.all_sprites_level2 = pygame.sprite.Group()
+        self.all_enemies_level2_sprites = pygame.sprite.Group()
+        self.all_bullet_sprites = pygame.sprite.Group()
         self.all_rings_sprites = pygame.sprite.Group()
+        self.all_tiles_sprites = pygame.sprite.Group()
+        self.plane_characters = pygame.sprite.Group()
+        self.plane_upgrade_sprites = pygame.sprite.Group()
         self.all_enemy_sprites = pygame.sprite.Group()
+        self.all_sprites_wo_mh = pygame.sprite.Group()
+        self.all_spikes_sprites = pygame.sprite.Group()
         for i in range(-50, 51):
             Tiles(i * 300, SCREEN_HEIGHT - 100, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
                   self.all_tiles_sprites,
@@ -76,6 +109,19 @@ class Game:
                       self.all_enemy_sprites,
                       self.all_sprites,
                       self.all_sprites_wo_mh)
+
+        self.plane_character = Plane_Character(SCREEN_WIDTH // 2,
+                                               SCREEN_HEIGHT // 2,
+                                               self.plane_sprites,
+                                               self.all_sprites_level2, self.plane_characters)
+
+        self.fire_rate = 250
+        self.damage = 10
+        self.bullet_width = 15
+        self.bullet_height = 15
+        self.bullet_speed = self.plane_character.speed_x * 1.2
+        self.bullet_image = 1
+        self.bullet_spread = 30
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -133,7 +179,7 @@ class Game:
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         self.game_loop(True)
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
-                        self.game_loop_lvl_2()
+                        self.game_loop_level2()
 
             pygame.display.update()
 
@@ -204,9 +250,50 @@ class Game:
 
             pygame.display.update()
 
-    def game_loop_lvl_2(self):
-        print("im here")
+    def game_loop_level2(self):
+        self.ot_vinta.play(-1)
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+            if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
+                running = False
+            self.spawner()
+            self.plane_actions()
+            self.collide_enemy()
+            self.draw_level2()
+            self.check()
+            self.all_sprites_level2.update()
 
+            pygame.display.flip()
+
+    def plane_actions(self):
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_UP] or keys[pygame.K_w]:
+            self.plane_character.move_up()
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.plane_character.move_down()
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+            self.plane_character.move_left()
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.plane_character.move_right()
+        if keys[pygame.K_SPACE]:
+            self.shooting()
+
+    def shooting(self):
+        if pygame.time.get_ticks() - self.last_shot >= self.fire_rate:
+            Plane_Bullet(self.plane_character.x + self.plane_character.width,
+                         self.plane_character.y + self.plane_character.height / 2 + 5,
+                         random.randint(-self.bullet_spread, self.bullet_spread),
+                         self.damage,
+                         self.bullet_width,
+                         self.bullet_height,
+                         self.bullet_speed,
+                         pygame.image.load(f'data/Plane Sprites/bullshit_{self.bullet_image}.png'),
+                         self.all_sprites_level2, self.all_bullet_sprites)
+            self.last_shot = pygame.time.get_ticks()
     def start_video_loop(self) -> None:
         # video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
         # success, video_image = video.read()
@@ -247,12 +334,6 @@ class Game:
         background_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
         background_music.set_volume(0.1)
         background_music.play(-1)
-
-
-
-
-
-
 
     def game_loop(self, flag: bool) -> None:
         running = flag
@@ -373,3 +454,112 @@ class Game:
         self.draw_num_of_rings()
         # self.draw_lines()
         self.all_sprites.draw(screen)
+
+    def draw_timer_and_score(self):
+        self.timer = pygame.time.get_ticks() // 1000
+        self.minutes = (self.ot_vinta_len - self.timer) // 60
+        self.seconds = self.ot_vinta_len - self.minutes * 60 - self.timer
+        self.seconds = self.seconds if self.seconds >= 10 else '0' + str(self.seconds)
+
+        text_surface = self.my_font.render(
+            f'{self.minutes}:{self.seconds}',
+            True, (255, 255, 255))
+        screen.blit(text_surface, (SCREEN_WIDTH / 2, 10))
+        text_surface = self.my_font.render(
+            f'score: {self.score}',
+            True, (255, 255, 255))
+        screen.blit(text_surface, (30, 50))
+
+    def draw_rings_level2(self):
+        self.rings_sprites_count += 1
+        screen.blit(pygame.transform.scale(self.rings_sprites[self.rings_sprites_count // 2 % 8], (32, 32)), (5, 5))
+        text_surface = self.my_font.render(f'X{self.plane_character.rings}', True, (255, 255, 255))
+        screen.blit(text_surface, (40, 10))
+
+    def draw_level2(self):
+        if self.background_image_x >= 0:
+            self.background_image_x -= 3
+        else:
+            self.background_image_x = SCREEN_WIDTH
+        screen.blit(self.background_image_level2, (self.background_image_x - SCREEN_WIDTH, 0))
+        screen.blit(self.background_image_level2, (self.background_image_x, 0))
+        self.all_sprites_level2.draw(screen)
+        self.draw_rings_level2()
+        self.draw_timer_and_score()
+
+    def spawner(self):
+        if pygame.time.get_ticks() - self.last_enemy >= 500:
+            Plane_Enemy(self.fly_sprites, self.all_sprites_level2, self.all_enemies_level2_sprites)
+            self.last_enemy = pygame.time.get_ticks()
+        if pygame.time.get_ticks() - self.last_ring >= 3000:
+            self.j = random.randint(0, SCREEN_HEIGHT - 64)
+            [Plane_Rings(i * 70, self.j, self.rings_sprites, self.all_sprites_level2, self.all_rings_sprites) for i in
+             range(random.randint(3, 7))]
+            self.last_ring = pygame.time.get_ticks()
+        if pygame.time.get_ticks() - self.last_cloud >= 5000:
+            Plane_Cloud(self.cloud_sprites, self.all_sprites_level2, self.all_enemies_level2_sprites)
+            self.last_cloud = pygame.time.get_ticks()
+        if self.ot_vinta_len - self.timer == 195 and not self.plane_upgrade_sprites:
+            Plane_Upgrates(1, self.upgrade_image, self.all_sprites_level2,
+                           self.plane_upgrade_sprites)
+        if self.ot_vinta_len - self.timer == 150 and not self.plane_upgrade_sprites:
+            Plane_Upgrates(2, self.upgrade_image, self.all_sprites_level2,
+                           self.plane_upgrade_sprites)
+
+    def check(self):
+        for enemy in self.all_enemies_level2_sprites:
+            if enemy.health <= 0 or enemy.x + enemy.width < 0:
+                if enemy.health <= 0:
+                    self.score += 200
+                    self.boom_sound.play()
+                enemy.kill()
+        for bullet in self.all_bullet_sprites:
+            if bullet.x > SCREEN_WIDTH + bullet.width:
+                bullet.kill()
+            if pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites):
+                enemy = pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites)
+                bullet.kill()
+                enemy.health -= bullet.damage
+        for ring in self.all_rings_sprites:
+            if ring.x + ring.width < 0:
+                ring.kill()
+            if pygame.sprite.spritecollideany(ring, self.plane_characters):
+                self.ring_sound.play()
+                self.score += 100
+                self.plane_character.rings += 1
+                ring.kill()
+        for upgrade in self.plane_upgrade_sprites:
+            if upgrade.x + upgrade.width < 0:
+                upgrade.kill()
+            if pygame.sprite.spritecollideany(upgrade, self.plane_characters):
+                if upgrade.type == 1:
+                    self.score += 200
+                    self.ring_sound.play()
+                    self.bullet_speed = self.plane_character.speed_x * 1.5
+                    self.fire_rate = 100
+                    self.bullet_width = 20
+                    self.bullet_height = 20
+                    self.bullet_image = 2
+                    upgrade.kill()
+                else:
+                    self.score += 200
+                    self.ring_sound.play()
+                    self.bullet_speed = self.plane_character.speed_x * 1.4
+                    self.fire_rate = 50
+                    self.bullet_width = 10
+                    self.bullet_height = 10
+                    self.bullet_image = 1
+                    self.damage = 4
+                    self.bullet_spread = 100
+                    upgrade.kill()
+
+    def collide_enemy(self):
+        if pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites):
+            enemy = pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites)
+            if enemy.__class__.__name__ == "Plane_Enemy":
+                self.score -= 50
+                self.boom_sound.play()
+                enemy.kill()
+                self.plane_character.rings -= 6
+            else:
+                self.plane_character.rings = self.plane_character.rings // 2 + 1

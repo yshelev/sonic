@@ -177,7 +177,10 @@ class MainHero(Character):
                     self.start_image = self.start_image_left
             elif self.moving_right:
                 if abs(self.additional_speed) / FPS > 7.5:
-                    self.image = self.fast_right_frames[self.cur_fast_frame]
+                    if abs(self.additional_speed) / FPS == 20:
+                        self.image = self.super_fast_right_frames
+                    else:
+                        self.image = self.fast_right_frames[self.cur_fast_frame]
                 else:
                     self.image = self.right_frames[self.cur_frame]
                     self.start_image = self.start_image_right
