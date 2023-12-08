@@ -258,8 +258,10 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    self.quit()
             if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
                 running = False
+                self.ot_vinta.stop()
             self.spawner()
             self.plane_actions()
             self.collide_enemy()
