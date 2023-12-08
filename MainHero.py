@@ -127,7 +127,7 @@ class MainHero(Character):
 
     def play_sound_start_jump(self) -> None:
         self.jump_sound.set_volume(0.1)
-        self.jump_sound.play(-1)
+        self.jump_sound.play()
 
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
@@ -363,4 +363,4 @@ class MainHero(Character):
 
     def play_collect_ring(self) -> None:
         self.enemy_death_sound.set_volume(0.1)
-        self.enemy_death_sound.play(-1)
+        self.enemy_death_sound.play()

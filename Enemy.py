@@ -68,7 +68,7 @@ class Enemy(Character):
 
     def play_enemy_death(self) -> None:
         self.enemy_death_sound.set_volume(0.1)
-        self.enemy_death_sound.play(-1)
+        self.enemy_death_sound.play()
 
     def moveself_x(self, tiles_sprite):
         self.move_right(tiles_sprite) if self.speed_x > 0 else self.move_left(tiles_sprite) if self.speed_x < 0 else \
