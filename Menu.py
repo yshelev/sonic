@@ -64,9 +64,11 @@ class Menu:
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
                         running = False
                         TailsLevel()
+                        self.main_menu()
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         running = False
                         SonicLevel()
+                        self.main_menu()
 
             pygame.display.update()
 
