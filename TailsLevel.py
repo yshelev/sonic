@@ -70,15 +70,17 @@ class TailsLevel:
         self.background_image_x = 0
 
         self.ot_vinta.play(-1)
-        self.game_loop()
+        self.output = self.game_loop()
 
-    def game_loop(self):
+    def game_loop(self) -> bool:
+        flag = True
         running = True
         while running:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    flag = False
                     self.quit()
             if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
                 running = False
@@ -91,6 +93,7 @@ class TailsLevel:
             self.all_sprites_level2.update()
 
             pygame.display.flip()
+        return flag
 
     def plane_actions(self):
         keys = pygame.key.get_pressed()
@@ -117,7 +120,6 @@ class TailsLevel:
                          pygame.image.load(f'data/Plane Sprites/bullshit_{self.bullet_image}.png'),
                          self.all_sprites_level2, self.all_bullet_sprites)
             self.last_shot = pygame.time.get_ticks()
-
 
     def play_music(self) -> None:
         background_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
@@ -236,3 +238,6 @@ class TailsLevel:
 
     def quit(self):
         pygame.quit()
+
+    def get_output(self):
+        return self.output

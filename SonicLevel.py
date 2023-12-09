@@ -92,26 +92,29 @@ class SonicLevel:
         self.background_image_speed_x = 0.6
 
         self.play_music()
-        self.game_loop()
+        self.output = self.game_loop()
 
     def play_music(self) -> None:
         background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
         background_music.set_volume(0.1)
         background_music.play(-1)
 
-    def game_loop(self) -> None:
+    def game_loop(self) -> bool:
+        flag = True
         running = True
         while running:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                    flag = False
 
             running = self.movement_of_main_character() * running
             self.background_image_movement()
             self.all_sprites.update(self.all_tiles_sprites)
             self.draw()
             pygame.display.flip()
+        return flag
 
     def draw_lines(self) -> None:
         pygame.draw.rect(screen, "black", (100, 479, 10, 10))
@@ -217,3 +220,6 @@ class SonicLevel:
         self.draw_num_of_rings()
         # self.draw_lines()
         self.all_sprites.draw(screen)
+
+    def get_output(self) -> bool:
+        return self.output
