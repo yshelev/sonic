@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 
 from Enemy_score import Enemy_score
@@ -54,6 +56,8 @@ class SonicLevel:
         ]
         self.rings_sprites_count = 0
 
+        self.immune_timer = pygame.time.Clock()
+
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
         self.all_rings_sprites = pygame.sprite.Group()
@@ -77,11 +81,12 @@ class SonicLevel:
                       self.all_rings_sprites,
                       self.all_sprites,
                       self.all_sprites_wo_mh)
-            if i == 0:
+            if i % 20 == 0:
                 Enemy(i * 300 + 150, SCREEN_HEIGHT - 200, self.enemy_images[0], self.enemy_images, self.enemy_images,
                       self.all_enemy_sprites,
                       self.all_sprites,
-                      self.all_sprites_wo_mh)
+                      self.all_sprites_wo_mh
+                      )
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -98,22 +103,20 @@ class SonicLevel:
 
         self.background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
 
-        self.play_music()
-        self.output = self.game_loop()
+        # self.play_music()
+        self.game_loop()
 
     def play_music(self) -> None:
         self.background_music.set_volume(0.1)
         self.background_music.play(-1)
 
-    def game_loop(self) -> bool:
-        flag = True
+    def game_loop(self):
         running = True
         while running:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
-                    flag = False
+                    self.quit()
 
             running = self.movement_of_main_character() * running
             self.background_image_movement()
@@ -121,7 +124,9 @@ class SonicLevel:
             self.draw()
             pygame.display.flip()
         self.background_music.stop()
-        return flag
+
+    def end_screen(self):
+        pass
 
     def draw_lines(self) -> None:
         pygame.draw.rect(screen, "black", (100, 479, 10, 10))
@@ -195,7 +200,8 @@ class SonicLevel:
         if pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
             enemies = pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites)
             if self.main_hero.collide_enemy(enemies):
-                Enemy_score(self.main_hero.get_add_score(), self.my_font, pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
+                Enemy_score(self.main_hero.get_add_score(), self.my_font,
+                            pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
             self.main_hero.start_jump(self.all_tiles_sprites)
         running = True
         if not self.main_hero.is_alive():
@@ -233,5 +239,6 @@ class SonicLevel:
         # self.draw_lines()
         self.all_sprites.draw(screen)
 
-    def get_output(self) -> bool:
-        return self.output
+    def quit(self):
+        pygame.quit()
+        sys.exit()
