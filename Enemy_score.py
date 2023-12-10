@@ -8,11 +8,11 @@ class Enemy_score(pygame.sprite.Sprite):
         self.image = font.render(f"{score}", True, (255, 255, 255))
         self.rect = rect
         self.speed_y = -600
-        self.additional_speed_y = 10
+        self.additional_speed_y = 1200
 
 
     def update(self, tiles):
-        self.speed_y = min(0, self.additional_speed_y + self.speed_y)
-        self.rect = self.rect.move(0, self.speed_y / FPS)
-        if self.speed_y == 0:
+        self.speed_y += self.additional_speed_y / FPS
+        self.rect = self.rect.move(0, -self.speed_y / FPS)
+        if self.rect.y <= 0:
             self.kill()
