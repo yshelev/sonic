@@ -217,7 +217,6 @@ class Menu:
         #         run = False
         #     window.blit(video_surf, (0, 0))
         #     pygame.display.flip()
-        #
-        # pygame.mixer.music.stop()
-        self.main_menu(flag)
 
+        pygame.mixer.music.stop()
+        self.main_menu(flag)

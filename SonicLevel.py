@@ -1,3 +1,6 @@
+import pygame
+
+from Enemy_score import Enemy_score
 from MainHero import MainHero
 from Settings import *
 from Tiles import Tiles
@@ -11,8 +14,6 @@ class SonicLevel:
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        self.background_image_level2 = pygame.transform.scale(pygame.image.load("data/background_sky.png"),
-                                                              (SCREEN_WIDTH, SCREEN_HEIGHT))
         running_sonic_right_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 5}.png")
             if i < 50 else
@@ -30,6 +31,9 @@ class SonicLevel:
             if i < 20 else
             pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
             for i in range(24 * 2, 28 * 2)
+        ]
+        super_fast_running_sonic_sprites = [
+
         ]
         self.rings_sprites_for_draw = [
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
@@ -57,6 +61,7 @@ class SonicLevel:
         self.all_enemy_sprites = pygame.sprite.Group()
         self.all_sprites_wo_mh = pygame.sprite.Group()
         self.all_spikes_sprites = pygame.sprite.Group()
+        self.all_enemies_score = pygame.sprite.Group()
         for i in range(-50, 51):
             Tiles(i * 300, SCREEN_HEIGHT - 100, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
                   self.all_tiles_sprites,
@@ -91,13 +96,14 @@ class SonicLevel:
         self.background_image_slow = 4
         self.background_image_speed_x = 0.6
 
+        self.background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
+
         self.play_music()
         self.output = self.game_loop()
 
     def play_music(self) -> None:
-        background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
-        background_music.set_volume(0.1)
-        background_music.play(-1)
+        self.background_music.set_volume(0.1)
+        self.background_music.play(-1)
 
     def game_loop(self) -> bool:
         flag = True
@@ -114,6 +120,7 @@ class SonicLevel:
             self.all_sprites.update(self.all_tiles_sprites)
             self.draw()
             pygame.display.flip()
+        self.background_music.stop()
         return flag
 
     def draw_lines(self) -> None:
@@ -134,12 +141,14 @@ class SonicLevel:
         text_surface = self.my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 0))
 
-    def quit(self) -> None:
-        pygame.quit()
+    def draw_score(self):
+        text_surface = self.my_font.render(f'score: {self.main_hero.get_score()}', True, (255, 255, 255))
+        screen.blit(text_surface, (20, 40))
 
     def movement_of_main_character(self) -> bool:
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
+            self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
         if not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
                 keys[pygame.K_RIGHT] or keys[button_settings["right"]])):
@@ -185,7 +194,9 @@ class SonicLevel:
             rings.kill()
         if pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
             enemies = pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites)
-            self.main_hero.collide_enemy(enemies)
+            if self.main_hero.collide_enemy(enemies):
+                Enemy_score(self.main_hero.get_add_score(), self.my_font, pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
+            self.main_hero.start_jump(self.all_tiles_sprites)
         running = True
         if not self.main_hero.is_alive():
             running = False
@@ -218,6 +229,7 @@ class SonicLevel:
         screen.blit(self.background_image, (self.background_image_x, 0))
 
         self.draw_num_of_rings()
+        self.draw_score()
         # self.draw_lines()
         self.all_sprites.draw(screen)
 
