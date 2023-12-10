@@ -23,6 +23,7 @@ class TailsLevel:
         self.plane_sprites = [pygame.image.load(f"data/Plane Sprites/plane_image{i}.png") for i in range(1, 5)]
         self.fly_sprites = [pygame.image.load(f"data/Plane Sprites/FLY_BUG{i}.png") for i in range(1, 5)]
         self.cloud_sprites = [pygame.image.load(f"data/Plane Sprites/Sprite-{i}.png") for i in range(1, 8)]
+        self.sad_cloud_sprites = [pygame.image.load(f"data/Plane Sprites/Cloud({i}).png") for i in range(1, 7)]
         self.rings_sprites = [
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
@@ -36,11 +37,17 @@ class TailsLevel:
         self.last_cloud = 0
         self.ring_sound = pygame.mixer.Sound('data/sounds/level 2/ring_sound.mp3')
         self.boom_sound = pygame.mixer.Sound('data/sounds/level 2/boom.mp3')
+        self.zap_sound = pygame.mixer.Sound('data/sounds/level 2/zap.wav')
+        self.bonus_sound = pygame.mixer.Sound('data/sounds/level 2/bonus.wav')
         self.ot_vinta = pygame.mixer.Sound('data/MUSIC/ot_vinta.mp3')
         self.ring_sound.set_volume(0.1)
         self.boom_sound.set_volume(0.1)
+        self.zap_sound.set_volume(0.1)
+        self.bonus_sound.set_volume(0.1)
         self.ot_vinta.set_volume(0.3)
         self.ot_vinta_len = 200
+        self.start_time = 0
+        self.current_time = 0
         self.timer = 0
         self.score = 0
 
@@ -70,17 +77,17 @@ class TailsLevel:
         self.background_image_x = 0
 
         self.ot_vinta.play(-1)
-        self.output = self.game_loop()
+        self.game_loop()
 
-    def game_loop(self) -> bool:
-        flag = True
+    def game_loop(self):
+        self.start_time = pygame.time.get_ticks()
         running = True
         while running:
+            self.current_time = pygame.time.get_ticks()
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
-                    flag = False
                     self.quit()
             if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
                 running = False
@@ -93,7 +100,6 @@ class TailsLevel:
             self.all_sprites_level2.update()
 
             pygame.display.flip()
-        return flag
 
     def plane_actions(self):
         keys = pygame.key.get_pressed()
@@ -121,13 +127,14 @@ class TailsLevel:
                          self.all_sprites_level2, self.all_bullet_sprites)
             self.last_shot = pygame.time.get_ticks()
 
+
     def play_music(self) -> None:
         background_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
         background_music.set_volume(0.1)
         background_music.play(-1)
 
     def draw_timer_and_score(self):
-        self.timer = pygame.time.get_ticks() // 1000
+        self.timer = (self.current_time-self.start_time)//1000
         self.minutes = (self.ot_vinta_len - self.timer) // 60
         self.seconds = self.ot_vinta_len - self.minutes * 60 - self.timer
         self.seconds = self.seconds if self.seconds >= 10 else '0' + str(self.seconds)
@@ -206,7 +213,7 @@ class TailsLevel:
             if pygame.sprite.spritecollideany(upgrade, self.plane_characters):
                 if upgrade.type == 1:
                     self.score += 200
-                    self.ring_sound.play()
+                    self.bonus_sound.play()
                     self.bullet_speed = self.plane_character.speed_x * 1.5
                     self.fire_rate = 100
                     self.bullet_width = 20
@@ -215,13 +222,13 @@ class TailsLevel:
                     upgrade.kill()
                 else:
                     self.score += 200
-                    self.ring_sound.play()
+                    self.bonus_sound.play()
                     self.bullet_speed = self.plane_character.speed_x * 1.4
                     self.fire_rate = 50
                     self.bullet_width = 10
                     self.bullet_height = 10
                     self.bullet_image = 1
-                    self.damage = 4
+                    self.damage = 6
                     self.bullet_spread = 100
                     upgrade.kill()
 
@@ -234,10 +241,13 @@ class TailsLevel:
                 enemy.kill()
                 self.plane_character.rings -= 6
             else:
-                self.plane_character.rings = self.plane_character.rings // 2 + 1
+                if enemy.damage:
+                    self.plane_character.rings -= enemy.damage
+                    self.score -= 50
+                    self.zap_sound.play()
+                    enemy.damage = 0
+                    enemy.images = list(
+                        map(lambda image: pygame.transform.scale(image, (enemy.width, enemy.height)), self.sad_cloud_sprites))
 
     def quit(self):
         pygame.quit()
-
-    def get_output(self):
-        return self.output
