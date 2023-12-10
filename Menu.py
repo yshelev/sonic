@@ -18,7 +18,7 @@ class Menu:
         self.BG2 = pygame.image.load("data/menu_objects/play_background.png")
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
-        self.main_menu()
+        self.start_video_loop()
     def get_font(self, size):
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
@@ -60,15 +60,15 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        self.main_menu()
+                        self.main_menu(True)
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        TailsLevel()
-                        self.main_menu()
+                        tails_game = TailsLevel()
+                        self.main_menu(tails_game.get_output())
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        SonicLevel()
-                        self.main_menu()
+                        sonic_game = SonicLevel()
+                        self.main_menu(sonic_game.get_output())
 
             pygame.display.update()
 
@@ -116,7 +116,7 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                         running = False
-                        self.main_menu()
+                        self.main_menu(True)
 
             pygame.display.update()
 
@@ -140,12 +140,12 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if DEVELOPERS_BACK.checkForInput(DEVELOPERS_MOUSE_POS):
                         running = False
-                        self.main_menu()
+                        self.main_menu(True)
 
             pygame.display.update()
 
-    def main_menu(self):
-        running = True
+    def main_menu(self, flag):
+        running = flag
         while running:
             screen.blit(self.BG1, (0, 0))
 
@@ -187,6 +187,7 @@ class Menu:
             pygame.display.update()
 
     def start_video_loop(self) -> None:
+        flag = True
         video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
         success, video_image = video.read()
         fps = video.get(cv2.CAP_PROP_FPS)
@@ -203,13 +204,14 @@ class Menu:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                    flag = False
 
             success, video_image = video.read()
             if success:
                 video_surf = pygame.image.frombuffer(
                     video_image.tobytes(),
                     video_image.shape[1::-1],
-                    "background_imageR"
+                    "BGR"
                 )
             else:
                 run = False
@@ -217,4 +219,4 @@ class Menu:
             pygame.display.flip()
 
         pygame.mixer.music.stop()
-        self.main_menu()
+        self.main_menu(flag)
