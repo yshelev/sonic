@@ -1,6 +1,7 @@
 from typing import Tuple, Type
 
 from Character import Character
+from Enemy_score import Enemy_score
 from Settings import *
 import pygame
 
@@ -30,12 +31,15 @@ class MainHero(Character):
         self.is_falling = False
         self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
         self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
+        self.score = 0
+        self.add_score = 0
 
     def move_left(self, tiles) -> (int, float):
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_left = True
-        self.additional_speed -= self.boost / FPS
+        self.additional_speed = max(-20 * FPS, self.additional_speed - self.boost / FPS)
+
 
         move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
 
@@ -58,7 +62,7 @@ class MainHero(Character):
         can_move_left, can_move_right, point_x = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_right = True
-        self.additional_speed += self.boost / FPS
+        self.additional_speed = min(20 * FPS, self.additional_speed + self.boost / FPS)
 
         move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
 
@@ -123,7 +127,6 @@ class MainHero(Character):
 
     def start_jump(self, tiles_sprites) -> None:
         super().start_jump(tiles_sprites)
-        self.play_sound_start_jump()
 
     def play_sound_start_jump(self) -> None:
         self.jump_sound.set_volume(0.1)
@@ -171,6 +174,10 @@ class MainHero(Character):
                 self.image = self.start_image
             elif self.moving_left:
                 if abs(self.additional_speed) / FPS > 7.5:
+                    if abs(self.additional_speed) / FPS == 20:
+                        self.image = self.fast_left_frames[self.cur_fast_frame]
+                    else:
+                        self.image = self.fast_left_frames[self.cur_fast_frame]
                     self.image = self.fast_left_frames[self.cur_fast_frame]
                 else:
                     self.image = self.left_frames[self.cur_frame]
@@ -178,7 +185,7 @@ class MainHero(Character):
             elif self.moving_right:
                 if abs(self.additional_speed) / FPS > 7.5:
                     if abs(self.additional_speed) / FPS == 20:
-                        self.image = self.super_fast_right_frames
+                        self.image = self.fast_right_frames[self.cur_fast_frame]
                     else:
                         self.image = self.fast_right_frames[self.cur_fast_frame]
                 else:
@@ -350,11 +357,16 @@ class MainHero(Character):
         self.play_collect_ring()
         self.number_of_rings += 1
 
+    def get_score(self):
+        return self.score
+
     def is_alive(self):
         return self.number_of_rings > 0
 
     def collide_enemy(self, enemies):
         if self.speed_y > 0:
+            self.add_score += 100
+            self.score += self.add_score
             enemies.kill()
             return True
         else:
@@ -362,5 +374,9 @@ class MainHero(Character):
             return False
 
     def play_collect_ring(self) -> None:
+        self.score += 1000
         self.enemy_death_sound.set_volume(0.1)
         self.enemy_death_sound.play()
+
+    def get_add_score(self):
+        return self.add_score
