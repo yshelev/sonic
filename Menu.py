@@ -18,7 +18,7 @@ class Menu:
         self.BG2 = pygame.image.load("data/menu_objects/play_background.png")
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
-        self.main_menu(True)
+        self.start_video_loop()
     def get_font(self, size):
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
@@ -64,7 +64,7 @@ class Menu:
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
                         running = False
                         tails_game = TailsLevel()
-                        self.main_menu(TailsLevel.get_output())
+                        self.main_menu(tails_game.get_output())
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         running = False
                         sonic_game = SonicLevel()
@@ -211,7 +211,7 @@ class Menu:
                 video_surf = pygame.image.frombuffer(
                     video_image.tobytes(),
                     video_image.shape[1::-1],
-                    "background_imageR"
+                    "BGR"
                 )
             else:
                 run = False
