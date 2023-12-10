@@ -114,7 +114,7 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                         running = False
-                        self.main_menu(True)
+                        self.main_menu()
 
             pygame.display.update()
 
@@ -137,7 +137,7 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if DEVELOPERS_BACK.checkForInput(DEVELOPERS_MOUSE_POS):
                         running = False
-                        self.main_menu(True)
+                        self.main_menu()
 
             pygame.display.update()
 

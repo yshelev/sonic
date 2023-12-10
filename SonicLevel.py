@@ -66,27 +66,37 @@ class SonicLevel:
         self.all_sprites_wo_mh = pygame.sprite.Group()
         self.all_spikes_sprites = pygame.sprite.Group()
         self.all_enemies_score = pygame.sprite.Group()
+        for i in range(10):
+            Tiles(- 5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300, pygame.image.load("data/GROUND/Floor.png"),
+                  self.all_tiles_sprites,
+                  self.all_sprites,
+                  self.all_sprites_wo_mh)
+        for i in range(10):
+            Tiles(5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300, pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 90),
+                  self.all_tiles_sprites,
+                  self.all_sprites,
+                  self.all_sprites_wo_mh)
         for i in range(-50, 51):
             Tiles(i * 300, SCREEN_HEIGHT - 100, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
-            if i % 10 == 0:
-                Tiles(i * 300, SCREEN_HEIGHT - 400, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
-                      self.all_tiles_sprites,
-                      self.all_sprites,
-                      self.all_sprites_wo_mh)
-            if i % 20 == 0:
-                Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
-                      self.all_rings_sprites,
-                      self.all_sprites,
-                      self.all_sprites_wo_mh)
-            if i % 20 == 0:
-                Enemy(i * 300 + 150, SCREEN_HEIGHT - 200, self.enemy_images[0], self.enemy_images, self.enemy_images,
-                      self.all_enemy_sprites,
-                      self.all_sprites,
-                      self.all_sprites_wo_mh
-                      )
+        #     if i % 10 == 0:
+        #         Tiles(i * 300, SCREEN_HEIGHT - 400, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
+        #               self.all_tiles_sprites,
+        #               self.all_sprites,
+        #               self.all_sprites_wo_mh)
+        #     if i % 20 == 0:
+        #         Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
+        #               self.all_rings_sprites,
+        #               self.all_sprites,
+        #               self.all_sprites_wo_mh)
+        #     if i % 20 == 0:
+        #         Enemy(i * 300 + 150, SCREEN_HEIGHT - 200, self.enemy_images[0], self.enemy_images, self.enemy_images,
+        #               self.all_enemy_sprites,
+        #               self.all_sprites,
+        #               self.all_sprites_wo_mh
+        #               )
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -130,13 +140,13 @@ class SonicLevel:
 
     def draw_lines(self) -> None:
         pygame.draw.rect(screen, "black", (100, 479, 10, 10))
-        pygame.draw.rect(screen, "black", (self.main_hero.x,
+        pygame.draw.rect(screen, "black", (self.main_hero.x + 5,
                                            self.main_hero.y - self.main_hero.speed_y / FPS,
-                                           self.main_hero.width,
+                                           self.main_hero.width - 5,
                                            self.main_hero.height + self.main_hero.speed_y / FPS))
-        pygame.draw.rect(screen, "red", (self.main_hero.x,
+        pygame.draw.rect(screen, "red", (self.main_hero.x + 5,
                                          self.main_hero.y,
-                                         self.main_hero.width,
+                                         self.main_hero.width - 5,
                                          self.main_hero.height + self.main_hero.speed_y / FPS)
                          )
 
@@ -236,7 +246,7 @@ class SonicLevel:
 
         self.draw_num_of_rings()
         self.draw_score()
-        # self.draw_lines()
+        self.draw_lines()
         self.all_sprites.draw(screen)
 
     def quit(self):
