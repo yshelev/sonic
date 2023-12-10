@@ -194,7 +194,8 @@ class Plane_Cloud(pygame.sprite.Sprite):
         self.image = images[self.cur_frame]
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.speed_x = 400
-        self.health = 999999999999
+        self.health = 999999
+        self.damage = 10
 
     def update(self, *args, **kwargs):
         self.cur_frame += 1
