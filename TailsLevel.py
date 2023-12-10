@@ -1,9 +1,11 @@
 import random
-
+import sys
 import pygame
 
 from Plane_Level import *
 from Settings import *
+from button import *
+from Menu import *
 
 
 class TailsLevel:
@@ -50,6 +52,7 @@ class TailsLevel:
         self.current_time = 0
         self.timer = 0
         self.score = 0
+        self.win = False
 
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
@@ -76,22 +79,27 @@ class TailsLevel:
 
         self.background_image_x = 0
 
-        self.ot_vinta.play(-1)
-        self.game_loop()
+        self.output = self.game_loop()
 
     def game_loop(self):
+        self.ot_vinta.play(-1)
         self.start_time = pygame.time.get_ticks()
+        flag = True
         running = True
         while running:
             self.current_time = pygame.time.get_ticks()
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    flag = False
                     running = False
                     self.quit()
             if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
+                if self.ot_vinta_len - self.timer == 0:
+                    self.win = True
                 running = False
                 self.ot_vinta.stop()
+                self.end_screen()
             self.spawner()
             self.plane_actions()
             self.collide_enemy()
@@ -100,6 +108,62 @@ class TailsLevel:
             self.all_sprites_level2.update()
 
             pygame.display.flip()
+        return flag
+
+    def end_screen(self):
+        running = True
+        while running:
+            if self.win == True:
+                bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
+                                                       (SCREEN_WIDTH, SCREEN_HEIGHT))
+                screen.blit(bg, (1, 1))
+                text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                    f'ХОРОШ',
+                    True, (255, 255, 255))
+                screen.blit(text_surface, (400, 100))
+            else:
+                bg = pygame.transform.scale(pygame.image.load("data/tails_loser.jpg"),
+                                            (SCREEN_WIDTH, SCREEN_HEIGHT))
+                screen.blit(bg, (1, 1))
+
+            PLAY_MOUSE_POS = pygame.mouse.get_pos()
+            RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                           pos=(SCREEN_WIDTH // 1.2, 650),
+                           text_input="ЗАНОВО", font=self.get_font(50), base_color="White", hovering_color="Orange")
+
+            RETRY.changeColor(pygame.mouse.get_pos())
+            RETRY.update(screen)
+
+            RETURN_TO_MAIN_MENU = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                                         pos=(SCREEN_WIDTH // 1.2, 750),
+                                         text_input="В МЕНЮ", font=self.get_font(50), base_color="White",
+                                         hovering_color="Orange")
+
+            RETURN_TO_MAIN_MENU.changeColor(pygame.mouse.get_pos())
+            RETURN_TO_MAIN_MENU.update(screen)
+
+            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                f'ОЧКИ: {self.score}',
+                True, (0, 0, 0))
+            screen.blit(text_surface, (20, 100))
+
+
+
+
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if RETRY.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+                        TailsLevel()
+                    if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+            pygame.display.update()
+
+    def get_font(self, size):
+        return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
     def plane_actions(self):
         keys = pygame.key.get_pressed()
@@ -127,14 +191,13 @@ class TailsLevel:
                          self.all_sprites_level2, self.all_bullet_sprites)
             self.last_shot = pygame.time.get_ticks()
 
-
     def play_music(self) -> None:
         background_music = pygame.mixer.Sound('data/MUSIC/background_image_Music.mp3')
         background_music.set_volume(0.1)
         background_music.play(-1)
 
     def draw_timer_and_score(self):
-        self.timer = (self.current_time-self.start_time)//1000
+        self.timer = (self.current_time - self.start_time) // 1000
         self.minutes = (self.ot_vinta_len - self.timer) // 60
         self.seconds = self.ot_vinta_len - self.minutes * 60 - self.timer
         self.seconds = self.seconds if self.seconds >= 10 else '0' + str(self.seconds)
@@ -247,7 +310,12 @@ class TailsLevel:
                     self.zap_sound.play()
                     enemy.damage = 0
                     enemy.images = list(
-                        map(lambda image: pygame.transform.scale(image, (enemy.width, enemy.height)), self.sad_cloud_sprites))
+                        map(lambda image: pygame.transform.scale(image, (enemy.width, enemy.height)),
+                            self.sad_cloud_sprites))
 
     def quit(self):
         pygame.quit()
+        sys.exit()
+
+    def get_output(self) -> bool:
+        return self.output
