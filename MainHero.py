@@ -1,4 +1,3 @@
-from typing import Tuple, Type
 
 from Character import Character
 from Enemy_score import Enemy_score
