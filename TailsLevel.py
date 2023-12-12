@@ -116,7 +116,7 @@ class TailsLevel:
             if self.win == True:
                 bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
-                screen.blit(bg, (1, 1))
+                screen.blit(bg, (0, 0))
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
                     f'ХОРОШ',
                     True, (255, 255, 255))
@@ -124,7 +124,7 @@ class TailsLevel:
             else:
                 bg = pygame.transform.scale(pygame.image.load("data/tails_loser.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
-                screen.blit(bg, (1, 1))
+                screen.blit(bg, (0, 0))
 
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
             RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),

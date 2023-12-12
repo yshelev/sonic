@@ -16,14 +16,14 @@ class Plane_Character(pygame.sprite.Sprite):
         self.moving_right = False
         self.moving_up = False
         self.moving_down = False
-        self.width, self.height = 256, 128
+        self.width, self.height = 256, 128-30
         self.x = x
         self.y = y
         self.images = images
 
         self.cur_frame = 0
         self.image = images[self.cur_frame]
-        self.images = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)), self.images))
+        self.images = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height+30)), self.images))
         self.rect = pygame.Rect(x, y, self.width, self.height)
         self.speed_x = 500
         self.speed_y = 500
