@@ -40,6 +40,8 @@ class Character(pygame.sprite.Sprite):
             lambda image: pygame.transform.flip(image, True, False), self.right_jump_frames
         ))
         self.cur_frame_jump = 0
+        self.is_falling = False
+
 
     def update(self, *args, **kwargs) -> None:
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
@@ -69,6 +71,9 @@ class Character(pygame.sprite.Sprite):
         can_move_right, can_move_left = self.can_move_x(tiles)
         if can_move_left * can_move_right == 1:
             self.x += self.speed_x / FPS
+        else:
+            self.start_jump(tiles)
+            self.moving_left = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_right(self, tiles) -> None:
@@ -78,6 +83,7 @@ class Character(pygame.sprite.Sprite):
         if can_move_right * can_move_left == 1:
             self.x += self.speed_x / FPS
         else:
+            self.start_jump(tiles)
             self.moving_right = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -94,6 +100,7 @@ class Character(pygame.sprite.Sprite):
                 self.y += (self.speed_y / FPS)
         else:
             self.is_jumping = False
+            self.is_falling = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def get_is_jumping(self) -> bool:

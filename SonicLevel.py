@@ -66,18 +66,50 @@ class SonicLevel:
         self.all_sprites_wo_mh = pygame.sprite.Group()
         self.all_spikes_sprites = pygame.sprite.Group()
         self.all_enemies_score = pygame.sprite.Group()
+        with open("data/map.txt") as f:
+            self.map = [i.split() for i in f.readlines()[::-1]]
+
+        for i in self.map:
+            print(i)
         for i in range(10):
-            Tiles(- 5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300, pygame.image.load("data/GROUND/Floor.png"),
+            Tiles(-5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
+                  pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 270),
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
         for i in range(10):
-            Tiles(5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300, pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 90),
+            Tiles(5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
+                  pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 90),
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
+        for i in range(9):
+            for j in range(-10, 10):
+                char = self.map[i][j + 10]
+                if char == "t":
+                    Tiles(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, SCREEN_WIDTH // 2,
+                          SCREEN_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
+                          self.all_tiles_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
+                if char == "e":
+                    Enemy(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, self.enemy_images[0],
+                          self.enemy_images,
+                          self.enemy_images,
+                          self.all_enemy_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh
+                          )
+                if char == "s":
+                    Tiles(SCREEN_WIDTH // 2 * j + SCREEN_WIDTH // 4 - SCREEN_WIDTH // 8,
+                          SCREEN_HEIGHT - (i + 2) * SCREEN_HEIGHT // 30, SCREEN_WIDTH // 8,
+                          SCREEN_HEIGHT // 30, pygame.image.load("data/GROUND/Platform.png"),
+                          self.all_tiles_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
+
         for i in range(-50, 51):
-            Tiles(i * 300, SCREEN_HEIGHT - 100, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
+            Tiles(i * 300, SCREEN_HEIGHT, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
@@ -218,6 +250,7 @@ class SonicLevel:
             running = False
         for i in self.all_enemy_sprites:
             i.check(self.all_tiles_sprites)
+
             if i.get_is_jumping():
                 i.jump(self.all_tiles_sprites)
             i.moveself_x(self.all_tiles_sprites)
@@ -246,7 +279,7 @@ class SonicLevel:
 
         self.draw_num_of_rings()
         self.draw_score()
-        self.draw_lines()
+        # self.draw_lines()
         self.all_sprites.draw(screen)
 
     def quit(self):

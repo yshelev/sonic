@@ -23,7 +23,7 @@ class MainHero(Character):
 
         self.fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
                                          self.fast_right_frames))
-        self.padding = 5
+        self.padding = 15
         self.cur_fast_frame = 0
         self.additional_speed = 0
         self.boost = 300
@@ -127,9 +127,6 @@ class MainHero(Character):
             self.jump(tiles)
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
-
-    def start_jump(self, tiles_sprites) -> None:
-        super().start_jump(tiles_sprites)
 
     def play_sound_start_jump(self) -> None:
         self.jump_sound.set_volume(0.1)
