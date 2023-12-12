@@ -103,6 +103,24 @@ class Character(pygame.sprite.Sprite):
             self.is_falling = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
+    def start_dead_jump(self):
+        self.speed_y = -400
+        self.dead_jump()
+
+    def dead_jump(self):
+        self.speed_y += GRAVITY / FPS
+        self.y += self.speed_y / FPS
+        if self.y > SCREEN_HEIGHT:
+            super().kill()
+            return False
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+        return True
+
+
+    def kill(self):
+        self.alive = False
+        self.start_dead_jump()
+
     def get_is_jumping(self) -> bool:
         return self.is_jumping
 

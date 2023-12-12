@@ -90,7 +90,7 @@ class MainHero(Character):
         can_move_invisible_bottom, can_move_invisible_top = self.can_move_invisible_wall_y()
         direction_x = self.move_direction()[0]
 
-        if not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left):
+        if self.is_alive() * (not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left)):
             move_code_x = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left,
                                                can_move_invisible_right)
 
@@ -122,7 +122,7 @@ class MainHero(Character):
 
         mc = exit_codes["sonic_movement_y"][move_code_y]
 
-        if mc != STOPPED_BY_BOT_WALL_OUTSIDE:
+        if mc != STOPPED_BY_BOT_WALL_OUTSIDE * self.is_alive():
             self.jump(tiles)
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
@@ -363,12 +363,12 @@ class MainHero(Character):
         return self.number_of_rings > 0
 
     def collide_enemy(self, enemies):
-        if self.speed_y > 0:
+        if (self.speed_y > 0) * (enemies.is_alive()):
             self.add_score += 100
             self.score += self.add_score
             enemies.kill()
             return True
-        else:
+        elif enemies.is_alive():
             self.get_damage()
             return False
 

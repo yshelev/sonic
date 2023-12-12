@@ -8,10 +8,12 @@ from Settings import *
 from Tiles import Tiles
 from Enemy import Enemy
 from Rings import Rings
+from button import Button
 
 
 class SonicLevel:
     def __init__(self):
+        self.last_screen = None
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -69,8 +71,10 @@ class SonicLevel:
         with open("data/map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
 
-        for i in self.map:
-            print(i)
+        self.finish_tale = Tiles(-4 * SCREEN_WIDTH, SCREEN_HEIGHT - 2 * 300, 300, 300,
+                                 pygame.transform.rotate(pygame.image.load("data/GROUND/movable platform.png"), 270),
+                                 self.all_sprites)
+
         for i in range(10):
             Tiles(-5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
                   pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 270),
@@ -167,8 +171,57 @@ class SonicLevel:
             pygame.display.flip()
         self.background_music.stop()
 
-    def end_screen(self):
-        pass
+    def end_screen(self, win):
+        dct_win_phrases = {
+            True: "Поздравляю, вы победили!",
+            False: "К сожалению, вы проиграли("
+        }
+        running = True
+        while running:
+
+            bg = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
+            screen.blit(bg, (0, 0))
+            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                f'{dct_win_phrases[win]}',
+                True, (255, 255, 255))
+            screen.blit(text_surface, (400, 100))
+
+            PLAY_MOUSE_POS = pygame.mouse.get_pos()
+            RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                           pos=(SCREEN_WIDTH // 1.2, 650),
+                           text_input="ЗАНОВО", font=self.get_font(50), base_color="White",
+                           hovering_color="Orange")
+
+            RETRY.changeColor(pygame.mouse.get_pos())
+            RETRY.update(screen)
+
+            RETURN_TO_MAIN_MENU = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                                         pos=(SCREEN_WIDTH // 1.2, 750),
+                                         text_input="В МЕНЮ", font=self.get_font(50), base_color="White",
+                                         hovering_color="Orange")
+
+            RETURN_TO_MAIN_MENU.changeColor(pygame.mouse.get_pos())
+            RETURN_TO_MAIN_MENU.update(screen)
+
+            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                f'ОЧКИ: {self.main_hero.score}',
+                True, (0, 0, 0))
+            screen.blit(text_surface, (20, 100))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if RETRY.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+                        SonicLevel()
+                    if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+            pygame.display.update()
+
+    def get_font(self, size):
+        return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
     def draw_lines(self) -> None:
         pygame.draw.rect(screen, "black", (100, 479, 10, 10))
@@ -193,12 +246,13 @@ class SonicLevel:
         screen.blit(text_surface, (20, 40))
 
     def movement_of_main_character(self) -> bool:
+        running = True
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping():
+        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping()):
             self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
-        if not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
-                keys[pygame.K_RIGHT] or keys[button_settings["right"]])):
+        if self.main_hero.is_alive() * (not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
+                keys[pygame.K_RIGHT] or keys[button_settings["right"]]))):
             if keys[pygame.K_LEFT] or keys[button_settings["left"]]:
                 output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
@@ -214,11 +268,11 @@ class SonicLevel:
                         tile.move_x(-movement_sprites_speed, self.main_hero, self.all_tiles_sprites)
             else:
                 self.main_hero.set_moving_right(False)
-        else:
+        elif self.main_hero.is_alive():
             self.main_hero.set_moving_right(True)
             self.main_hero.set_moving_left(True)
 
-        if self.main_hero.get_is_jumping():
+        if self.main_hero.get_is_jumping() * self.main_hero.is_alive():
             jump_speed_tiles = self.main_hero.jump(self.all_tiles_sprites)
             for tile in self.all_sprites_wo_mh:
                 tile.move_y(jump_speed_tiles, self.main_hero, self.all_tiles_sprites)
@@ -226,11 +280,11 @@ class SonicLevel:
         output_code_x, movement_sprites_speed_x, output_code_y, movement_sprites_speed_y = \
             self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         if exit_codes["sonic_movement_x"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
-                                                             STOPPED_BY_LEFT_INVISIBLE_WALL]:
+                                                             STOPPED_BY_LEFT_INVISIBLE_WALL]  * self.main_hero.is_alive():
             for tile in self.all_sprites_wo_mh:
                 tile.move_x(-movement_sprites_speed_x, self.main_hero, self.all_tiles_sprites)
         if exit_codes["sonic_movement_y"][output_code_y] in [STOPPED_BY_TOP_INVISIBLE_WALL,
-                                                             STOPPED_BY_BOT_INVISIBLE_WALL]:
+                                                             STOPPED_BY_BOT_INVISIBLE_WALL]* self.main_hero.is_alive():
             for tile in self.all_sprites_wo_mh:
                 tile.move_y(movement_sprites_speed_y, self.main_hero, self.all_tiles_sprites)
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
@@ -244,18 +298,48 @@ class SonicLevel:
             if self.main_hero.collide_enemy(enemies):
                 Enemy_score(self.main_hero.get_add_score(), self.my_font,
                             pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
-            self.main_hero.start_jump(self.all_tiles_sprites)
-        running = True
-        if not self.main_hero.is_alive():
+                self.main_hero.start_jump(self.all_tiles_sprites)
+        if self.check_exit():
             running = False
-        for i in self.all_enemy_sprites:
-            i.check(self.all_tiles_sprites)
+            self.end_screen(True)
 
-            if i.get_is_jumping():
-                i.jump(self.all_tiles_sprites)
-            i.moveself_x(self.all_tiles_sprites)
+        if not self.main_hero.is_alive():
+            self.last_screen = screen.copy()
+            running = False
+            self.play_mh_death()
+            self.main_hero.dead_jump()
+
+
+        for i in self.all_enemy_sprites:
+            if i.is_alive():
+                i.check(self.all_tiles_sprites)
+                if i.get_is_jumping():
+                    i.jump(self.all_tiles_sprites)
+                i.moveself_x(self.all_tiles_sprites)
+            else:
+                i.dead_jump()
 
         return running
+
+    def play_mh_death(self):
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            running = self.main_hero.dead_jump()
+
+            self.last_screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
+            self.last_screen.blit(self.background_image, (self.background_image_x, 0))
+
+            self.all_sprites.draw(self.last_screen)
+            screen.blit(self.last_screen, (0, 0))
+
+            pygame.display.update()
+
+        self.end_screen(False)
+
+
+
+
 
     def background_image_movement(self) -> None:
         if self.main_hero.get_additional_speed() > 0:
@@ -285,3 +369,6 @@ class SonicLevel:
     def quit(self):
         pygame.quit()
         sys.exit()
+
+    def check_exit(self):
+        return self.main_hero.rect.colliderect(self.finish_tale)
