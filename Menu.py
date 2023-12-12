@@ -55,20 +55,19 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        self.main_menu(True)
+                        self.main_menu()
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        tails_game = TailsLevel()
-                        self.main_menu(tails_game.get_output())
+                        TailsLevel()
+                        self.main_menu()
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        sonic_game = SonicLevel()
-                        self.main_menu(sonic_game.get_output())
+                        SonicLevel()
+                        self.main_menu()
 
             pygame.display.update()
 
@@ -111,12 +110,11 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                         running = False
-                        self.main_menu(True)
+                        self.main_menu()
 
             pygame.display.update()
 
@@ -135,17 +133,16 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if DEVELOPERS_BACK.checkForInput(DEVELOPERS_MOUSE_POS):
                         running = False
-                        self.main_menu(True)
+                        self.main_menu()
 
             pygame.display.update()
 
-    def main_menu(self, flag):
-        running = flag
+    def main_menu(self):
+        running = True
         while running:
             screen.blit(self.BG1, (0, 0))
 
@@ -168,8 +165,7 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    sys.exit()
+                    self.quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                         running = False
@@ -181,13 +177,11 @@ class Menu:
                         running = False
                         self.options()
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        pygame.quit()
-                        sys.exit()
+                        self.quit()
 
             pygame.display.update()
 
     def start_video_loop(self) -> None:
-        flag = True
         # video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
         # success, video_image = video.read()
         # fps = video.get(cv2.CAP_PROP_FPS)
@@ -203,8 +197,8 @@ class Menu:
         #     clock.tick(fps)
         #     for event in pygame.event.get():
         #         if event.type == pygame.QUIT:
-        #             run = False
-        #             flag = False
+        #             self.quit()
+        #
         #
         #     success, video_image = video.read()
         #     if success:
@@ -219,4 +213,8 @@ class Menu:
         #     pygame.display.flip()
 
         pygame.mixer.music.stop()
-        self.main_menu(flag)
+        self.main_menu()
+
+    def quit(self):
+        pygame.quit()
+        sys.exit()

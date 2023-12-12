@@ -36,6 +36,20 @@ class Enemy(Character):
             self.y -= speed / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
+    def start_jump(self, tiles_sprites) -> None:
+        self.speed_y = -300
+        self.is_jumping = True
+        self.jump(tiles_sprites)
+
+    def start_fall(self, tiles_sprites):
+        self.speed_y = 0
+        self.is_falling = True
+        self.jump(tiles_sprites)
+
+
+    def get_is_falling(self):
+        return self.is_falling
+
     def check(self, tiles):
         tiles_stacked = self.stack(tiles)
         if tiles_stacked:
@@ -43,11 +57,14 @@ class Enemy(Character):
             top_indent = tile.rect.y - self.rect.y - self.rect.h
             bot_indent = tile.rect.y + tile.rect.h - self.rect.y
             self.y += top_indent if abs(top_indent) < bot_indent else bot_indent
+            tile: Tiles = tiles_stacked[0]
+            left_indent = tile.rect.x - self.rect.x - self.rect.w
+            right_indent = tile.rect.x + tile.rect.w - self.rect.x
+            self.x += -1 if abs(left_indent) < right_indent else 1
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def stack(self, tiles):
         return [i for i in tiles if i.rect.colliderect(self.rect)]
-
 
     def update(self, *args, **kwargs) -> None:
         self.jump_counter += 1
@@ -73,3 +90,7 @@ class Enemy(Character):
     def moveself_x(self, tiles_sprite):
         self.move_right(tiles_sprite) if self.speed_x > 0 else self.move_left(tiles_sprite) if self.speed_x < 0 else \
             None
+
+    def can_move_y(self, tiles_sprites) -> (bool, bool):
+        return (not(any(self.rect.move(0, (self.speed_y - 60) / FPS).colliderect(i) for i in tiles_sprites)),
+                not(any(self.rect.move(0, (self.speed_y - 60) / FPS).colliderect(i) for i in tiles_sprites)))

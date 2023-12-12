@@ -23,6 +23,7 @@ class MainHero(Character):
 
         self.fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
                                          self.fast_right_frames))
+        self.padding = 15
         self.cur_fast_frame = 0
         self.additional_speed = 0
         self.boost = 300
@@ -40,8 +41,8 @@ class MainHero(Character):
         self.moving_left = True
         self.additional_speed = max(-20 * FPS, self.additional_speed - self.boost / FPS)
 
-
-        move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
+        move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left,
+                                         can_move_invisible_right)
 
         ec = exit_codes["sonic_movement_x"][move_code]
         direction = self.move_direction()[0]
@@ -64,7 +65,8 @@ class MainHero(Character):
         self.moving_right = True
         self.additional_speed = min(20 * FPS, self.additional_speed + self.boost / FPS)
 
-        move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left, can_move_invisible_right)
+        move_code = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left,
+                                         can_move_invisible_right)
 
         ec = exit_codes["sonic_movement_x"][move_code]
         direction = self.move_direction()[0]
@@ -116,7 +118,8 @@ class MainHero(Character):
         else:
             move_code_x = exit_codes["sonic_movement_x"].index(MOVING)
 
-        move_code_y = self.get_move_y_code(can_move_top, can_move_bottom, can_move_invisible_top, can_move_invisible_bottom)
+        move_code_y = self.get_move_y_code(can_move_top, can_move_bottom, can_move_invisible_top,
+                                           can_move_invisible_bottom)
 
         mc = exit_codes["sonic_movement_y"][move_code_y]
 
@@ -125,13 +128,9 @@ class MainHero(Character):
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
-    def start_jump(self, tiles_sprites) -> None:
-        super().start_jump(tiles_sprites)
-
     def play_sound_start_jump(self) -> None:
         self.jump_sound.set_volume(0.1)
         self.jump_sound.play()
-
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
         self.is_jumping = True
@@ -205,12 +204,13 @@ class MainHero(Character):
 
     def can_move_y(self, tiles_sprites: pygame.sprite.Group) -> (bool, bool, list[int]):
         return not any(pygame.rect.Rect(
-            self.x, self.y, self.width,
+            self.x + self.padding, self.y, self.width - 2 * self.padding,
             self.height + (GRAVITY + self.speed_y) / FPS
         ).colliderect(i) for i in filter(lambda i: i.rect.y > self.rect.y, tiles_sprites)), not any(pygame.rect.Rect(
-            self.x, self.y - (self.speed_y + GRAVITY) / FPS, self.width,
-                    self.height + (self.speed_y + GRAVITY) / FPS
-        ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites)), [i.rect.y - self.rect.w - 2 for
+            self.x + self.padding, self.y - (self.speed_y + GRAVITY) / FPS, self.width - 2 * self.padding,
+            self.height + (self.speed_y + GRAVITY) / FPS
+        ).colliderect(i) for i in filter(lambda i: i.rect.y < self.rect.y, tiles_sprites)), [i.rect.y - self.rect.w - 2
+                                                                                             for
                                                                                              i
                                                                                              in filter(
                 lambda i: i.rect.y > self.rect.y, tiles_sprites) if pygame.rect.Rect(
