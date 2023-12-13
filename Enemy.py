@@ -23,7 +23,7 @@ class Enemy(Character):
         self.jump_cooldown = random.randint(100, 1000)
         self.movement_counter = 0
         self.jump_counter = 0
-        self.speed_x = 180 * random.choice([-1, 1])
+        self.speed_x = 180 * random.randint(-1000, 1000) / 500.0
         self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/enemy_death.mp3')
         self.alive = True
 
@@ -33,7 +33,7 @@ class Enemy(Character):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_y(self, speed: float, mh: MainHero, tiles) -> None:
-        if self.can_move_y(tiles):
+        if any(self.can_move_y(tiles)):
             self.y -= speed / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -46,7 +46,6 @@ class Enemy(Character):
         self.speed_y = 0
         self.is_falling = True
         self.jump(tiles_sprites)
-
 
     def get_is_falling(self):
         return self.is_falling
@@ -70,14 +69,17 @@ class Enemy(Character):
     def update(self, *args, **kwargs) -> None:
         self.jump_counter += 1
         self.movement_counter += 1
+        if self.can_move_y(args[0]):
+            self.is_falling = True
         if self.jump_counter > self.jump_cooldown:
             self.start_jump(args[0])
-            self.jump_cooldown = random.randint(1000, 1500)
+            self.jump_cooldown = random.randint(300, 900)
             self.jump_counter = 0
         if self.movement_counter > self.movement_cooldown:
-            self.speed_x *= -1
-            self.movement_cooldown = random.randint(1000, 1500)
+            self.speed_x = 180 * random.randint(-1000, 1000) / 500.0
+            self.movement_cooldown = random.randint(300, 900)
             self.movement_counter = 0
+
         super().update()
 
     def kill(self):
@@ -96,5 +98,6 @@ class Enemy(Character):
             None
 
     def can_move_y(self, tiles_sprites) -> (bool, bool):
-        return (not(any(self.rect.move(0, (self.speed_y - 60) / FPS).colliderect(i) for i in tiles_sprites)),
-                not(any(self.rect.move(0, (self.speed_y - 60) / FPS).colliderect(i) for i in tiles_sprites)))
+        return (not (any(self.rect.move(0, (self.speed_y - 60) / FPS).colliderect(i) for i in tiles_sprites)),
+                not (any(self.rect.move(0, (self.speed_y - 60) / FPS).colliderect(i) for i in tiles_sprites)),
+                [i.rect.y - self.height - 1 for i in filter(lambda x: x.rect.y > self.rect.y, tiles_sprites) if (self.rect.move(0, (self.speed_y - 60) / FPS))])

@@ -28,11 +28,8 @@ class MainHero(Character):
                                           super_fast_images))
 
 
-        print(len(super_fast_images))
-        print(len(self.super_fast_right_frames))
         self.super_fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
                                          self.super_fast_right_frames))
-        print(len(self.super_fast_left_frames))
 
 
         self.padding = 15
@@ -82,9 +79,8 @@ class MainHero(Character):
 
         ec = exit_codes["sonic_movement_x"][move_code]
         direction_x, direction_y = self.move_direction()
-        if direction_y == TOP:
-            self.x += (self.speed_x + self.additional_speed) / FPS
-        elif ec == OK:
+
+        if ec == OK:
             self.x += (self.speed_x + self.additional_speed) / FPS
         elif ec != STOPPED_BY_RIGHT_INVISIBLE_WALL:
             self.x += (self.speed_x + self.additional_speed) / FPS * can_move_right * (direction_x in [RIGHT, STAY])
@@ -110,25 +106,16 @@ class MainHero(Character):
                                                can_move_invisible_right)
 
             if can_move_right and self.additional_speed > 0:
-                if can_move_invisible_right:
-                    self.x += self.additional_speed / FPS
+                self.x += (self.additional_speed / FPS) * can_move_invisible_right
             elif can_move_left and self.additional_speed < 0:
-                if can_move_invisible_left:
-                    self.x += self.additional_speed / FPS
+                self.x += (self.additional_speed / FPS) * can_move_invisible_left
             else:
                 self.additional_speed = 0
             if direction_x == RIGHT:
                 self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
             elif direction_x == LEFT:
                 self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
-            if not self.is_jumping and abs(self.additional_speed) / FPS < 5:
-                self.image = self.start_image
-                self.cur_fast_frame = 0
-            if not self.is_jumping:
-                if direction_x == LEFT:
-                    self.image = self.fast_left_frames[self.cur_fast_frame]
-                elif direction_x == RIGHT:
-                    self.image = self.fast_left_frames[self.cur_fast_frame]
+
         else:
             move_code_x = exit_codes["sonic_movement_x"].index(MOVING)
 
@@ -277,13 +264,13 @@ class MainHero(Character):
                              self.rect.y,
                              self.width + (self.speed_x - self.additional_speed) / FPS,
                              self.rect.height).colliderect(i.rect) * (direction in [LEFT, STAY])
-            for i in filter(lambda i: i.rect.x < self.rect.x, tiles_sprites))),
+            for i in filter(lambda i: i.rect.x + i.rect.w - 5 < self.rect.x + 5, tiles_sprites))),
                 not (any(
                     pygame.rect.Rect(self.rect.x + (self.speed_x + self.additional_speed) / FPS,
                                      self.rect.y,
                                      self.width,
                                      self.rect.height).colliderect(i.rect) * (direction in [RIGHT, STAY])
-                    for i in filter(lambda i: i.rect.x > self.rect.x, tiles_sprites))),
+                    for i in filter(lambda i: i.rect.x + 5 > self.rect.x + self.rect.w - 5, tiles_sprites))),
                 [min(i.rect.x - self.rect.w - 1,
                      RIGHT_INVISIBLE_LINE[0][0] - 1) if i.rect.x + i.rect.w > self.rect.x else max(
                     i.rect.x + i.rect.w + 1,

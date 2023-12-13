@@ -78,10 +78,10 @@ class SonicLevel:
         with open("data/map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
 
-        self.finish_tale = Tiles(-4 * SCREEN_WIDTH, SCREEN_HEIGHT - 1 * 300, 100, 100,
-                                 pygame.transform.rotate(pygame.image.load("data/GROUND/movable platform.png"), 270),
-                                 self.all_sprites,
-                                 self.all_sprites_wo_mh)
+        NUM_TALES_X = len(self.map[0])
+        NUM_TALES_Y = len(self.map)
+
+        TALE_WIDTH, TALE_HEIGHT = 8 * SCREEN_WIDTH / NUM_TALES_X, 2 * SCREEN_HEIGHT / NUM_TALES_Y
 
         for i in range(10):
             Tiles(-5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
@@ -100,12 +100,12 @@ class SonicLevel:
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
-        for y in range(6):
-            for x in range(-15, 16):
+        for y in range(NUM_TALES_Y):
+            for x in range(-NUM_TALES_X // 2, NUM_TALES_X // 2 + 1):
                 char = self.map[y][x + 15]
                 if char == "t":
-                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, SCREEN_WIDTH // 2,
-                          SCREEN_HEIGHT // 20, pygame.image.load("data/GROUND/Platform.png"),
+                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
+                          TALE_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
                           self.all_tiles_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh)
@@ -117,13 +117,20 @@ class SonicLevel:
                           self.all_sprites,
                           self.all_sprites_wo_mh
                           )
-                # if char == "s":
-                #     Tiles(SCREEN_WIDTH // 2 * j + SCREEN_WIDTH // 4 - SCREEN_WIDTH // 8,
-                #           SCREEN_HEIGHT - (i + 2) * SCREEN_HEIGHT // 30, SCREEN_WIDTH // 8,
-                #           SCREEN_HEIGHT // 30, pygame.image.load("data/GROUND/Platform.png"),
-                #           self.all_tiles_sprites,
-                #           self.all_sprites,
-                #           self.all_sprites_wo_mh)
+                if char == "s":
+                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10, TALE_WIDTH,
+                          TALE_HEIGHT // 10, pygame.image.load("data/OBJECTS/SPIKES.png"),
+                          self.all_spikes_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
+
+                if char == "f":
+                    self.finish_tale = Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10, TALE_WIDTH,
+                          TALE_HEIGHT // 10,
+                                             pygame.transform.rotate(
+                                                 pygame.image.load("data/eggman_signs/eggman_sign_1.png"), 270),
+                                             self.all_sprites,
+                                             self.all_sprites_wo_mh)
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -165,8 +172,8 @@ class SonicLevel:
 
     def end_screen(self, win):
         dct_win_phrases = {
-            True: "Поздравляю, вы победили!",
-            False: "К сожалению, вы проиграли("
+            True: "победа",
+            False: "поражение"
         }
         running = True
         while running:
@@ -272,11 +279,11 @@ class SonicLevel:
         output_code_x, movement_sprites_speed_x, output_code_y, movement_sprites_speed_y = \
             self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         if exit_codes["sonic_movement_x"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
-                                                             STOPPED_BY_LEFT_INVISIBLE_WALL]  * self.main_hero.is_alive():
+                                                             STOPPED_BY_LEFT_INVISIBLE_WALL] * self.main_hero.is_alive():
             for tile in self.all_sprites_wo_mh:
                 tile.move_x(-movement_sprites_speed_x, self.main_hero, self.all_tiles_sprites)
         if exit_codes["sonic_movement_y"][output_code_y] in [STOPPED_BY_TOP_INVISIBLE_WALL,
-                                                             STOPPED_BY_BOT_INVISIBLE_WALL]* self.main_hero.is_alive():
+                                                             STOPPED_BY_BOT_INVISIBLE_WALL] * self.main_hero.is_alive():
             for tile in self.all_sprites_wo_mh:
                 tile.move_y(movement_sprites_speed_y, self.main_hero, self.all_tiles_sprites)
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
@@ -301,11 +308,10 @@ class SonicLevel:
             self.play_mh_death()
             self.main_hero.dead_jump()
 
-
         for i in self.all_enemy_sprites:
             if i.is_alive():
                 i.check(self.all_tiles_sprites)
-                if i.get_is_jumping():
+                if i.get_is_jumping() or i.get_is_falling():
                     i.jump(self.all_tiles_sprites)
                 i.moveself_x(self.all_tiles_sprites)
             else:
@@ -329,10 +335,6 @@ class SonicLevel:
 
         self.end_screen(False)
 
-
-
-
-
     def background_image_movement(self) -> None:
         if self.main_hero.get_additional_speed() > 0:
             if (self.background_image_x - self.background_image_speed_x) > 0:
@@ -342,10 +344,9 @@ class SonicLevel:
                 self.background_image_x = SCREEN_WIDTH
         elif self.main_hero.get_additional_speed() < 0:
             if (self.background_image_x + self.background_image_speed_x) < SCREEN_WIDTH:
-                if self.background_image_x + self.background_image_speed_x > 0:
-                    self.background_image_x += (
-                            self.background_image_speed_x * -self.main_hero.get_additional_speed() / (
-                            FPS * self.background_image_slow))
+                self.background_image_x += (
+                        self.background_image_speed_x * -self.main_hero.get_additional_speed() / (
+                        FPS * self.background_image_slow) * self.background_image_x + self.background_image_speed_x > 0)
             else:
                 self.background_image_x = 0
 
