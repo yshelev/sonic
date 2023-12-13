@@ -83,11 +83,6 @@ class SonicLevel:
 
         TALE_WIDTH, TALE_HEIGHT = 8 * SCREEN_WIDTH / NUM_TALES_X, 2 * SCREEN_HEIGHT / NUM_TALES_Y
 
-        self.finish_tale = Tiles(-4 * SCREEN_WIDTH, SCREEN_HEIGHT - 1 * 300, 100, 100,
-                                 pygame.transform.rotate(pygame.image.load("data/GROUND/movable platform.png"), 270),
-                                 self.all_sprites,
-                                 self.all_sprites_wo_mh)
-
         for i in range(10):
             Tiles(-5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
                   pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 270),
@@ -122,13 +117,20 @@ class SonicLevel:
                           self.all_sprites,
                           self.all_sprites_wo_mh
                           )
-                # if char == "s":
-                #     Tiles(SCREEN_WIDTH // 2 * j + SCREEN_WIDTH // 4 - SCREEN_WIDTH // 8,
-                #           SCREEN_HEIGHT - (i + 2) * SCREEN_HEIGHT // 30, SCREEN_WIDTH // 8,
-                #           SCREEN_HEIGHT // 30, pygame.image.load("data/GROUND/Platform.png"),
-                #           self.all_tiles_sprites,
-                #           self.all_sprites,
-                #           self.all_sprites_wo_mh)
+                if char == "s":
+                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10, TALE_WIDTH,
+                          TALE_HEIGHT // 10, pygame.image.load("data/OBJECTS/SPIKES.png"),
+                          self.all_spikes_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
+
+                if char == "f":
+                    self.finish_tale = Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10, TALE_WIDTH,
+                          TALE_HEIGHT // 10,
+                                             pygame.transform.rotate(
+                                                 pygame.image.load("data/eggman_signs/eggman_sign_1.png"), 270),
+                                             self.all_sprites,
+                                             self.all_sprites_wo_mh)
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -170,8 +172,8 @@ class SonicLevel:
 
     def end_screen(self, win):
         dct_win_phrases = {
-            True: "🤩🤩🤩",
-            False: "😿😿😿"
+            True: "победа",
+            False: "поражение"
         }
         running = True
         while running:

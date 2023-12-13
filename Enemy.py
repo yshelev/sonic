@@ -19,12 +19,11 @@ class Enemy(Character):
             *sprite_group: pygame.sprite.Group
     ) -> None:
         super().__init__(x, y, start_image, images, jump_images, *sprite_group)
-        self.start_x, start_y = x, y
         self.movement_cooldown = random.randint(100, 1000)
         self.jump_cooldown = random.randint(100, 1000)
         self.movement_counter = 0
         self.jump_counter = 0
-        self.speed_x = 180 * random.choice([-1, 1])
+        self.speed_x = 180 * random.randint(-1000, 1000) / 500.0
         self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/enemy_death.mp3')
         self.alive = True
 
@@ -74,14 +73,13 @@ class Enemy(Character):
             self.is_falling = True
         if self.jump_counter > self.jump_cooldown:
             self.start_jump(args[0])
-            self.jump_cooldown = random.randint(1000, 1500)
+            self.jump_cooldown = random.randint(300, 900)
             self.jump_counter = 0
         if self.movement_counter > self.movement_cooldown:
-            self.speed_x *= -1
-            self.movement_cooldown = random.randint(1000, 1500)
+            self.speed_x = 180 * random.randint(-1000, 1000) / 500.0
+            self.movement_cooldown = random.randint(300, 900)
             self.movement_counter = 0
-        if abs(self.start_x - self.x >= 200):
-            self.speed_x *= -1
+
         super().update()
 
     def kill(self):

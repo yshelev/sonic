@@ -264,13 +264,13 @@ class MainHero(Character):
                              self.rect.y,
                              self.width + (self.speed_x - self.additional_speed) / FPS,
                              self.rect.height).colliderect(i.rect) * (direction in [LEFT, STAY])
-            for i in filter(lambda i: i.rect.x < self.rect.x, tiles_sprites))),
+            for i in filter(lambda i: i.rect.x + i.rect.w - 5 < self.rect.x + 5, tiles_sprites))),
                 not (any(
                     pygame.rect.Rect(self.rect.x + (self.speed_x + self.additional_speed) / FPS,
                                      self.rect.y,
                                      self.width,
                                      self.rect.height).colliderect(i.rect) * (direction in [RIGHT, STAY])
-                    for i in filter(lambda i: i.rect.x > self.rect.x, tiles_sprites))),
+                    for i in filter(lambda i: i.rect.x + 5 > self.rect.x + self.rect.w - 5, tiles_sprites))),
                 [min(i.rect.x - self.rect.w - 1,
                      RIGHT_INVISIBLE_LINE[0][0] - 1) if i.rect.x + i.rect.w > self.rect.x else max(
                     i.rect.x + i.rect.w + 1,
