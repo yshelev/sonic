@@ -95,17 +95,22 @@ class SonicLevel:
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
-        for i in range(9):
-            for j in range(-10, 10):
-                char = self.map[i][j + 10]
-                # if char == "t":
-                #     Tiles(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, SCREEN_WIDTH // 2,
-                #           SCREEN_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
-                #           self.all_tiles_sprites,
-                #           self.all_sprites,
-                #           self.all_sprites_wo_mh)
+        for i in range(-50, 51):
+            Tiles(i * 300, SCREEN_HEIGHT, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
+                  self.all_tiles_sprites,
+                  self.all_sprites,
+                  self.all_sprites_wo_mh)
+        for y in range(6):
+            for x in range(-15, 16):
+                char = self.map[y][x + 15]
+                if char == "t":
+                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, SCREEN_WIDTH // 2,
+                          SCREEN_HEIGHT // 20, pygame.image.load("data/GROUND/Platform.png"),
+                          self.all_tiles_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
                 if char == "e":
-                    Enemy(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, self.enemy_images[0],
+                    Enemy(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, self.enemy_images[0],
                           self.enemy_images,
                           self.enemy_images,
                           self.all_enemy_sprites,
@@ -119,28 +124,6 @@ class SonicLevel:
                 #           self.all_tiles_sprites,
                 #           self.all_sprites,
                 #           self.all_sprites_wo_mh)
-
-        for i in range(-50, 51):
-            Tiles(i * 300, SCREEN_HEIGHT, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
-                  self.all_tiles_sprites,
-                  self.all_sprites,
-                  self.all_sprites_wo_mh)
-        #     if i % 10 == 0:
-        #         Tiles(i * 300, SCREEN_HEIGHT - 400, 100, 50, pygame.image.load("data/GROUND/Platform.png "),
-        #               self.all_tiles_sprites,
-        #               self.all_sprites,
-        #               self.all_sprites_wo_mh)
-        #     if i % 20 == 0:
-        #         Rings(i * 300 + 150, SCREEN_HEIGHT - 200, 100, 100, self.rings_sprites,
-        #               self.all_rings_sprites,
-        #               self.all_sprites,
-        #               self.all_sprites_wo_mh)
-        #     if i % 20 == 0:
-        #         Enemy(i * 300 + 150, SCREEN_HEIGHT - 200, self.enemy_images[0], self.enemy_images, self.enemy_images,
-        #               self.all_enemy_sprites,
-        #               self.all_sprites,
-        #               self.all_sprites_wo_mh
-        #               )
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,

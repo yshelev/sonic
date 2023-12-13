@@ -81,14 +81,16 @@ class MainHero(Character):
                                          can_move_invisible_right)
 
         ec = exit_codes["sonic_movement_x"][move_code]
-        direction = self.move_direction()[0]
-        if ec == OK:
+        direction_x, direction_y = self.move_direction()
+        if direction_y == TOP:
+            self.x += (self.speed_x + self.additional_speed) / FPS
+        elif ec == OK:
             self.x += (self.speed_x + self.additional_speed) / FPS
         elif ec != STOPPED_BY_RIGHT_INVISIBLE_WALL:
-            self.x += (self.speed_x + self.additional_speed) / FPS * can_move_right * (direction in [RIGHT, STAY])
+            self.x += (self.speed_x + self.additional_speed) / FPS * can_move_right * (direction_x in [RIGHT, STAY])
         if ec == STOPPED_BY_RIGHT_WALL_OUTSIDE:
             self.additional_speed = 0
-        if direction == LEFT:
+        if direction_x == LEFT:
             self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return exit_codes["sonic_movement_x"][move_code], self.speed_x + self.additional_speed

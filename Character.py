@@ -63,7 +63,6 @@ class Character(pygame.sprite.Sprite):
             else:
                 self.image = self.start_image
             self.cur_frame_jump = 0
-        self.image = pygame.transform.scale(self.image, (self.width, self.height))
 
     def move_left(self, tiles) -> None:
         self.moving_left = True
