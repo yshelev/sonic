@@ -92,7 +92,7 @@ class Character(pygame.sprite.Sprite):
         self.jump(tiles_sprites)
 
     def jump(self, tiles_sprites):
-        can_move_top, can_move_bottom = self.can_move_y(tiles_sprites)
+        can_move_top, can_move_bottom, ys = self.can_move_y(tiles_sprites)
         self.speed_y += GRAVITY / FPS
         if can_move_bottom:
             if can_move_top:
