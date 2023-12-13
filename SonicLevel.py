@@ -78,7 +78,7 @@ class SonicLevel:
         with open("data/map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
 
-        self.finish_tale = Tiles(-4 * SCREEN_WIDTH, SCREEN_HEIGHT - 2 * 300, 300, 300,
+        self.finish_tale = Tiles(-4 * SCREEN_WIDTH, SCREEN_HEIGHT - 1 * 300, 100, 100,
                                  pygame.transform.rotate(pygame.image.load("data/GROUND/movable platform.png"), 270),
                                  self.all_sprites,
                                  self.all_sprites_wo_mh)
