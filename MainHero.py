@@ -14,6 +14,7 @@ class MainHero(Character):
             images: list[pygame.image],
             jump_images: list[pygame.image],
             fast_images: list[pygame.image],
+            super_fast_images: list[pygame.image],
             group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(x, y, start_image, images, jump_images, group_all_sprite)
@@ -22,6 +23,18 @@ class MainHero(Character):
 
         self.fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
                                          self.fast_right_frames))
+
+        self.super_fast_right_frames = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)),
+                                          super_fast_images))
+
+
+        print(len(super_fast_images))
+        print(len(self.super_fast_right_frames))
+        self.super_fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
+                                         self.super_fast_right_frames))
+        print(len(self.super_fast_left_frames))
+
+
         self.padding = 15
         self.cur_fast_frame = 0
         self.additional_speed = 0
@@ -173,17 +186,16 @@ class MainHero(Character):
             elif self.moving_left:
                 if abs(self.additional_speed) / FPS > 7.5:
                     if abs(self.additional_speed) / FPS == 20:
-                        self.image = self.fast_left_frames[self.cur_fast_frame]
+                        self.image = self.super_fast_left_frames[self.cur_fast_frame]
                     else:
                         self.image = self.fast_left_frames[self.cur_fast_frame]
-                    self.image = self.fast_left_frames[self.cur_fast_frame]
                 else:
                     self.image = self.left_frames[self.cur_frame]
                     self.start_image = self.start_image_left
             elif self.moving_right:
                 if abs(self.additional_speed) / FPS > 7.5:
                     if abs(self.additional_speed) / FPS == 20:
-                        self.image = self.fast_right_frames[self.cur_fast_frame]
+                        self.image = self.super_fast_right_frames[self.cur_fast_frame]
                     else:
                         self.image = self.fast_right_frames[self.cur_fast_frame]
                 else:

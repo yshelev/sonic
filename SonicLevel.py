@@ -37,7 +37,8 @@ class SonicLevel:
             for i in range(24 * 2, 28 * 2)
         ]
         super_fast_running_sonic_sprites = [
-
+            pygame.image.load(f"data/Sonic Sprites/tile{i // 2}{i // 2}{i // 2}.png")
+            for i in range(1 * 2, 5 * 2)
         ]
         self.rings_sprites_for_draw = [
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
@@ -47,15 +48,21 @@ class SonicLevel:
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (100, 100))
             for i in range(1, 9)
         ]
-        self.enemy_images = [pygame.transform.scale(pygame.image.load(f'data/ENEMY/BUG {i // 3}.2.png'), (1000, 1000))
-                             for i in range(3, 12)
-                             ]
+        self.enemy_images = [
+            pygame.transform.scale(pygame.image.load(f'data/ENEMY/BUG {i // 3}.2.png'), (1000, 1000))
+            for i in range(3, 12)
+        ]
         self.rings_sprites_count = 0
 
         self.rings_sprites = [
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
         ]
+        self.death_sprites = [
+            pygame.image.load(f"data/Sonic Sprites/tile0{i // 2}.png")
+            for i in range(51 * 2, 53 * 2)
+        ]
+
         self.rings_sprites_count = 0
 
         self.immune_timer = pygame.time.Clock()
@@ -73,7 +80,8 @@ class SonicLevel:
 
         self.finish_tale = Tiles(-4 * SCREEN_WIDTH, SCREEN_HEIGHT - 2 * 300, 300, 300,
                                  pygame.transform.rotate(pygame.image.load("data/GROUND/movable platform.png"), 270),
-                                 self.all_sprites)
+                                 self.all_sprites,
+                                 self.all_sprites_wo_mh)
 
         for i in range(10):
             Tiles(-5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
@@ -90,12 +98,12 @@ class SonicLevel:
         for i in range(9):
             for j in range(-10, 10):
                 char = self.map[i][j + 10]
-                if char == "t":
-                    Tiles(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, SCREEN_WIDTH // 2,
-                          SCREEN_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
-                          self.all_tiles_sprites,
-                          self.all_sprites,
-                          self.all_sprites_wo_mh)
+                # if char == "t":
+                #     Tiles(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, SCREEN_WIDTH // 2,
+                #           SCREEN_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
+                #           self.all_tiles_sprites,
+                #           self.all_sprites,
+                #           self.all_sprites_wo_mh)
                 if char == "e":
                     Enemy(SCREEN_WIDTH // 2 * j, SCREEN_HEIGHT - (i + 1) * SCREEN_HEIGHT // 10, self.enemy_images[0],
                           self.enemy_images,
@@ -104,13 +112,13 @@ class SonicLevel:
                           self.all_sprites,
                           self.all_sprites_wo_mh
                           )
-                if char == "s":
-                    Tiles(SCREEN_WIDTH // 2 * j + SCREEN_WIDTH // 4 - SCREEN_WIDTH // 8,
-                          SCREEN_HEIGHT - (i + 2) * SCREEN_HEIGHT // 30, SCREEN_WIDTH // 8,
-                          SCREEN_HEIGHT // 30, pygame.image.load("data/GROUND/Platform.png"),
-                          self.all_tiles_sprites,
-                          self.all_sprites,
-                          self.all_sprites_wo_mh)
+                # if char == "s":
+                #     Tiles(SCREEN_WIDTH // 2 * j + SCREEN_WIDTH // 4 - SCREEN_WIDTH // 8,
+                #           SCREEN_HEIGHT - (i + 2) * SCREEN_HEIGHT // 30, SCREEN_WIDTH // 8,
+                #           SCREEN_HEIGHT // 30, pygame.image.load("data/GROUND/Platform.png"),
+                #           self.all_tiles_sprites,
+                #           self.all_sprites,
+                #           self.all_sprites_wo_mh)
 
         for i in range(-50, 51):
             Tiles(i * 300, SCREEN_HEIGHT, 300, SCREEN_HEIGHT // 3, pygame.image.load("data/GROUND/Floor.png"),
@@ -141,6 +149,7 @@ class SonicLevel:
             running_sonic_right_sprites,
             running_sonic_right_sphere_sprites,
             fast_running_sonic_sprites,
+            super_fast_running_sonic_sprites,
             self.all_sprites
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
