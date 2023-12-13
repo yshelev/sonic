@@ -16,14 +16,15 @@ class Plane_Character(pygame.sprite.Sprite):
         self.moving_right = False
         self.moving_up = False
         self.moving_down = False
-        self.width, self.height = 256, 128-30
+        self.width, self.height = 256, 128 - 30
         self.x = x
         self.y = y
         self.images = images
 
         self.cur_frame = 0
         self.image = images[self.cur_frame]
-        self.images = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height+30)), self.images))
+        self.images = list(
+            map(lambda image: pygame.transform.scale(image, (self.width, self.height + 30)), self.images))
         self.rect = pygame.Rect(x, y, self.width, self.height)
         self.speed_x = 500
         self.speed_y = 500
@@ -157,23 +158,28 @@ class Plane_Upgrates(pygame.sprite.Sprite):
 
     def __init__(
             self,
+            width: int,
+            height: int,
             type: int,
             image: pygame.image,
             *group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(*group_all_sprite)
-        self.width, self.height = 64, 64
-        self.x = SCREEN_WIDTH + 200
-        self.y = random.randint(int(0.25 * SCREEN_HEIGHT), int(0.75 * SCREEN_HEIGHT))
+        self.width, self.height = width, height
+        self.x = SCREEN_WIDTH + self.width + 600
+        self.y = -self.height - 400
         self.cur_frame = 0
         self.image = image
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.speed_x = 400
+        self.speed_x = 700
+        self.speed_y = 500
         self.type = type
 
     def update(self, *args, **kwargs):
         self.x -= self.speed_x / FPS
+        self.y += self.speed_y / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+
 
 class Plane_Cloud(pygame.sprite.Sprite):
 
@@ -202,4 +208,3 @@ class Plane_Cloud(pygame.sprite.Sprite):
         self.x -= self.speed_x / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.image = self.images[self.cur_frame // 6 % len(self.images)]
-

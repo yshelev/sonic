@@ -30,7 +30,7 @@ class TailsLevel:
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
         ]
-        self.upgrade_image = pygame.image.load(f"data/Plane Sprites/health.png")
+        self.upgrade_image = self.upgrade_image = pygame.transform.scale(pygame.image.load(f"data/airplane_upgrades/crate.png"), (60, 60))
         self.rings_sprites_count = 0
 
         self.last_enemy = 0
@@ -181,7 +181,7 @@ class TailsLevel:
     def shooting(self):
         if pygame.time.get_ticks() - self.last_shot >= self.fire_rate:
             Plane_Bullet(self.plane_character.x + self.plane_character.width,
-                         self.plane_character.y + self.plane_character.height / 2 + 5,
+                         self.plane_character.y + self.plane_character.height / 2 + 15,
                          random.randint(-self.bullet_spread, self.bullet_spread),
                          self.damage,
                          self.bullet_width,
@@ -242,10 +242,10 @@ class TailsLevel:
             Plane_Cloud(self.cloud_sprites, self.all_sprites_level2, self.all_enemies_level2_sprites)
             self.last_cloud = pygame.time.get_ticks()
         if self.ot_vinta_len - self.timer == 195 and not self.plane_upgrade_sprites:
-            Plane_Upgrates(1, self.upgrade_image, self.all_sprites_level2,
+            Plane_Upgrates(60, 60, 1, self.upgrade_image, self.all_sprites_level2,
                            self.plane_upgrade_sprites)
-        if self.ot_vinta_len - self.timer == 150 and not self.plane_upgrade_sprites:
-            Plane_Upgrates(2, self.upgrade_image, self.all_sprites_level2,
+        if self.ot_vinta_len - self.timer == 200 and not self.plane_upgrade_sprites:
+            Plane_Upgrates(60, 60, 2, self.upgrade_image, self.all_sprites_level2,
                            self.plane_upgrade_sprites)
 
     def check(self):
