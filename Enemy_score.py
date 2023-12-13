@@ -1,4 +1,5 @@
 from Settings import *
+from Tiles import Tiles
 
 
 class Enemy_score(pygame.sprite.Sprite):
@@ -15,3 +16,5 @@ class Enemy_score(pygame.sprite.Sprite):
         self.rect = self.rect.move(0, -self.speed_y / FPS)
         if self.rect.y <= 0:
             self.kill()
+
+

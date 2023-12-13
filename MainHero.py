@@ -1,6 +1,5 @@
 
 from Character import Character
-from Enemy_score import Enemy_score
 from Settings import *
 import pygame
 
@@ -380,3 +379,10 @@ class MainHero(Character):
 
     def get_add_score(self):
         return self.add_score
+
+    def animation_next_level(self, direction):
+        self.additional_speed = 5 * FPS
+        if 0 <= self.x <= SCREEN_WIDTH:
+            self.x += (self.speed_x + self.additional_speed) / FPS * direction
+            return True
+        return False

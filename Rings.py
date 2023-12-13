@@ -10,7 +10,7 @@ class Rings(Tiles):
         super().__init__(x, y, width, height, images[0], *sprite_group)
 
         self.counter = 0
-        self.images = images
+        self.images = list(map(lambda image: pygame.transform.scale(image, (width, height)), images))
 
     def update(self, *args, **kwargs):
         self.counter = (self.counter + 1) % 48

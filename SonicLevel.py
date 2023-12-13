@@ -5,6 +5,8 @@ import pygame
 from Enemy_score import Enemy_score
 from MainHero import MainHero
 from Settings import *
+from SonicBossFight import SonicBossFight
+# from SonicBossFight import SonicBossFight
 from Tiles import Tiles
 from Enemy import Enemy
 from Rings import Rings
@@ -84,13 +86,13 @@ class SonicLevel:
         TALE_WIDTH, TALE_HEIGHT = 8 * SCREEN_WIDTH / NUM_TALES_X, 2 * SCREEN_HEIGHT / NUM_TALES_Y
 
         for i in range(10):
-            Tiles(-5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
+            Tiles(SCREEN_WIDTH // 60 * 8 * (-NUM_TALES_X // 2 - 2), SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
                   pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 270),
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
         for i in range(10):
-            Tiles(5 * SCREEN_WIDTH, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
+            Tiles(SCREEN_WIDTH // 60 * 8 * (NUM_TALES_X // 2), SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
                   pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 90),
                   self.all_tiles_sprites,
                   self.all_sprites,
@@ -101,16 +103,16 @@ class SonicLevel:
                   self.all_sprites,
                   self.all_sprites_wo_mh)
         for y in range(NUM_TALES_Y):
-            for x in range(-NUM_TALES_X // 2, NUM_TALES_X // 2 + 1):
-                char = self.map[y][x + 15]
+            for x in range(-NUM_TALES_X // 2, NUM_TALES_X // 2):
+                char = self.map[y][x + NUM_TALES_X // 2]
                 if char == "t":
-                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
+                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
                           TALE_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
                           self.all_tiles_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh)
                 if char == "e":
-                    Enemy(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, self.enemy_images[0],
+                    Enemy(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, self.enemy_images[0],
                           self.enemy_images,
                           self.enemy_images,
                           self.all_enemy_sprites,
@@ -118,19 +120,27 @@ class SonicLevel:
                           self.all_sprites_wo_mh
                           )
                 if char == "s":
-                    Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10, TALE_WIDTH,
+                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10,
+                          TALE_WIDTH,
                           TALE_HEIGHT // 10, pygame.image.load("data/OBJECTS/SPIKES.png"),
                           self.all_spikes_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh)
 
                 if char == "f":
-                    self.finish_tale = Tiles(SCREEN_WIDTH // 10 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10, TALE_WIDTH,
-                          TALE_HEIGHT // 10,
-                                             pygame.transform.rotate(
-                                                 pygame.image.load("data/eggman_signs/eggman_sign_1.png"), 270),
+                    self.finish_tale = Tiles(SCREEN_WIDTH // 60 * 8 * x,
+                                             SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT, TALE_WIDTH // 2,
+                                             TALE_HEIGHT, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
                                              self.all_sprites,
                                              self.all_sprites_wo_mh)
+
+                if char == "r":
+                    for k in range(5):
+                        Rings(SCREEN_WIDTH // 60 * 8 * x + 25 * k, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - 25, 25, 25,
+                              self.rings_sprites,
+                              self.all_sprites,
+                              self.all_rings_sprites,
+                              self.all_sprites_wo_mh)
 
         self.main_hero = MainHero(
             SCREEN_WIDTH // 2,
@@ -150,6 +160,8 @@ class SonicLevel:
 
         # self.play_music()
         self.game_loop()
+
+        self.sbf = SonicBossFight()
 
     def play_music(self) -> None:
         self.background_music.set_volume(0.1)
@@ -299,8 +311,10 @@ class SonicLevel:
                             pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
                 self.main_hero.start_jump(self.all_tiles_sprites)
         if self.check_exit():
+            self.last_screen = screen.copy()
             running = False
-            self.end_screen(True)
+            self.next_level()
+            self.main_hero.animation_next_level(-1)
 
         if not self.main_hero.is_alive():
             self.last_screen = screen.copy()
@@ -322,6 +336,9 @@ class SonicLevel:
     def play_mh_death(self):
         running = True
         while running:
+            for event in pygame.event.get():
+                if event == pygame.QUIT:
+                    self.quit()
             self.clock.tick(FPS)
             running = self.main_hero.dead_jump()
 
@@ -359,9 +376,41 @@ class SonicLevel:
         # self.draw_lines()
         self.all_sprites.draw(screen)
 
+    def next_level(self):
+        self.last_animation()
+        # self.all_sprites.empty()
+        # SonicBossFight()
+
+
+
     def quit(self):
         pygame.quit()
         sys.exit()
 
     def check_exit(self):
         return self.main_hero.rect.colliderect(self.finish_tale)
+
+    def last_animation(self):
+        running = True
+        direction = -1 if self.finish_tale.rect.x < self.main_hero.rect.x else 1
+        while running:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event == pygame.QUIT:
+                    self.quit()
+
+            running = self.main_hero.animation_next_level(direction)
+
+
+            self.main_hero.update()
+            # self.finish_tale.update()
+
+            screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
+            screen.blit(self.background_image, (self.background_image_x, 0))
+
+            self.all_sprites.draw(screen)
+
+            pygame.display.update()
+
+
+
