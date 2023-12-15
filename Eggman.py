@@ -2,6 +2,7 @@ import random
 
 import pygame
 
+from MainHero import MainHero
 from Settings import *
 
 
@@ -30,16 +31,26 @@ class Eggman(pygame.sprite.Sprite):
 
         self.width, self.height = self.man_width, self.man_height
 
+        self.speed_y_multiplier = 10
         self.speed_y = 300
+        self.speed_x_multiplier = 10
         self.speed_x = 300
 
         self.types = {
-            "robot_dies":list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
-                                  [pygame.image.load(f"data/eggman/robot/eggman_robot_dies_{i // 3}.png") for
-                                   i in range(3, 9)])),
-            "robot_fly": list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
-                                  [pygame.image.load(f"data/eggman/robot/eggman_robot_fly_{i // 3}.png") for
-                                   i in range(3, 9)])),
+            "robot_dies": list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
+                                   [pygame.image.load(f"data/eggman/robot/eggman_robot_dies_{i // 3}.png") for
+                                    i in range(3, 9)])),
+            "robot_fly_right": list(
+                map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
+                    [pygame.image.load(f"data/eggman/robot/eggman_robot_fly_{i // 3}.png") for
+                     i in range(3, 9)])),
+            "robot_fly_left": list(map(lambda x: pygame.transform.flip(x, True, False),
+                                       list(map(lambda x: pygame.transform.scale(x, (
+                                           self.robot_width, self.start_robot_height)),
+                                                [pygame.image.load(f"data/eggman/robot/eggman_robot_fly_{i // 3}.png")
+                                                 for
+                                                 i in range(3, 9)])))),
+
             "robot_animation": list(map(lambda x: pygame.transform.flip(x, True, False),
                                         list(map(lambda x: pygame.transform.scale(x, (
                                             self.robot_width, self.start_robot_height)),
@@ -57,14 +68,23 @@ class Eggman(pygame.sprite.Sprite):
 
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
+    def eggman_movement(self, sonic: MainHero):
+        self.x += (sonic.rect.x - self.rect.x) / self.speed_x_multiplier / FPS
+        self.y += (sonic.rect.y - self.rect.y) / self.speed_y_multiplier / FPS
+
+        self.speed_x_multiplier = max(self.speed_x_multiplier - 0.01, 5)
+
+        self.speed_y_multiplier = max(self.speed_y_multiplier - 0.01, 5)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
+
+
     def turn_game_mod(self):
         self.width = self.robot_width
-        self.height = self.start_robot_height
-        self.x = SCREEN_WIDTH - self.width * 2
-        self.y = -self.height
+        self.height = self.robot_height
+
         self.current_stage = 1
 
-        self.rect = pygame.Rect(self.x, self.y, self.robot_width, self.start_robot_height)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def turn_robot(self):
         self.width = self.robot_width
@@ -73,7 +93,7 @@ class Eggman(pygame.sprite.Sprite):
         self.y = -self.height
         self.current_stage = 1
 
-        self.rect = pygame.Rect(self.x, self.y, self.robot_width, self.start_robot_height)
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def man_run_out(self):
         self.man_run_animation()
@@ -117,7 +137,5 @@ class Eggman(pygame.sprite.Sprite):
 
     def update(self, *args, **kwargs):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-        self.fly_counter = random.choice([0, 1])
-
-    def turn_game_mod(self):
-        pass
+        self.fly_counter = (self.fly_counter + 0.1) % len(self.types["robot_fly_left"])
+        self.image = self.types["robot_fly_left" if args[0] else "robot_fly_right"][int(self.fly_counter)]
