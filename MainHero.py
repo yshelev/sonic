@@ -235,7 +235,9 @@ class MainHero(Character):
         self.cur_fast_frame = (self.cur_fast_frame + 1 * (abs(self.additional_speed) > 7.5)) % len(
             self.fast_left_frames)
         if self.speed_y != 0:
-            self.cur_frame_jump = min(self.cur_frame_jump + 1 * self.is_jumping, len(self.left_jump_frames) - 1)
+            self.cur_frame_jump = (self.cur_frame_jump + 1 * self.is_jumping) % len(self.left_jump_frames)
+        else:
+            self.cur_frame_jump = 0
 
     def can_move_y(self, tiles_sprites: pygame.sprite.Group) -> (bool, bool, list[int]):
         return not any(pygame.rect.Rect(
@@ -424,6 +426,7 @@ class MainHero(Character):
         if self.x <= SCREEN_WIDTH:
             self.x += (self.speed_x + self.additional_speed) / FPS
             return True
+        self.moving_right = False
         return False
 
     def animation_boss_fight_in(self):
@@ -432,4 +435,6 @@ class MainHero(Character):
         if self.x + self.width <= SCREEN_WIDTH // 3:
             self.x += (self.speed_x + self.additional_speed) / FPS
             return True
+        self.additional_speed = 0
+        self.moving_right = False
         return False

@@ -130,11 +130,11 @@ class SonicLevel:
 
                 if char == "f":
                     self.finish_tale = Tiles(SCREEN_WIDTH // 60 * 8 * x,
-                                             SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT, TALE_WIDTH // 2,
-                                             TALE_HEIGHT, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
+                                             SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 2, TALE_WIDTH,
+                                             TALE_HEIGHT // 2, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
                                              self.all_sprites,
                                              self.all_sprites_wo_mh,
-                                             animation_list=list(map(lambda x: pygame.transform.scale(x, (TALE_WIDTH // 2, TALE_HEIGHT)), [pygame.image.load(f"data/eggman_signs/eggman_sign_{i // 3}.png") for i in range(3, 15)])))
+                                             animation_list=list(map(lambda x: pygame.transform.scale(x, (TALE_WIDTH, TALE_HEIGHT // 2)), [pygame.image.load(f"data/eggman_signs/eggman_sign_{i // 3}.png") for i in range(3, 15)])))
 
                 if char == "r":
                     for k in range(5):

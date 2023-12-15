@@ -45,6 +45,7 @@ class SonicBossFight:
         ]
 
         self.all_tiles_sprites = pygame.sprite.Group()
+        self.rlbt_tiles_sprites = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites_wo_mh = pygame.sprite.Group()
 
@@ -58,22 +59,26 @@ class SonicBossFight:
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh)
+                  self.all_sprites_wo_mh,
+                  self.rlbt_tiles_sprites)
             Tiles(i * SCREEN_WIDTH // 4, SCREEN_HEIGHT - 5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2,
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh)
+                  self.all_sprites_wo_mh,
+                  self.rlbt_tiles_sprites)
             Tiles(SCREEN_WIDTH - 5, i * SCREEN_HEIGHT // 4, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 4,
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh)
+                  self.all_sprites_wo_mh,
+                  self.rlbt_tiles_sprites)
             Tiles(-SCREEN_WIDTH // 3, i * SCREEN_HEIGHT // 4, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 4,
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh)
+                  self.all_sprites_wo_mh,
+                  self.rlbt_tiles_sprites)
 
         self.main_hero = MainHero(
             0,
@@ -87,10 +92,7 @@ class SonicBossFight:
             self.all_sprites
         )
 
-        self.eggman = Eggman(SCREEN_WIDTH // 3 * 2, 105, 100, 100,
-                             None,
-                             None,
-                             [pygame.image.load(f"data/eggman/run/eggman_run_{i}.png") for i in range(1, 5)],
+        self.eggman = Eggman(SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT - 105, 100, 100,
                              self.all_sprites,
                              self.all_sprites_wo_mh)
 
@@ -106,10 +108,58 @@ class SonicBossFight:
 
             screen.blit(self.background_image, (0, 0))
             running = self.main_hero.animation_boss_fight_in()
-            self.all_sprites.update()
+            self.main_hero.update()
             self.all_sprites.draw(screen)
             pygame.display.update()
+        self.eggman_is_angry()
 
+    def eggman_is_angry(self):
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+
+            screen.blit(self.background_image, (0, 0))
+            running = self.eggman.man_jump_animation()
+            self.all_sprites.draw(screen)
+            pygame.display.update()
+        self.eggman.reset_counter()
+        self.eggman_is_running()
+
+    def eggman_is_running(self):
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+
+            screen.blit(self.background_image, (0, 0))
+            running = self.eggman.man_run_out()
+            self.all_sprites.draw(screen)
+            pygame.display.update()
+        pygame.time.wait(2000)
+        self.eggman.reset_counter()
+        self.eggman_on_robot_animation()
+
+    def eggman_on_robot_animation(self):
+        self.eggman.turn_robot()
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+
+            print(f"{self.eggman.y = }")
+            screen.blit(self.background_image, (0, 0))
+            running = self.eggman.fall_on_robot_animation()
+            self.all_sprites.draw(screen)
+            pygame.display.update()
+        self.eggman.reset_counter()
+        self.eggman.turn_game_mod()
         self.game_loop()
 
     def game_loop(self):
