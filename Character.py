@@ -11,12 +11,15 @@ class Character(pygame.sprite.Sprite):
         start_image: pygame.image,
         images: list[pygame.image],
         jump_images: list[pygame.image],
+        dead_image: pygame.image,
         *group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(*group_all_sprite)
         self.moving_left = False
         self.moving_right = False
         self.width, self.height = 100, 100
+        self.dead_image = pygame.transform.scale(dead_image, (self.width, self.height))
+
         self.right_frames = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)), images))
 
         self.left_frames = list(map(lambda image: pygame.transform.flip(image, True, False), self.right_frames))
@@ -109,6 +112,7 @@ class Character(pygame.sprite.Sprite):
     def dead_jump(self):
         self.speed_y += GRAVITY / FPS
         self.y += self.speed_y / FPS
+        self.image = self.dead_image
         if self.y > SCREEN_HEIGHT:
             super().kill()
             return False

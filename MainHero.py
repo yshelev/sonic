@@ -1,4 +1,3 @@
-
 from Character import Character
 from Settings import *
 import pygame
@@ -14,9 +13,10 @@ class MainHero(Character):
             jump_images: list[pygame.image],
             fast_images: list[pygame.image],
             super_fast_images: list[pygame.image],
+            dead_image: pygame.image,
             group_all_sprite: pygame.sprite.Group
     ) -> None:
-        super().__init__(x, y, start_image, images, jump_images, group_all_sprite)
+        super().__init__(x, y, start_image, images, jump_images, dead_image, group_all_sprite)
         self.fast_right_frames = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)),
                                           fast_images))
 
@@ -24,12 +24,10 @@ class MainHero(Character):
                                          self.fast_right_frames))
 
         self.super_fast_right_frames = list(map(lambda image: pygame.transform.scale(image, (self.width, self.height)),
-                                          super_fast_images))
-
+                                                super_fast_images))
 
         self.super_fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
-                                         self.super_fast_right_frames))
-
+                                               self.super_fast_right_frames))
 
         self.padding = 15
         self.cur_fast_frame = 0
@@ -42,6 +40,46 @@ class MainHero(Character):
         self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
         self.score = 0
         self.add_score = 0
+
+    def move_left_level_boss(self, tiles):
+        can_move_left, can_move_right, _ = self.can_move_x(tiles)
+        self.additional_speed -= self.boost / FPS
+        self.moving_left = True
+        direction = self.move_direction()[0]
+
+        if (direction in [LEFT, STAY]) * can_move_left:
+            self.x -= (self.speed_x - self.additional_speed) / FPS
+        elif (direction == RIGHT) * can_move_right:
+            self.x -= (self.speed_x - self.additional_speed) / FPS
+            self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
+
+    def move_right_level_boss(self, tiles):
+        can_move_left, can_move_right, _ = self.can_move_x(tiles)
+        self.additional_speed += self.boost / FPS
+        self.moving_right = True
+        direction = self.move_direction()[0]
+        if (direction in [RIGHT, STAY]) * can_move_right:
+            self.x += (self.speed_x + self.additional_speed) / FPS
+        elif (direction == LEFT) * can_move_left:
+            self.x += (self.speed_x + self.additional_speed) / FPS
+            self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
+
+    def jump_level_boss(self, tiles_sprites):
+        self.is_jumping = True
+        self.speed_y += GRAVITY / FPS
+        can_move_bottom, can_move_top, point_y = self.can_move_y(tiles_sprites)
+        direction = self.move_direction()[1]
+        if direction in [BOT, STAY]:
+            if can_move_bottom:
+                self.y += self.speed_y / FPS
+            else:
+                self.y = point_y[0] if point_y else self.y
+                self.speed_y = 0
+                self.is_jumping = False
+                self.is_falling = False
+        else:
+            self.y += self.speed_y / FPS
+        self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
     def move_left(self, tiles) -> (int, float):
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
@@ -105,9 +143,9 @@ class MainHero(Character):
                                                can_move_invisible_right)
 
             if can_move_right and self.additional_speed > 0:
-                self.x += (self.additional_speed / FPS) * can_move_invisible_right
+                self.x += (self.additional_speed / FPS)
             elif can_move_left and self.additional_speed < 0:
-                self.x += (self.additional_speed / FPS) * can_move_invisible_left
+                self.x += (self.additional_speed / FPS)
             else:
                 self.additional_speed = 0
             if direction_x == RIGHT:
@@ -167,8 +205,6 @@ class MainHero(Character):
             else:
                 self.image = self.right_jump_frames[self.cur_frame_jump]
         elif not self.is_falling:
-            if self.speed_y == 0:
-                self.cur_frame_jump = 0
             if self.moving_right and self.moving_left:
                 self.image = self.start_image
             elif self.moving_left:
@@ -380,9 +416,20 @@ class MainHero(Character):
     def get_add_score(self):
         return self.add_score
 
-    def animation_next_level(self, direction):
+    def animation_next_level(self):
+        self.is_jumping = False
+        self.moving_left = False
+        self.moving_right = True
         self.additional_speed = 5 * FPS
-        if 0 <= self.x <= SCREEN_WIDTH:
-            self.x += (self.speed_x + self.additional_speed) / FPS * direction
+        if self.x <= SCREEN_WIDTH:
+            self.x += (self.speed_x + self.additional_speed) / FPS
+            return True
+        return False
+
+    def animation_boss_fight_in(self):
+        self.moving_right = True
+        self.additional_speed = 5 * FPS
+        if self.x + self.width <= SCREEN_WIDTH // 3:
+            self.x += (self.speed_x + self.additional_speed) / FPS
             return True
         return False

@@ -6,7 +6,6 @@ from Enemy_score import Enemy_score
 from MainHero import MainHero
 from Settings import *
 from SonicBossFight import SonicBossFight
-# from SonicBossFight import SonicBossFight
 from Tiles import Tiles
 from Enemy import Enemy
 from Rings import Rings
@@ -112,9 +111,11 @@ class SonicLevel:
                           self.all_sprites,
                           self.all_sprites_wo_mh)
                 if char == "e":
-                    Enemy(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, self.enemy_images[0],
+                    Enemy(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6,
+                          self.enemy_images[0],
                           self.enemy_images,
                           self.enemy_images,
+                          self.enemy_images[0],
                           self.all_enemy_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh
@@ -132,11 +133,12 @@ class SonicLevel:
                                              SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT, TALE_WIDTH // 2,
                                              TALE_HEIGHT, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
                                              self.all_sprites,
-                                             self.all_sprites_wo_mh)
+                                             self.all_sprites_wo_mh,
+                                             animation_list=list(map(lambda x: pygame.transform.scale(x, (TALE_WIDTH // 2, TALE_HEIGHT)), [pygame.image.load(f"data/eggman_signs/eggman_sign_{i // 3}.png") for i in range(3, 15)])))
 
                 if char == "r":
                     for k in range(5):
-                        Rings(SCREEN_WIDTH // 60 * 8 * x + 25 * k, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - 25, 25, 25,
+                        Rings(SCREEN_WIDTH // 60 * 8 * x + 35 * k, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - 35, 35, 35,
                               self.rings_sprites,
                               self.all_sprites,
                               self.all_rings_sprites,
@@ -150,6 +152,7 @@ class SonicLevel:
             running_sonic_right_sphere_sprites,
             fast_running_sonic_sprites,
             super_fast_running_sonic_sprites,
+            pygame.image.load(f"data/Sonic Sprites/tile051.png"),
             self.all_sprites
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
@@ -160,8 +163,6 @@ class SonicLevel:
 
         # self.play_music()
         self.game_loop()
-
-        self.sbf = SonicBossFight()
 
     def play_music(self) -> None:
         self.background_music.set_volume(0.1)
@@ -314,7 +315,7 @@ class SonicLevel:
             self.last_screen = screen.copy()
             running = False
             self.next_level()
-            self.main_hero.animation_next_level(-1)
+            self.main_hero.animation_next_level()
 
         if not self.main_hero.is_alive():
             self.last_screen = screen.copy()
@@ -379,9 +380,7 @@ class SonicLevel:
     def next_level(self):
         self.last_animation()
         # self.all_sprites.empty()
-        # SonicBossFight()
-
-
+        SonicBossFight(self.main_hero.get_number_of_rings(), self.main_hero.get_score())
 
     def quit(self):
         pygame.quit()
@@ -392,18 +391,16 @@ class SonicLevel:
 
     def last_animation(self):
         running = True
-        direction = -1 if self.finish_tale.rect.x < self.main_hero.rect.x else 1
         while running:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event == pygame.QUIT:
                     self.quit()
 
-            running = self.main_hero.animation_next_level(direction)
-
+            running = self.main_hero.animation_next_level()
 
             self.main_hero.update()
-            # self.finish_tale.update()
+            self.finish_tale.animation_finish_tale()
 
             screen.blit(self.background_image, (self.background_image_x - SCREEN_WIDTH, 0))
             screen.blit(self.background_image, (self.background_image_x, 0))
@@ -411,6 +408,3 @@ class SonicLevel:
             self.all_sprites.draw(screen)
 
             pygame.display.update()
-
-
-

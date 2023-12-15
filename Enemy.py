@@ -16,9 +16,10 @@ class Enemy(Character):
             start_image: pygame.image,
             images: list[pygame.image],
             jump_images: list[pygame.image],
+            dead_jump: pygame.image,
             *sprite_group: pygame.sprite.Group
     ) -> None:
-        super().__init__(x, y, start_image, images, jump_images, *sprite_group)
+        super().__init__(x, y, start_image, images, jump_images, dead_jump, *sprite_group)
         self.movement_cooldown = random.randint(100, 1000)
         self.jump_cooldown = random.randint(100, 1000)
         self.movement_counter = 0
