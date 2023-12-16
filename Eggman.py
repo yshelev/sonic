@@ -46,6 +46,12 @@ class Eggman(pygame.sprite.Sprite):
             "robot_dies": list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
                                    [pygame.image.load(f"data/eggman/robot/eggman_robot_dies_{i // 3}.png") for
                                     i in range(3, 9)])),
+            "robot_shoot_right": list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
+                                   [pygame.image.load(f"data/eggman/robot/eggman_robot_hit_{2}.png")
+                                    ])),
+            "robot_shoot_left": list(map(lambda x: pygame.transform.flip(x, True, False), list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
+                                   [pygame.image.load(f"data/eggman/robot/eggman_robot_hit_{2}.png")
+                                    ])))),
             "robot_fly_right": list(
                 map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
                     [pygame.image.load(f"data/eggman/robot/eggman_robot_fly_{i // 3}.png") for
@@ -144,7 +150,7 @@ class Eggman(pygame.sprite.Sprite):
         self.shot_cooldown -= 1
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.fly_counter = (self.fly_counter + 0.1) % len(self.types["robot_fly_left"])
-        self.image = self.types["robot_fly_left" if args[0] else "robot_fly_right"][int(self.fly_counter)]
+        self.image = self.types["robot_fly_left" if args[0] else "robot_fly_right"][int(self.fly_counter)] if self.shot_cooldown > 20 else self.types["robot_shoot_left" if args[0] else "robot_shoot_right"][0]
 
     def shoot(self, *groups):
         self.shot_cooldown = 600
@@ -153,10 +159,6 @@ class Eggman(pygame.sprite.Sprite):
         for i in range(8):
             pygame.draw.line(screen, (0, 0, 0), (start_x, start_y), (start_x + shoot_length * math.cos(i * math.pi / 4), start_y + shoot_length * math.sin(i * math.pi / 4)), 20)
             Bullet(start_x, start_y, start_x + shoot_length * math.cos(i * math.pi / 4), start_y + shoot_length * math.sin(i * math.pi / 4), self.bullet_sprite, 1, *groups)
-
-
-
-
 
     def collide_sonic(self, sonic: MainHero):
         if self.y < sonic.y:
