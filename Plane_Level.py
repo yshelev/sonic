@@ -66,12 +66,14 @@ class Plane_Enemy(pygame.sprite.Sprite):
 
     def __init__(
             self,
+            level: int,
             images: list[pygame.image],
             *group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(*group_all_sprite)
+        self.level = level
         self.k = random.random()
-        self.width, self.height = int(45 * (2 + self.k)), int(25 * (2 + self.k))
+        self.width, self.height = int(45 * (2 + self.k + level)), int(25 * (2 + self.k))
         self.x = SCREEN_WIDTH + random.randint(1000, 1200)
         self.y = random.randint(0, SCREEN_HEIGHT - self.height)
         self.images = images
@@ -82,7 +84,7 @@ class Plane_Enemy(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.speed_x = random.randint(400, 600)
         self.speed_y = random.randint(-10, 10)
-        self.health = 15 * (1 + 2 * self.k)
+        self.health = 15 * (1 + 2 * (self.k + self.level))
 
     def alive(self):
         return self.health > 0 and self.x + self.width > 0

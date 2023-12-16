@@ -30,9 +30,12 @@ class TailsLevel:
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
         ]
-        self.upgrade_image = self.upgrade_image = pygame.transform.scale(pygame.image.load(f"data/airplane_upgrades/crate.png"), (60, 60))
+        self.upgrade_image = self.upgrade_image = pygame.transform.scale(
+            pygame.image.load(f"data/airplane_upgrades/crate.png"), (60, 60))
         self.rings_sprites_count = 0
 
+
+        self.enemy_level = 0
         self.last_enemy = 0
         self.last_shot = 0
         self.last_ring = 0
@@ -100,6 +103,8 @@ class TailsLevel:
                 running = False
                 self.ot_vinta.stop()
                 self.end_screen()
+            if self.ot_vinta_len-self.timer> 100:
+                self.enemy_level = 1
             self.spawner()
             self.plane_actions()
             self.collide_enemy()
@@ -115,7 +120,7 @@ class TailsLevel:
         while running:
             if self.win == True:
                 bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
-                                                       (SCREEN_WIDTH, SCREEN_HEIGHT))
+                                            (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
                     f'ХОРОШ',
@@ -146,10 +151,6 @@ class TailsLevel:
                 f'ОЧКИ: {self.score}',
                 True, (0, 0, 0))
             screen.blit(text_surface, (20, 100))
-
-
-
-
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -230,7 +231,7 @@ class TailsLevel:
 
     def spawner(self):
         if pygame.time.get_ticks() - self.last_enemy >= 500:
-            Plane_Enemy(self.fly_sprites, self.all_sprites_level2, self.all_enemies_level2_sprites)
+            Plane_Enemy(self.enemy_level, self.fly_sprites, self.all_sprites_level2, self.all_enemies_level2_sprites)
             self.last_enemy = pygame.time.get_ticks()
         if pygame.time.get_ticks() - self.last_ring >= 3000:
             self.j = random.randint(0, SCREEN_HEIGHT - 64)
@@ -241,10 +242,10 @@ class TailsLevel:
         if pygame.time.get_ticks() - self.last_cloud >= 5000:
             Plane_Cloud(self.cloud_sprites, self.all_sprites_level2, self.all_enemies_level2_sprites)
             self.last_cloud = pygame.time.get_ticks()
-        if self.ot_vinta_len - self.timer == 195 and not self.plane_upgrade_sprites:
+        if self.ot_vinta_len - self.timer == 180 and not self.plane_upgrade_sprites:
             Plane_Upgrates(60, 60, 1, self.upgrade_image, self.all_sprites_level2,
                            self.plane_upgrade_sprites)
-        if self.ot_vinta_len - self.timer == 200 and not self.plane_upgrade_sprites:
+        if self.ot_vinta_len - self.timer == 100 and not self.plane_upgrade_sprites:
             Plane_Upgrates(60, 60, 2, self.upgrade_image, self.all_sprites_level2,
                            self.plane_upgrade_sprites)
 
