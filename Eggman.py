@@ -1,7 +1,8 @@
 import random
-
+import math
 import pygame
 
+from Bullet import Bullet
 from MainHero import MainHero
 from Settings import *
 
@@ -10,10 +11,12 @@ class Eggman(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, *sprite_group):
         super().__init__(*sprite_group)
 
+        self.shot_cooldown = 0
         self.x = x
         self.y = y
         self.alive = False
-        robot_sprites = []
+
+        self.bullet_sprite = pygame.transform.scale(pygame.image.load("data/Plane Sprites/bullshit_2.png"), (30, 30))
 
         self.current_stage = 0
         self.counter = 0
@@ -138,9 +141,22 @@ class Eggman(pygame.sprite.Sprite):
         self.counter = 0
 
     def update(self, *args, **kwargs):
+        self.shot_cooldown -= 1
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.fly_counter = (self.fly_counter + 0.1) % len(self.types["robot_fly_left"])
         self.image = self.types["robot_fly_left" if args[0] else "robot_fly_right"][int(self.fly_counter)]
+
+    def shoot(self, *groups):
+        self.shot_cooldown = 600
+        start_x, start_y = self.x + self.width // 2, self.y + self.height // 2
+        shoot_length = SCREEN_WIDTH
+        for i in range(8):
+            pygame.draw.line(screen, (0, 0, 0), (start_x, start_y), (start_x + shoot_length * math.cos(i * math.pi / 4), start_y + shoot_length * math.sin(i * math.pi / 4)), 20)
+            Bullet(start_x, start_y, start_x + shoot_length * math.cos(i * math.pi / 4), start_y + shoot_length * math.sin(i * math.pi / 4), self.bullet_sprite, 1, *groups)
+
+
+
+
 
     def collide_sonic(self, sonic: MainHero):
         if self.y < sonic.y:
@@ -155,3 +171,6 @@ class Eggman(pygame.sprite.Sprite):
         if self.hp < 0:
             self.alive = False
             self.kill()
+
+    def can_shoot(self):
+        return self.shot_cooldown <= 0
