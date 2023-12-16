@@ -49,7 +49,7 @@ class Eggman(pygame.sprite.Sprite):
             "robot_shoot_right": list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
                                    [pygame.image.load(f"data/eggman/robot/eggman_robot_hit_{2}.png")
                                     ])),
-            "robot_shoot_left": list(map(lambda x: pygame.transform.flip(x, True, False), list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
+            "robot_shoot_left": list(map(lambda x: pygame.transform.flip(x, True, False), list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.robot_height)),
                                    [pygame.image.load(f"data/eggman/robot/eggman_robot_hit_{2}.png")
                                     ])))),
             "robot_fly_right": list(
