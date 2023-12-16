@@ -13,6 +13,10 @@ class SonicBossFight:
         self.score = score
         self.rings = rings
 
+        self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
+
+        self.rings_sprites_count = 0
+
         self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
 
@@ -164,19 +168,19 @@ class SonicBossFight:
                 if event.type == pygame.QUIT:
                     self.quit()
 
-            running = self.movement_of_main_character() * running
-            self.eggman.eggman_movement(self.main_hero)
+            running = self.movement(running)
+            self.update()
+
             screen.blit(self.background_image, (0, 0))
-            self.main_hero.update()
-            self.eggman.update(self.main_hero.x < self.eggman.x)
-            self.all_sprites.draw(screen)
+            self.draw()
+
             pygame.display.update()
 
     def movement_of_main_character(self) -> bool:
         running = True
         keys = pygame.key.get_pressed()
         if self.main_hero.is_alive() * (keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping()):
-            self.main_hero.play_sound_start_jump()
+            # self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
         if self.main_hero.is_alive() * (not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
                 keys[pygame.K_RIGHT] or keys[button_settings["right"]]))):
@@ -191,12 +195,69 @@ class SonicBossFight:
         elif self.main_hero.is_alive():
             self.main_hero.set_moving_right(True)
             self.main_hero.set_moving_left(True)
+        if not self.main_hero.is_alive():
+            self.last_screen = screen.copy()
+            running = False
+            self.play_mh_death()
+            self.main_hero.dead_jump()
 
         if self.main_hero.get_is_jumping() * self.main_hero.is_alive():
             self.main_hero.jump_level_boss(self.all_tiles_sprites)
+        if self.main_hero.rect.colliderect(self.eggman.rect):
+            if self.eggman.collide_sonic(self.main_hero):
+                self.main_hero.start_jump(self.all_tiles_sprites)
         self.main_hero.movement_by_inertia(self.all_tiles_sprites)
         return running
 
     def quit(self):
         pygame.quit()
         sys.exit()
+
+    def play_mh_death(self):
+        running = True
+        while running:
+            for event in pygame.event.get():
+                if event == pygame.QUIT:
+                    self.quit()
+            self.clock.tick(FPS)
+            running = self.main_hero.dead_jump()
+
+            self.last_screen.blit(self.background_image, (0, 0))
+
+            self.all_sprites.draw(self.last_screen)
+            screen.blit(self.last_screen, (0, 0))
+
+            pygame.display.update()
+
+    def draw(self) -> None:
+
+        self.draw_num_of_rings()
+        self.draw_score()
+        self.draw_lines()
+        self.all_sprites.draw(screen)
+
+    def draw_score(self):
+        text_surface = self.my_font.render(f'score: {self.main_hero.get_score()}', True, (255, 255, 255))
+        screen.blit(text_surface, (20, 40))
+
+    def draw_lines(self) -> None:
+        pygame.draw.rect(screen, (0, 0, 0), (SCREEN_WIDTH // 8 - 5, SCREEN_HEIGHT // 8 - 5, SCREEN_WIDTH - SCREEN_WIDTH // 4 + 10, SCREEN_HEIGHT // 8 + 10), 5)
+        pygame.draw.rect(screen, (255, 0, 0), (SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8, (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // 1000, SCREEN_HEIGHT // 8))
+
+    def draw_num_of_rings(self) -> None:
+        self.rings_sprites_count = (self.rings_sprites_count + 1) % 48
+        screen.blit(self.rings_sprites_for_draw[self.rings_sprites_count // 6], (5, 5))
+        text_surface = self.my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
+        screen.blit(text_surface, (20, 0))
+
+    def update(self):
+        self.main_hero.update()
+        self.eggman.update(self.main_hero.x < self.eggman.x)
+
+
+
+    def movement(self, running):
+        running = self.movement_of_main_character() * running
+        self.eggman.eggman_movement(self.main_hero)
+        return running
+

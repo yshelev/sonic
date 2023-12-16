@@ -28,6 +28,9 @@ class MainHero(Character):
 
         self.super_fast_left_frames = list(map(lambda image: pygame.transform.flip(image, True, False),
                                                self.super_fast_right_frames))
+        self.unavailable_counter = 0
+
+        self.unavailable_image = pygame.image.load("data/Sonic Sprites/tile084.png")
 
         self.padding = 15
         self.cur_fast_frame = 0
@@ -37,7 +40,7 @@ class MainHero(Character):
         self.number_of_rings = 50
         self.is_falling = False
         self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
-        self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
+        # self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
         self.score = 0
         self.add_score = 0
 
@@ -230,7 +233,13 @@ class MainHero(Character):
         else:
             self.image = self.start_image
 
+        if self.unavailable_counter:
+            if (self.unavailable_counter % 20) // 10 < 1:
+                self.image = self.unavailable_image
+
     def update_counters(self) -> None:
+        if self.unavailable_counter:
+            self.unavailable_counter = self.unavailable_counter + 1 if self.unavailable_counter < 200 else 0
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
         self.cur_fast_frame = (self.cur_fast_frame + 1 * (abs(self.additional_speed) > 7.5)) % len(
             self.fast_left_frames)
@@ -386,9 +395,11 @@ class MainHero(Character):
         return move_code
 
     def get_damage(self):
-        self.number_of_rings -= 10
-        if self.number_of_rings <= 0:
-            self.kill()
+        if not self.unavailable_counter:
+            self.unavailable_counter += 1
+            self.number_of_rings -= 10
+            if self.number_of_rings <= 0:
+                self.kill()
 
     def add_rings(self):
         self.play_collect_ring()
@@ -407,13 +418,14 @@ class MainHero(Character):
             enemies.kill()
             return True
         elif enemies.is_alive():
-            self.get_damage()
+            if not self.unavailable_counter:
+                self.get_damage()
             return False
 
     def play_collect_ring(self) -> None:
         self.score += 1000
-        self.enemy_death_sound.set_volume(0.1)
-        self.enemy_death_sound.play()
+        # self.enemy_death_sound.set_volume(0.1)
+        # self.enemy_death_sound.play()
 
     def get_add_score(self):
         return self.add_score

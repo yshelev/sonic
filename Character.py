@@ -5,14 +5,14 @@ from Settings import *
 class Character(pygame.sprite.Sprite):
 
     def __init__(
-        self,
-        x: int,
-        y: int,
-        start_image: pygame.image,
-        images: list[pygame.image],
-        jump_images: list[pygame.image],
-        dead_image: pygame.image,
-        *group_all_sprite: pygame.sprite.Group
+            self,
+            x: int,
+            y: int,
+            start_image: pygame.image,
+            images: list[pygame.image],
+            jump_images: list[pygame.image],
+            dead_image: pygame.image,
+            *group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(*group_all_sprite)
         self.moving_left = False
@@ -45,7 +45,6 @@ class Character(pygame.sprite.Sprite):
         self.cur_frame_jump = 0
         self.is_falling = False
 
-
     def update(self, *args, **kwargs) -> None:
         self.cur_frame = (self.cur_frame + 1) % len(self.left_frames)
         if self.is_jumping:
@@ -69,7 +68,7 @@ class Character(pygame.sprite.Sprite):
 
     def move_left(self, tiles) -> None:
         self.moving_left = True
-        self.moving_right =False
+        self.moving_right = False
         can_move_right, can_move_left = self.can_move_x(tiles)
         if can_move_left * can_move_right == 1:
             self.x += self.speed_x / FPS
@@ -110,6 +109,7 @@ class Character(pygame.sprite.Sprite):
         self.dead_jump()
 
     def dead_jump(self):
+        print('Qwe')
         self.speed_y += GRAVITY / FPS
         self.y += self.speed_y / FPS
         self.image = self.dead_image
@@ -118,7 +118,6 @@ class Character(pygame.sprite.Sprite):
             return False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return True
-
 
     def kill(self):
         self.alive = False
@@ -146,9 +145,9 @@ class Character(pygame.sprite.Sprite):
         self.moving_right = moving_right
 
     def can_move_x(self, tiles_sprites) -> (bool, bool):
-        return (not(any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
-                not(any(self.rect.move(self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
+        return (not (any(self.rect.move(-self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)),
+                not (any(self.rect.move(self.speed_x / FPS, 0).colliderect(i) for i in tiles_sprites)))
 
     def can_move_y(self, tiles_sprites) -> (bool, bool):
-        return (not(any(self.rect.move(0, self.speed_y / FPS).colliderect(i) for i in tiles_sprites)),
-                not(any(self.rect.move(0, self.speed_y / FPS).colliderect(i) for i in tiles_sprites)))
+        return (not (any(self.rect.move(0, self.speed_y / FPS).colliderect(i) for i in tiles_sprites)),
+                not (any(self.rect.move(0, self.speed_y / FPS).colliderect(i) for i in tiles_sprites)))

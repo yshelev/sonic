@@ -12,6 +12,7 @@ class Eggman(pygame.sprite.Sprite):
 
         self.x = x
         self.y = y
+        self.alive = False
         robot_sprites = []
 
         self.current_stage = 0
@@ -35,6 +36,8 @@ class Eggman(pygame.sprite.Sprite):
         self.speed_y = 300
         self.speed_x_multiplier = 10
         self.speed_x = 300
+
+        self.hp = 1000
 
         self.types = {
             "robot_dies": list(map(lambda x: pygame.transform.scale(x, (self.robot_width, self.start_robot_height)),
@@ -76,7 +79,6 @@ class Eggman(pygame.sprite.Sprite):
 
         self.speed_y_multiplier = max(self.speed_y_multiplier - 0.01, 5)
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
-
 
     def turn_game_mod(self):
         self.width = self.robot_width
@@ -139,3 +141,17 @@ class Eggman(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         self.fly_counter = (self.fly_counter + 0.1) % len(self.types["robot_fly_left"])
         self.image = self.types["robot_fly_left" if args[0] else "robot_fly_right"][int(self.fly_counter)]
+
+    def collide_sonic(self, sonic: MainHero):
+        if self.y < sonic.y:
+            sonic.get_damage()
+            return False
+        else:
+            self.get_damage(sonic.speed_y)
+            return True
+
+    def get_damage(self, sonic_speed_y):
+        self.hp -= abs(int(sonic_speed_y)) / FPS
+        if self.hp < 0:
+            self.alive = False
+            self.kill()

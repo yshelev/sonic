@@ -261,7 +261,7 @@ class SonicLevel:
         running = True
         keys = pygame.key.get_pressed()
         if self.main_hero.is_alive() * (keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping()):
-            self.main_hero.play_sound_start_jump()
+            # self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
         if self.main_hero.is_alive() * (not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
                 keys[pygame.K_RIGHT] or keys[button_settings["right"]]))):
