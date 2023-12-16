@@ -51,6 +51,7 @@ class SonicBossFight:
         self.all_tiles_sprites = pygame.sprite.Group()
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites_wo_mh = pygame.sprite.Group()
+        self.all_bullets_sprites = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
 
@@ -67,17 +68,17 @@ class SonicBossFight:
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh,)
+                  self.all_sprites_wo_mh, )
             Tiles(SCREEN_WIDTH - 5, i * SCREEN_HEIGHT // 4, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 4,
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh,)
+                  self.all_sprites_wo_mh, )
             Tiles(-SCREEN_WIDTH // 3 + 5, i * SCREEN_HEIGHT // 4, SCREEN_WIDTH // 3, SCREEN_HEIGHT // 4,
                   self.tile_image_width,
                   self.all_tiles_sprites,
                   self.all_sprites,
-                  self.all_sprites_wo_mh,)
+                  self.all_sprites_wo_mh, )
 
         self.main_hero = MainHero(
             0,
@@ -206,7 +207,7 @@ class SonicBossFight:
         if self.main_hero.rect.colliderect(self.eggman.rect):
             if self.eggman.collide_sonic(self.main_hero):
                 self.main_hero.start_jump(self.all_tiles_sprites)
-        self.main_hero.movement_by_inertia(self.all_tiles_sprites)
+        self.main_hero.movement_by_inertia_boss_level(self.all_tiles_sprites)
         return running
 
     def quit(self):
@@ -241,8 +242,12 @@ class SonicBossFight:
         screen.blit(text_surface, (20, 40))
 
     def draw_lines(self) -> None:
-        pygame.draw.rect(screen, (0, 0, 0), (SCREEN_WIDTH // 8 - 5, SCREEN_HEIGHT // 8 - 5, SCREEN_WIDTH - SCREEN_WIDTH // 4 + 10, SCREEN_HEIGHT // 8 + 10), 5)
-        pygame.draw.rect(screen, (255, 0, 0), (SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8, (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // 1000, SCREEN_HEIGHT // 8))
+        pygame.draw.rect(screen, (0, 0, 0), (
+        SCREEN_WIDTH // 8 - 5, SCREEN_HEIGHT // 8 - 5, SCREEN_WIDTH - SCREEN_WIDTH // 4 + 10, SCREEN_HEIGHT // 8 + 10),
+                         5)
+        pygame.draw.rect(screen, (255, 0, 0), (
+        SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8, (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // 1000,
+        SCREEN_HEIGHT // 8))
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count = (self.rings_sprites_count + 1) % 48
@@ -251,13 +256,19 @@ class SonicBossFight:
         screen.blit(text_surface, (20, 0))
 
     def update(self):
+        if self.eggman.can_shoot():
+            self.eggman.shoot(self.all_sprites, self.all_bullets_sprites)
+
+        if bullets := pygame.sprite.spritecollideany(self.main_hero, self.all_bullets_sprites):
+            if self.main_hero.get_damage():
+                bullets.kill()
+
+        for bullet in self.all_bullets_sprites:
+            bullet.move_self()
         self.main_hero.update()
         self.eggman.update(self.main_hero.x < self.eggman.x)
-
-
 
     def movement(self, running):
         running = self.movement_of_main_character() * running
         self.eggman.eggman_movement(self.main_hero)
         return running
-

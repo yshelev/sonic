@@ -146,6 +146,53 @@ class MainHero(Character):
                                                can_move_invisible_right)
 
             if can_move_right and self.additional_speed > 0:
+                if can_move_invisible_right:
+                    self.x += self.additional_speed / FPS
+            elif can_move_left and self.additional_speed < 0:
+                if can_move_invisible_left:
+                    self.x += self.additional_speed / FPS
+            else:
+                self.additional_speed = 0
+            if direction_x == RIGHT:
+                self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
+            elif direction_x == LEFT:
+                self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
+            if not self.is_jumping and abs(self.additional_speed) / FPS < 5:
+                self.image = self.start_image
+                self.cur_fast_frame = 0
+            if not self.is_jumping:
+                if direction_x == LEFT:
+                    self.image = self.fast_left_frames[self.cur_fast_frame]
+                elif direction_x == RIGHT:
+                    self.image = self.fast_left_frames[self.cur_fast_frame]
+        else:
+            move_code_x = exit_codes["sonic_movement_x"].index(MOVING)
+
+        move_code_y = self.get_move_y_code(can_move_top, can_move_bottom, can_move_invisible_top,
+                                           can_move_invisible_bottom)
+
+        mc = exit_codes["sonic_movement_y"][move_code_y]
+
+        if mc != STOPPED_BY_BOT_WALL_OUTSIDE * self.is_alive():
+            self.jump(tiles)
+
+        return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
+
+    def movement_by_inertia_boss_level(self, tiles) -> (int, float):
+        """
+        инерция(тормозит быстро)
+        """
+        can_move_bottom, can_move_top, point_y = self.can_move_y(tiles)
+        can_move_left, can_move_right, point_x = self.can_move_x(tiles)
+        can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
+        can_move_invisible_bottom, can_move_invisible_top = self.can_move_invisible_wall_y()
+        direction_x = self.move_direction()[0]
+
+        if self.is_alive() * (not (self.moving_right or self.moving_left) or (self.moving_right and self.moving_left)):
+            move_code_x = self.get_move_x_code(can_move_left, can_move_right, can_move_invisible_left,
+                                               can_move_invisible_right)
+
+            if can_move_right and self.additional_speed > 0:
                 self.x += (self.additional_speed / FPS)
             elif can_move_left and self.additional_speed < 0:
                 self.x += (self.additional_speed / FPS)
@@ -400,6 +447,8 @@ class MainHero(Character):
             self.number_of_rings -= 10
             if self.number_of_rings <= 0:
                 self.kill()
+            return True
+        return False
 
     def add_rings(self):
         self.play_collect_ring()
