@@ -103,7 +103,7 @@ class TailsLevel:
                 running = False
                 self.ot_vinta.stop()
                 self.end_screen()
-            if self.ot_vinta_len-self.timer> 100:
+            if self.ot_vinta_len-self.timer < 100:
                 self.enemy_level = 1
             self.spawner()
             self.plane_actions()
@@ -303,7 +303,7 @@ class TailsLevel:
                 self.score -= 50
                 self.boom_sound.play()
                 enemy.kill()
-                self.plane_character.rings -= 6
+                self.plane_character.rings -= (enemy.level + 1)*6
             else:
                 if enemy.damage:
                     self.plane_character.rings -= enemy.damage
