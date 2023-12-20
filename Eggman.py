@@ -119,16 +119,16 @@ class Eggman(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return self.x <= SCREEN_WIDTH
 
-    def last_move(self):
+    def last_move(self, direction):
         if self.y + self.height < SCREEN_HEIGHT:
             self.y += 600 / FPS
             self.rect = self.rect.move((0, 600 / FPS))
-            self.image = self.types["robot_dies"][0]
+            self.image = self.types["robot_dies_right" if direction else "robot_dies_left"][0]
 
             return True
         self.counter += 0.1
-        if int(self.counter) < len(self.types["robot_dies"]):
-            self.image = self.types["robot_dies"][int(self.counter)]
+        if int(self.counter) < len(self.types["robot_dies_right" if direction else "robot_dies_left"]):
+            self.image = self.types["robot_dies_right" if direction else "robot_dies_left"][int(self.counter)]
             return True
 
         return False
@@ -189,9 +189,11 @@ class Eggman(pygame.sprite.Sprite):
         if self.y < sonic.y:
             sonic.get_damage()
             return False
-        else:
+        elif sonic.available():
             self.get_damage(sonic.speed_y)
             return True
+        else:
+            return False
 
     def get_damage(self, sonic_speed_y):
         self.hp -= abs(int(sonic_speed_y)) / FPS

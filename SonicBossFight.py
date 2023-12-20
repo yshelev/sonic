@@ -189,7 +189,7 @@ class SonicBossFight:
                     self.quit()
 
             screen.blit(self.background_image, (0, 0))
-            running = self.eggman.last_move()
+            running = self.eggman.last_move(self.main_hero.x > (self.eggman.x + self.eggman.width // 2))
             self.all_sprites.draw(screen)
 
             pygame.display.flip()
@@ -225,7 +225,7 @@ class SonicBossFight:
         if self.main_hero.get_is_jumping() * self.main_hero.is_alive():
             self.main_hero.jump_level_boss(self.all_tiles_sprites)
         if self.main_hero.rect.colliderect(self.eggman.rect):
-            if self.eggman.collide_sonic(self.main_hero):
+            if self.eggman.collide_sonic(self.main_hero) * self.main_hero.available():
                 self.main_hero.start_jump(self.all_tiles_sprites)
         if not self.eggman.is_alive():
             self.last_screen = screen.copy()

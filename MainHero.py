@@ -501,3 +501,6 @@ class MainHero(Character):
         self.additional_speed = 0
         self.moving_right = False
         return False
+
+    def available(self):
+        return not self.unavailable_counter
