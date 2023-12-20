@@ -11,12 +11,14 @@ class Plane_Character(pygame.sprite.Sprite):
             images: list[pygame.image],
             *group_all_sprite: pygame.sprite.Group
     ) -> None:
-        super().__init__(group_all_sprite)
+        super().__init__(*group_all_sprite)
         self.moving_left = False
         self.moving_right = False
         self.moving_up = False
         self.moving_down = False
-        self.width, self.height = 256, 128 - 30
+        self.width = 192
+        self.height = (self.width*0.883)/2
+
         self.x = x
         self.y = y
         self.images = images

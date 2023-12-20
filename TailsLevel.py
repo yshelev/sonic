@@ -83,23 +83,20 @@ class TailsLevel:
 
         self.background_image_x = 0
 
-        self.output = self.game_loop()
+        self.game_loop()
 
     def game_loop(self):
         self.ot_vinta.play(-1)
         self.start_time = pygame.time.get_ticks()
-        flag = True
         running = True
         while running:
             self.current_time = pygame.time.get_ticks()
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    flag = False
-                    running = False
                     quit()
-            if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer - 190 == 0:
-                if self.ot_vinta_len - self.timer - 190 == 0:
+            if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
+                if self.ot_vinta_len - self.timer == 0:
                     self.win = True
                 running = False
                 self.ot_vinta.stop()
@@ -114,7 +111,6 @@ class TailsLevel:
             self.all_sprites_level2.update()
 
             pygame.display.flip()
-        return flag
 
     def end_screen(self):
         if self.win:
@@ -262,8 +258,7 @@ class TailsLevel:
         for bullet in self.all_bullet_sprites:
             if bullet.x > SCREEN_WIDTH + bullet.width:
                 bullet.kill()
-            if pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites):
-                enemy = pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites)
+            if enemy := pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites):
                 bullet.kill()
                 enemy.health -= bullet.damage
         for ring in self.all_rings_sprites:
@@ -300,8 +295,7 @@ class TailsLevel:
                     upgrade.kill()
 
     def collide_enemy(self):
-        if pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites):
-            enemy = pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites)
+        if enemy := pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites):
             if enemy.__class__.__name__ == "Plane_Enemy":
                 self.score -= 50
                 self.boom_sound.play()
@@ -316,10 +310,3 @@ class TailsLevel:
                     enemy.images = list(
                         map(lambda image: pygame.transform.scale(image, (enemy.width, enemy.height)),
                             self.sad_cloud_sprites))
-
-    def quit(self):
-        pygame.quit()
-        sys.exit()
-
-    def get_output(self) -> bool:
-        return self.output
