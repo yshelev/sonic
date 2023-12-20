@@ -2,6 +2,7 @@ import random
 import sys
 import pygame
 
+import Settings
 from Plane_Level import *
 from Settings import *
 from button import *
@@ -45,11 +46,11 @@ class TailsLevel:
         self.zap_sound = pygame.mixer.Sound('data/sounds/level 2/zap.wav')
         self.bonus_sound = pygame.mixer.Sound('data/sounds/level 2/bonus.wav')
         self.ot_vinta = pygame.mixer.Sound('data/MUSIC/ot_vinta.mp3')
-        self.ring_sound.set_volume(0.1)
-        self.boom_sound.set_volume(0.1)
-        self.zap_sound.set_volume(0.1)
-        self.bonus_sound.set_volume(0.1)
-        self.ot_vinta.set_volume(0.3)
+        self.ring_sound.set_volume(Settings.sound)
+        self.boom_sound.set_volume(Settings.sound)
+        self.zap_sound.set_volume(Settings.sound)
+        self.bonus_sound.set_volume(Settings.sound)
+        self.ot_vinta.set_volume(Settings.sound * 3)
         self.ot_vinta_len = 200
         self.start_time = 0
         self.current_time = 0
@@ -168,13 +169,13 @@ class TailsLevel:
 
     def plane_actions(self):
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
+        if keys[dict_movement[Settings.dict_movement_pointer]["top"]]:
             self.plane_character.move_up()
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        if keys[dict_movement[Settings.dict_movement_pointer]["down"]]:
             self.plane_character.move_down()
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
+        if keys[dict_movement[Settings.dict_movement_pointer]["left"]]:
             self.plane_character.move_left()
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        if keys[dict_movement[Settings.dict_movement_pointer]["right"]]:
             self.plane_character.move_right()
         if keys[pygame.K_SPACE]:
             self.shooting()

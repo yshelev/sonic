@@ -124,9 +124,9 @@ class Menu:
                     if SELECT_WASD.checkForInput(OPTIONS_MOUSE_POS):
                         Settings.dict_movement_pointer = 0
                     if MINUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
-                        Settings.sound -= 0.05
+                        Settings.sound = max(Settings.sound - 0.1, 0)
                     if PLUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
-                        Settings.sound += 0.05
+                        Settings.sound += max(Settings.sound + 0.1, 3)
 
             pygame.display.update()
 

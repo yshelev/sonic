@@ -19,13 +19,15 @@ sound = 0.1
 dict_movement_buttons = {
     "top": pygame.K_w,
     "left": pygame.K_a,
-    "right": pygame.K_d
+    "right": pygame.K_d,
+    "down": pygame.K_s
 }
 
 dict_movement_arrows = {
     "top": pygame.K_UP,
     "left": pygame.K_LEFT,
-    "right": pygame.K_RIGHT
+    "right": pygame.K_RIGHT,
+    "down": pygame.K_DOWN
 }
 
 dict_movement_pointer = 0
