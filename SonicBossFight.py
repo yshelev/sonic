@@ -179,6 +179,12 @@ class SonicBossFight:
             self.draw()
 
             pygame.display.update()
+    def prepare_eggman_death(self):
+        self.all_bullets_sprites.empty()
+        self.main_hero.start_jump(self.all_tiles_sprites)
+        self.main_hero.set_moving_left(False)
+        self.main_hero.set_moving_right(False)
+        self.all_sprites.add(self.eggman)
 
     def play_eggman_death(self):
         running = True
@@ -189,13 +195,14 @@ class SonicBossFight:
                     self.quit()
 
             screen.blit(self.background_image, (0, 0))
+            self.main_hero.movement_by_inertia_boss_level(self.all_tiles_sprites)
+            self.main_hero.update()
             running = self.eggman.last_move(self.main_hero.x > (self.eggman.x + self.eggman.width // 2))
             self.all_sprites.draw(screen)
 
             pygame.display.flip()
 
         self.end_screen(True)
-
 
     def movement_of_main_character(self) -> bool:
         running = True
@@ -231,6 +238,8 @@ class SonicBossFight:
             self.last_screen = screen.copy()
             running = False
             self.eggman.reset_counter()
+            self.eggman.eggman_death()
+            self.prepare_eggman_death()
             self.play_eggman_death()
 
         self.main_hero.movement_by_inertia_boss_level(self.all_tiles_sprites)
@@ -278,7 +287,8 @@ class SonicBossFight:
             SCREEN_HEIGHT // 8 + 10),
                          5)
         pygame.draw.rect(screen, (255, 0, 0), (
-            SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8, (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // int(self.eggman.max_hp),
+            SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8,
+            (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // int(self.eggman.max_hp),
             SCREEN_HEIGHT // 8))
 
     def draw_num_of_rings(self) -> None:
@@ -349,9 +359,7 @@ class SonicBossFight:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RETRY.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        SonicBossFight(self.score, self.rings)
+                        SonicBossFight(self.main_hero.get_score(), self.main_hero.get_number_of_rings())
                     if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                         running = False
             pygame.display.update()
-
-

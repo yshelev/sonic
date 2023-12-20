@@ -109,7 +109,6 @@ class Character(pygame.sprite.Sprite):
         self.dead_jump()
 
     def dead_jump(self):
-        print('Qwe')
         self.speed_y += GRAVITY / FPS
         self.y += self.speed_y / FPS
         self.image = self.dead_image

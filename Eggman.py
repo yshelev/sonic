@@ -121,9 +121,9 @@ class Eggman(pygame.sprite.Sprite):
 
     def last_move(self, direction):
         if self.y + self.height < SCREEN_HEIGHT:
-            self.y += 600 / FPS
-            self.rect = self.rect.move((0, 600 / FPS))
-            self.image = self.types["robot_dies_right" if direction else "robot_dies_left"][0]
+            self.y += 60 / FPS
+            self.rect = self.rect.move((0, 60 / FPS))
+            self.image = self.last_image
 
             return True
         self.counter += 0.1
@@ -206,3 +206,6 @@ class Eggman(pygame.sprite.Sprite):
 
     def is_alive(self):
         return self.alive
+
+    def eggman_death(self):
+        self.last_image = self.image

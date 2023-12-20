@@ -79,10 +79,9 @@ class MainHero(Character):
                 self.y += self.speed_y / FPS
             else:
                 self.y = point_y[0] if point_y else self.y
-                self.speed_y = 0
                 self.is_jumping = False
                 self.is_falling = False
-        else:
+        elif can_move_top:
             self.y += self.speed_y / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -214,7 +213,10 @@ class MainHero(Character):
         mc = exit_codes["sonic_movement_y"][move_code_y]
 
         if mc != STOPPED_BY_BOT_WALL_OUTSIDE * self.is_alive():
-            self.jump(tiles)
+            self.jump_level_boss(tiles)
+        else:
+            self.is_jumping = False
+            self.speed_y = 0
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
