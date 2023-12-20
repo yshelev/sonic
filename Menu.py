@@ -1,8 +1,7 @@
 import sys
 
 import cv2
-
-
+import Settings
 from Settings import *
 from button import Button
 from SonicLevel import SonicLevel
@@ -19,6 +18,9 @@ class Menu:
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
         self.start_video_loop()
+
+        self.additional_sound = 0.05
+
     def get_font(self, size):
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
@@ -97,13 +99,15 @@ class Menu:
             SELECT_WASD.update(screen)
 
             SELECT_ARROW = Button(image=pygame.image.load("data/menu_objects/select_rect.png"), pos=(800, 635),
-                                  text_input="Выбрать", font=self.get_font(30), base_color="White", hovering_color="Red")
+                                  text_input="Выбрать", font=self.get_font(30), base_color="White",
+                                  hovering_color="Red")
 
             SELECT_ARROW.changeColor(OPTIONS_MOUSE_POS)
             SELECT_ARROW.update(screen)
 
             OPTIONS_BACK = Button(image=pygame.image.load("data/menu_objects/back_rect.png"), pos=(600, 730),
-                                  text_input="Назад", font=self.get_font(40), base_color="White", hovering_color="Green")
+                                  text_input="Назад", font=self.get_font(40), base_color="White",
+                                  hovering_color="Green")
 
             OPTIONS_BACK.changeColor(OPTIONS_MOUSE_POS)
             OPTIONS_BACK.update(screen)
@@ -115,6 +119,16 @@ class Menu:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                         running = False
                         self.main_menu()
+                    if SELECT_ARROW.checkForInput(OPTIONS_MOUSE_POS):
+                        Settings.dict_movement_pointer = 1
+                        print(Settings.dict_movement_pointer)
+                    if SELECT_WASD.checkForInput(OPTIONS_MOUSE_POS):
+                        print("QWE")
+                        Settings.dict_movement_pointer = 0
+                    if MINUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
+                        Settings.sound -= 0.05
+                    if PLUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
+                        Settings.sound += 0.05
 
             pygame.display.update()
 
@@ -126,7 +140,8 @@ class Menu:
             screen.blit(self.BG4, (0, 0))
 
             DEVELOPERS_BACK = Button(image=pygame.image.load("data/menu_objects/back_rect.png"), pos=(600, 700),
-                                     text_input="Назад", font=self.get_font(40), base_color="White", hovering_color="Green")
+                                     text_input="Назад", font=self.get_font(40), base_color="White",
+                                     hovering_color="Green")
 
             DEVELOPERS_BACK.changeColor(DEVELOPERS_MOUSE_POS)
             DEVELOPERS_BACK.update(screen)
@@ -149,7 +164,8 @@ class Menu:
             MENU_MOUSE_POS = pygame.mouse.get_pos()
 
             PLAY_BUTTON = Button(image=pygame.image.load("data/menu_objects/play_rect.png"), pos=(990, 220),
-                                 text_input="Играть", font=self.get_font(45), base_color="white", hovering_color="green")
+                                 text_input="Играть", font=self.get_font(45), base_color="white",
+                                 hovering_color="green")
             OPTIONS_BUTTON = Button(image=pygame.image.load("data/menu_objects/play_rect.png"), pos=(950, 380),
                                     text_input="Настройки", font=self.get_font(43), base_color="white",
                                     hovering_color="green")

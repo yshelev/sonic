@@ -4,6 +4,7 @@ from Enemy import Enemy
 from Enemy_score import Enemy_score
 from MainHero import MainHero
 from Rings import Rings
+import Settings
 from Settings import *
 from SonicBossFight import SonicBossFight
 from Tiles import Tiles
@@ -151,7 +152,7 @@ class SonicLevel:
             fast_running_sonic_sprites,
             super_fast_running_sonic_sprites,
             pygame.image.load(f"data/Sonic Sprites/tile051.png"),
-            50,
+            10,
             0,
             self.all_sprites
         )
@@ -165,7 +166,7 @@ class SonicLevel:
         self.game_loop()
 
     def play_music(self) -> None:
-        self.background_music.set_volume(0.1)
+        self.background_music.set_volume(sound)
         self.background_music.play(-1)
 
     def game_loop(self):
@@ -259,14 +260,14 @@ class SonicLevel:
         screen.blit(text_surface, (20, 40))
 
     def movement_of_main_character(self) -> bool:
+        print(dict_movement_pointer)
         running = True
         keys = pygame.key.get_pressed()
-        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping()):
+        if self.main_hero.is_alive() * ((keys[pygame.K_SPACE] or keys[dict_movement[Settings.dict_movement_pointer]["top"]]) and not self.main_hero.get_is_jumping()):
             # self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
-        if self.main_hero.is_alive() * (not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
-                keys[pygame.K_RIGHT] or keys[button_settings["right"]]))):
-            if keys[pygame.K_LEFT] or keys[button_settings["left"]]:
+        if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[dict_movement[Settings.dict_movement_pointer]["right"]])):
+            if keys[dict_movement[Settings.dict_movement_pointer]["left"]]:
                 output_code, movement_sprites_speed = self.main_hero.move_left(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_sprites_wo_mh:
@@ -274,7 +275,7 @@ class SonicLevel:
             else:
                 self.main_hero.set_moving_left(False)
 
-            if keys[pygame.K_RIGHT] or keys[button_settings["right"]]:
+            if keys[dict_movement[Settings.dict_movement_pointer]["right"]]:
                 output_code, movement_sprites_speed = self.main_hero.move_right(self.all_tiles_sprites)
                 if output_code in [STOPPED_BY_RIGHT_INVISIBLE_WALL, STOPPED_BY_LEFT_INVISIBLE_WALL]:
                     for tile in self.all_sprites_wo_mh:

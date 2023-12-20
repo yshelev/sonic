@@ -4,6 +4,7 @@ import pygame.event
 
 from Eggman import Eggman
 from MainHero import MainHero
+import Settings
 from Settings import *
 from Tiles import Tiles
 from button import Button
@@ -207,16 +208,15 @@ class SonicBossFight:
     def movement_of_main_character(self) -> bool:
         running = True
         keys = pygame.key.get_pressed()
-        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] and not self.main_hero.get_is_jumping()):
+        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] or keys[dict_movement[Settings.dict_movement_pointer]["top"]] and not self.main_hero.get_is_jumping()):
             # self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
-        if self.main_hero.is_alive() * (not ((keys[pygame.K_LEFT] or keys[button_settings["left"]]) and (
-                keys[pygame.K_RIGHT] or keys[button_settings["right"]]))):
-            if keys[pygame.K_LEFT] or keys[button_settings["left"]]:
+        if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[dict_movement[Settings.dict_movement_pointer]["right"]])):
+            if keys[dict_movement[Settings.dict_movement_pointer]["left"]]:
                 self.main_hero.move_left_level_boss(self.all_tiles_sprites)
             else:
                 self.main_hero.set_moving_left(False)
-            if keys[pygame.K_RIGHT] or keys[button_settings["right"]]:
+            if keys[dict_movement[Settings.dict_movement_pointer]["right"]]:
                 self.main_hero.move_right_level_boss(self.all_tiles_sprites)
             else:
                 self.main_hero.set_moving_right(False)

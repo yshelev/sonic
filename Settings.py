@@ -14,10 +14,23 @@ BOTTOM_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2),
 TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
                       (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3))
 
-button_settings = {
-    "left": pygame.K_q,
-    "right": pygame.K_e
+sound = 0.1
+
+dict_movement_buttons = {
+    "top": pygame.K_w,
+    "left": pygame.K_a,
+    "right": pygame.K_d
 }
+
+dict_movement_arrows = {
+    "top": pygame.K_UP,
+    "left": pygame.K_LEFT,
+    "right": pygame.K_RIGHT
+}
+
+dict_movement_pointer = 0
+
+dict_movement = [dict_movement_buttons, dict_movement_arrows]
 
 OK = "OK"
 STOPPED_BY_RIGHT_INVISIBLE_WALL = "stopped by right invisible wall"
