@@ -1,3 +1,5 @@
+import sys
+
 import pygame
 
 SCREEN_WIDTH = 1200
@@ -14,7 +16,14 @@ BOTTOM_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2),
 TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
                       (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3))
 
-sound = 0.1
+
+with open("data/settings.txt") as f:
+    settings = {i.split(" = ")[0]: i.split(" = ")[1] for i in f.readlines()}
+
+sound = float(settings["sound"])
+dict_movement_pointer = int(settings["dict_movement_pointer"])
+max_score_sonic = int(settings["max_score_sonic"])
+max_score_tiles = int(settings["max_score_tiles"])
 
 dict_movement_buttons = {
     "top": pygame.K_w,
@@ -29,8 +38,6 @@ dict_movement_arrows = {
     "right": pygame.K_RIGHT,
     "down": pygame.K_DOWN
 }
-
-dict_movement_pointer = 0
 
 dict_movement = [dict_movement_buttons, dict_movement_arrows]
 
@@ -68,3 +75,13 @@ exit_codes = {
         MOVING,
     ],
 }
+
+
+def quit():
+    with open("data/settings.txt", "w") as f:
+        f.write("\n".join([f"{sound = }",
+                           f"{dict_movement_pointer = }",
+                           f"{max_score_sonic = }",
+                           f"{max_score_tiles = }"]))
+    pygame.quit()
+    sys.exit()

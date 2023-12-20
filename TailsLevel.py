@@ -97,9 +97,9 @@ class TailsLevel:
                 if event.type == pygame.QUIT:
                     flag = False
                     running = False
-                    self.quit()
-            if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer == 0:
-                if self.ot_vinta_len - self.timer == 0:
+                    quit()
+            if self.plane_character.rings <= 0 or self.ot_vinta_len - self.timer - 190 == 0:
+                if self.ot_vinta_len - self.timer - 190 == 0:
                     self.win = True
                 running = False
                 self.ot_vinta.stop()
@@ -117,15 +117,17 @@ class TailsLevel:
         return flag
 
     def end_screen(self):
+        if self.win:
+            Settings.max_score_tiles = max(Settings.max_score_tiles, self.score)
         running = True
         while running:
-            if self.win == True:
+            if self.win:
                 bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                    f'ХОРОШ',
-                    True, (255, 255, 255))
+                    f'ХОРОШ! {"Новый рекорд!" if Settings.max_score_tiles == self.score else "Но не лучше всех!"}',
+                    True, (0, 0, 0))
                 screen.blit(text_surface, (400, 100))
             else:
                 bg = pygame.transform.scale(pygame.image.load("data/tails_loser.jpg"),
@@ -155,7 +157,7 @@ class TailsLevel:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RETRY.checkForInput(PLAY_MOUSE_POS):
                         running = False

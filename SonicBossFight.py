@@ -54,11 +54,20 @@ class SonicBossFight:
         self.all_sprites = pygame.sprite.Group()
         self.all_sprites_wo_mh = pygame.sprite.Group()
         self.all_bullets_sprites = pygame.sprite.Group()
+        self.all_spikes_sprites = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
 
         self.tile_image_width = pygame.transform.scale(pygame.image.load("data/GROUND/Platform.png"),
                                                        (SCREEN_WIDTH // 4, 300))
+
+        with open("data/boss_map.txt") as f:
+            self.map = [i.split() for i in f.readlines()[::-1]]
+
+        NUM_TALES_X = len(self.map[0])
+        NUM_TALES_Y = len(self.map)
+
+        TALE_WIDTH, TALE_HEIGHT = SCREEN_WIDTH / NUM_TALES_X, SCREEN_HEIGHT / NUM_TALES_Y
 
         for i in range(-1, 5):
             Tiles(i * SCREEN_WIDTH // 4, -SCREEN_HEIGHT // 2 + 5, SCREEN_WIDTH // 4, SCREEN_HEIGHT // 2,
@@ -82,6 +91,37 @@ class SonicBossFight:
                   self.all_sprites,
                   self.all_sprites_wo_mh, )
 
+        for y in range(NUM_TALES_Y):
+            for x in range(NUM_TALES_X):
+                char = self.map[y][x]
+                if char == "t":
+                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
+                          TALE_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
+                          self.all_tiles_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
+
+                if char == "s":
+                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10,
+                          TALE_WIDTH,
+                          TALE_HEIGHT // 10, pygame.image.load("data/OBJECTS/SPIKES.png"),
+                          self.all_spikes_sprites,
+                          self.all_sprites,
+                          self.all_sprites_wo_mh)
+
+                if char == "f":
+                    self.finish_tale = Tiles(SCREEN_WIDTH // 60 * 8 * x,
+                                             SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 2, TALE_WIDTH,
+                                             TALE_HEIGHT // 2, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
+                                             self.all_sprites,
+                                             self.all_sprites_wo_mh,
+                                             animation_list=list(map(lambda x: pygame.transform.scale(x, (
+                                                 TALE_WIDTH, TALE_HEIGHT // 2)), [pygame.image.load(
+                                                 f"data/eggman_signs/eggman_sign_{i // 3}.png") for i in
+                                                                         range(3, 15)])))
+
+
+
         self.main_hero = MainHero(
             0,
             SCREEN_HEIGHT - 105,
@@ -96,6 +136,7 @@ class SonicBossFight:
             self.all_sprites
         )
 
+
         self.eggman = Eggman(SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT - 105, 100, 100,
                              self.all_sprites,
                              self.all_sprites_wo_mh)
@@ -108,7 +149,7 @@ class SonicBossFight:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             screen.blit(self.background_image, (0, 0))
             running = self.main_hero.animation_boss_fight_in()
@@ -123,7 +164,7 @@ class SonicBossFight:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             screen.blit(self.background_image, (0, 0))
             running = self.eggman.man_jump_animation()
@@ -138,7 +179,7 @@ class SonicBossFight:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             screen.blit(self.background_image, (0, 0))
             running = self.eggman.man_run_out()
@@ -155,7 +196,7 @@ class SonicBossFight:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             screen.blit(self.background_image, (0, 0))
             running = self.eggman.fall_on_robot_animation()
@@ -171,7 +212,7 @@ class SonicBossFight:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             running = self.movement(running)
             self.update()
@@ -180,9 +221,10 @@ class SonicBossFight:
             self.draw()
 
             pygame.display.update()
+
     def prepare_eggman_death(self):
         self.all_bullets_sprites.empty()
-        self.main_hero.start_jump(self.all_tiles_sprites)
+        self.main_hero.start_boss_jump(self.all_tiles_sprites)
         self.main_hero.set_moving_left(False)
         self.main_hero.set_moving_right(False)
         self.all_sprites.add(self.eggman)
@@ -193,7 +235,7 @@ class SonicBossFight:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             screen.blit(self.background_image, (0, 0))
             self.main_hero.movement_by_inertia_boss_level(self.all_tiles_sprites)
@@ -208,10 +250,12 @@ class SonicBossFight:
     def movement_of_main_character(self) -> bool:
         running = True
         keys = pygame.key.get_pressed()
-        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] or keys[dict_movement[Settings.dict_movement_pointer]["top"]] and not self.main_hero.get_is_jumping()):
+        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] or keys[
+            dict_movement[Settings.dict_movement_pointer]["top"]] and not self.main_hero.get_is_jumping()):
             # self.main_hero.play_sound_start_jump()
-            self.main_hero.start_jump(self.all_tiles_sprites)
-        if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[dict_movement[Settings.dict_movement_pointer]["right"]])):
+            self.main_hero.start_boss_jump(self.all_tiles_sprites)
+        if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[
+            dict_movement[Settings.dict_movement_pointer]["right"]])):
             if keys[dict_movement[Settings.dict_movement_pointer]["left"]]:
                 self.main_hero.move_left_level_boss(self.all_tiles_sprites)
             else:
@@ -233,7 +277,7 @@ class SonicBossFight:
             self.main_hero.jump_level_boss(self.all_tiles_sprites)
         if self.main_hero.rect.colliderect(self.eggman.rect):
             if self.eggman.collide_sonic(self.main_hero) * self.main_hero.available():
-                self.main_hero.start_jump(self.all_tiles_sprites)
+                self.main_hero.start_boss_jump(self.all_tiles_sprites)
         if not self.eggman.is_alive():
             self.last_screen = screen.copy()
             running = False
@@ -255,7 +299,7 @@ class SonicBossFight:
         while running:
             for event in pygame.event.get():
                 if event == pygame.QUIT:
-                    self.quit()
+                    quit()
             self.clock.tick(FPS)
             running = self.main_hero.dead_jump()
 
@@ -316,6 +360,8 @@ class SonicBossFight:
         return running
 
     def end_screen(self, win):
+        if win:
+            Settings.max_score_sonic = max(Settings.max_score_sonic, self.main_hero.get_score())
         dct_win_phrases = {
             True: "победа",
             False: "поражение"
@@ -327,7 +373,7 @@ class SonicBossFight:
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                f'{dct_win_phrases[win]}',
+                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * Settings.max_score_sonic == self.main_hero.get_score()) == 1 else None}',
                 True, (255, 255, 255))
             screen.blit(text_surface, (400, 100))
 
@@ -355,11 +401,11 @@ class SonicBossFight:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RETRY.checkForInput(PLAY_MOUSE_POS):
                         running = False
-                        SonicBossFight(self.main_hero.get_score(), self.main_hero.get_number_of_rings())
+                        SonicBossFight(self.score, self.rings)
                     if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                         running = False
             pygame.display.update()

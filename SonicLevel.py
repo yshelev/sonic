@@ -175,7 +175,7 @@ class SonicLevel:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             running = self.movement_of_main_character() * running
             self.background_image_movement()
@@ -185,6 +185,8 @@ class SonicLevel:
         self.background_music.stop()
 
     def end_screen(self, win):
+        if win:
+            Settings.max_score = max(Settings.max_score_sonic, self.main_hero.get_score())
         dct_win_phrases = {
             True: "победа",
             False: "поражение"
@@ -196,7 +198,7 @@ class SonicLevel:
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                f'{dct_win_phrases[win]}',
+                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * Settings.max_score_sonic == self.main_hero.get_score()) == 1 else "все по старому.."}',
                 True, (255, 255, 255))
             screen.blit(text_surface, (400, 100))
 
@@ -224,7 +226,7 @@ class SonicLevel:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if RETRY.checkForInput(PLAY_MOUSE_POS):
                         running = False
@@ -341,7 +343,7 @@ class SonicLevel:
         while running:
             for event in pygame.event.get():
                 if event == pygame.QUIT:
-                    self.quit()
+                    quit()
             self.clock.tick(FPS)
             running = self.main_hero.dead_jump()
 
@@ -397,7 +399,7 @@ class SonicLevel:
             self.clock.tick(FPS)
             for event in pygame.event.get():
                 if event == pygame.QUIT:
-                    self.quit()
+                    quit()
 
             running = self.main_hero.animation_next_level()
 

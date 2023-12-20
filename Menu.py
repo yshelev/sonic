@@ -57,7 +57,7 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if PLAY_BACK.checkForInput(PLAY_MOUSE_POS):
                         running = False
@@ -114,7 +114,7 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                         running = False
@@ -146,7 +146,7 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if DEVELOPERS_BACK.checkForInput(DEVELOPERS_MOUSE_POS):
                         running = False
@@ -179,7 +179,7 @@ class Menu:
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    self.quit()
+                    quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                         running = False
@@ -191,7 +191,7 @@ class Menu:
                         running = False
                         self.options()
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
-                        self.quit()
+                        quit()
 
             pygame.display.update()
 
@@ -211,7 +211,7 @@ class Menu:
         #     clock.tick(fps)
         #     for event in pygame.event.get():
         #         if event.type == pygame.QUIT:
-        #             self.quit()
+        #             quit()
         #
         #
         #     success, video_image = video.read()
@@ -229,6 +229,7 @@ class Menu:
         pygame.mixer.music.stop()
         self.main_menu()
 
-    def quit(self):
-        pygame.quit()
-        sys.exit()
+    # def quit(self):
+    #     
+    #     pygame.quit()
+    #     sys.exit()

@@ -43,7 +43,7 @@ class MainHero(Character):
         self.number_of_rings = rings
         self.is_falling = False
         self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
-        # self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
+        self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
         self.score = score
         self.add_score = 0
 
@@ -82,7 +82,7 @@ class MainHero(Character):
                 self.y = point_y[0] if point_y else self.y
                 self.is_jumping = False
                 self.is_falling = False
-        elif can_move_top:
+        elif self.y + self.speed_y / FPS > 0:
             self.y += self.speed_y / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -215,15 +215,17 @@ class MainHero(Character):
 
         if mc != STOPPED_BY_BOT_WALL_OUTSIDE * self.is_alive():
             self.jump_level_boss(tiles)
-        else:
-            self.is_jumping = False
-            self.speed_y = 0
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
     def play_sound_start_jump(self) -> None:
         self.jump_sound.set_volume(Settings.sound)
         self.jump_sound.play()
+
+    def start_boss_jump(self, tiles_sprites) -> None:
+        self.speed_y = -350
+        self.is_jumping = True
+        self.jump_level_boss(tiles_sprites)
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
         self.is_jumping = True
@@ -450,6 +452,7 @@ class MainHero(Character):
         if not self.unavailable_counter:
             self.unavailable_counter += 1
             self.number_of_rings -= 10
+            self.score -= 100
             if self.number_of_rings <= 0:
                 self.kill()
             return True
@@ -458,6 +461,7 @@ class MainHero(Character):
     def add_rings(self):
         self.play_collect_ring()
         self.number_of_rings += 1
+        self.score += 100
 
     def get_score(self):
         return self.score
@@ -478,8 +482,8 @@ class MainHero(Character):
 
     def play_collect_ring(self) -> None:
         self.score += 1000
-        # self.enemy_death_sound.set_volume(Settings.sound)
-        # self.enemy_death_sound.play()
+        self.enemy_death_sound.set_volume(Settings.sound)
+        self.enemy_death_sound.play()
 
     def get_add_score(self):
         return self.add_score
