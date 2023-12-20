@@ -1,14 +1,12 @@
 import sys
 
-import pygame
-
+from Enemy import Enemy
 from Enemy_score import Enemy_score
 from MainHero import MainHero
+from Rings import Rings
 from Settings import *
 from SonicBossFight import SonicBossFight
 from Tiles import Tiles
-from Enemy import Enemy
-from Rings import Rings
 from button import Button
 
 
@@ -153,6 +151,8 @@ class SonicLevel:
             fast_running_sonic_sprites,
             super_fast_running_sonic_sprites,
             pygame.image.load(f"data/Sonic Sprites/tile051.png"),
+            50,
+            0,
             self.all_sprites
         )
         self.background_image_x, self.background_image_y = SCREEN_WIDTH, 0
@@ -242,6 +242,7 @@ class SonicLevel:
                                            self.main_hero.width - 5,
                                            self.main_hero.height + self.main_hero.speed_y / FPS))
         pygame.draw.rect(screen, "red", (self.main_hero.x + 5,
+                                         self.main_hero.y,
                                          self.main_hero.y,
                                          self.main_hero.width - 5,
                                          self.main_hero.height + self.main_hero.speed_y / FPS)
@@ -379,8 +380,8 @@ class SonicLevel:
 
     def next_level(self):
         self.last_animation()
-        # self.all_sprites.empty()
-        SonicBossFight(self.main_hero.get_number_of_rings(), self.main_hero.get_score())
+        self.all_sprites.empty()
+        SonicBossFight(self.main_hero.get_score(), self.main_hero.get_number_of_rings())
 
     def quit(self):
         pygame.quit()
@@ -407,4 +408,10 @@ class SonicLevel:
 
             self.all_sprites.draw(screen)
 
+            self.all_sprites.update(self.all_tiles_sprites)
+
             pygame.display.update()
+
+
+
+

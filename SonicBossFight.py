@@ -6,6 +6,7 @@ from Eggman import Eggman
 from MainHero import MainHero
 from Settings import *
 from Tiles import Tiles
+from button import Button
 
 
 class SonicBossFight:
@@ -89,6 +90,8 @@ class SonicBossFight:
             fast_running_sonic_sprites,
             super_fast_running_sonic_sprites,
             pygame.image.load(f"data/Sonic Sprites/tile051.png"),
+            self.rings,
+            self.score,
             self.all_sprites
         )
 
@@ -177,6 +180,23 @@ class SonicBossFight:
 
             pygame.display.update()
 
+    def play_eggman_death(self):
+        running = True
+        while running:
+            self.clock.tick(FPS)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+
+            screen.blit(self.background_image, (0, 0))
+            running = self.eggman.last_move()
+            self.all_sprites.draw(screen)
+
+            pygame.display.flip()
+
+        self.end_screen(True)
+
+
     def movement_of_main_character(self) -> bool:
         running = True
         keys = pygame.key.get_pressed()
@@ -207,7 +227,14 @@ class SonicBossFight:
         if self.main_hero.rect.colliderect(self.eggman.rect):
             if self.eggman.collide_sonic(self.main_hero):
                 self.main_hero.start_jump(self.all_tiles_sprites)
+        if not self.eggman.is_alive():
+            self.last_screen = screen.copy()
+            running = False
+            self.eggman.reset_counter()
+            self.play_eggman_death()
+
         self.main_hero.movement_by_inertia_boss_level(self.all_tiles_sprites)
+
         return running
 
     def quit(self):
@@ -229,6 +256,7 @@ class SonicBossFight:
             screen.blit(self.last_screen, (0, 0))
 
             pygame.display.update()
+        self.end_screen(False)
 
     def draw(self) -> None:
 
@@ -237,17 +265,21 @@ class SonicBossFight:
         self.draw_lines()
         self.all_sprites.draw(screen)
 
+    def get_font(self, size):
+        return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
+
     def draw_score(self):
         text_surface = self.my_font.render(f'score: {self.main_hero.get_score()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 40))
 
     def draw_lines(self) -> None:
         pygame.draw.rect(screen, (0, 0, 0), (
-        SCREEN_WIDTH // 8 - 5, SCREEN_HEIGHT // 8 - 5, SCREEN_WIDTH - SCREEN_WIDTH // 4 + 10, SCREEN_HEIGHT // 8 + 10),
+            SCREEN_WIDTH // 8 - 5, SCREEN_HEIGHT // 8 - 5, SCREEN_WIDTH - SCREEN_WIDTH // 4 + 10,
+            SCREEN_HEIGHT // 8 + 10),
                          5)
         pygame.draw.rect(screen, (255, 0, 0), (
-        SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8, (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // 1000,
-        SCREEN_HEIGHT // 8))
+            SCREEN_WIDTH // 8, SCREEN_HEIGHT // 8, (SCREEN_WIDTH - SCREEN_WIDTH // 4) * int(self.eggman.hp) // int(self.eggman.max_hp),
+            SCREEN_HEIGHT // 8))
 
     def draw_num_of_rings(self) -> None:
         self.rings_sprites_count = (self.rings_sprites_count + 1) % 48
@@ -272,3 +304,54 @@ class SonicBossFight:
         running = self.movement_of_main_character() * running
         self.eggman.eggman_movement(self.main_hero)
         return running
+
+    def end_screen(self, win):
+        dct_win_phrases = {
+            True: "победа",
+            False: "поражение"
+        }
+        running = True
+        while running:
+
+            bg = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
+            screen.blit(bg, (0, 0))
+            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                f'{dct_win_phrases[win]}',
+                True, (255, 255, 255))
+            screen.blit(text_surface, (400, 100))
+
+            PLAY_MOUSE_POS = pygame.mouse.get_pos()
+            RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                           pos=(SCREEN_WIDTH // 1.2, 650),
+                           text_input="ЗАНОВО", font=self.get_font(50), base_color="White",
+                           hovering_color="Orange")
+
+            RETRY.changeColor(pygame.mouse.get_pos())
+            RETRY.update(screen)
+
+            RETURN_TO_MAIN_MENU = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                                         pos=(SCREEN_WIDTH // 1.2, 750),
+                                         text_input="В МЕНЮ", font=self.get_font(50), base_color="White",
+                                         hovering_color="Orange")
+
+            RETURN_TO_MAIN_MENU.changeColor(pygame.mouse.get_pos())
+            RETURN_TO_MAIN_MENU.update(screen)
+
+            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                f'ОЧКИ: {self.main_hero.score}',
+                True, (0, 0, 0))
+            screen.blit(text_surface, (20, 100))
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    self.quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if RETRY.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+                        SonicBossFight(self.score, self.rings)
+                    if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+            pygame.display.update()
+
+

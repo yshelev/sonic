@@ -14,6 +14,8 @@ class MainHero(Character):
             fast_images: list[pygame.image],
             super_fast_images: list[pygame.image],
             dead_image: pygame.image,
+            rings: int,
+            score: int,
             group_all_sprite: pygame.sprite.Group
     ) -> None:
         super().__init__(x, y, start_image, images, jump_images, dead_image, group_all_sprite)
@@ -37,11 +39,11 @@ class MainHero(Character):
         self.additional_speed = 0
         self.boost = 300
         self.stop_boost = self.boost * 3
-        self.number_of_rings = 50
+        self.number_of_rings = rings
         self.is_falling = False
         self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
         # self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
-        self.score = 0
+        self.score = score
         self.add_score = 0
 
     def move_left_level_boss(self, tiles):
