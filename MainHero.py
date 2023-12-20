@@ -1,3 +1,4 @@
+import Settings
 from Character import Character
 from Settings import *
 import pygame
@@ -221,7 +222,7 @@ class MainHero(Character):
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
     def play_sound_start_jump(self) -> None:
-        self.jump_sound.set_volume(sound)
+        self.jump_sound.set_volume(Settings.sound)
         self.jump_sound.play()
 
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
@@ -477,7 +478,7 @@ class MainHero(Character):
 
     def play_collect_ring(self) -> None:
         self.score += 1000
-        # self.enemy_death_sound.set_volume(sound)
+        # self.enemy_death_sound.set_volume(Settings.sound)
         # self.enemy_death_sound.play()
 
     def get_add_score(self):

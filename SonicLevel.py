@@ -166,7 +166,7 @@ class SonicLevel:
         self.game_loop()
 
     def play_music(self) -> None:
-        self.background_music.set_volume(sound)
+        self.background_music.set_volume(Settings.sound)
         self.background_music.play(-1)
 
     def game_loop(self):

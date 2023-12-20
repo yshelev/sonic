@@ -121,9 +121,7 @@ class Menu:
                         self.main_menu()
                     if SELECT_ARROW.checkForInput(OPTIONS_MOUSE_POS):
                         Settings.dict_movement_pointer = 1
-                        print(Settings.dict_movement_pointer)
                     if SELECT_WASD.checkForInput(OPTIONS_MOUSE_POS):
-                        print("QWE")
                         Settings.dict_movement_pointer = 0
                     if MINUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
                         Settings.sound -= 0.05
