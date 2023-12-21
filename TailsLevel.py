@@ -117,7 +117,7 @@ class TailsLevel:
         running = True
         while running:
             if self.win:
-                bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
+                bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_winner.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
@@ -125,7 +125,7 @@ class TailsLevel:
                     True, (0, 0, 0))
                 screen.blit(text_surface, (400, 100))
             else:
-                bg = pygame.transform.scale(pygame.image.load("data/tails_loser.jpg"),
+                bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_loser.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
 
