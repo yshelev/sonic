@@ -13,8 +13,6 @@ class TailsLevel:
     def __init__(self):
 
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
-        self.background_image = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
-                                                       (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         self.background_image_level2 = pygame.transform.scale(pygame.image.load("data/backgrounds/background_sky.png"),
                                                               (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -31,10 +29,9 @@ class TailsLevel:
             pygame.transform.scale(pygame.image.load(f'data/Rings spritez/Sprite-000{i}.png'), (20, 20))
             for i in range(1, 9)
         ]
-        self.upgrade_image = self.upgrade_image = pygame.transform.scale(
+        self.upgrade_image = pygame.transform.scale(
             pygame.image.load(f"data/airplane_upgrades/crate.png"), (60, 60))
         self.rings_sprites_count = 0
-
 
         self.enemy_level = 0
         self.last_enemy = 0
@@ -57,6 +54,7 @@ class TailsLevel:
         self.timer = 0
         self.score = 0
         self.win = False
+        self.invincibility_time = 0
 
         self.clock = pygame.time.Clock()
         self.all_sprites = pygame.sprite.Group()
@@ -83,7 +81,7 @@ class TailsLevel:
 
         self.background_image_x = 0
 
-        self.game_loop()
+        self.output = self.game_loop()
 
     def game_loop(self):
         self.ot_vinta.play(-1)
@@ -101,13 +99,14 @@ class TailsLevel:
                 running = False
                 self.ot_vinta.stop()
                 self.end_screen()
-            if self.ot_vinta_len-self.timer < 100:
+            if self.ot_vinta_len - self.timer < 100:
                 self.enemy_level = 1
             self.spawner()
             self.plane_actions()
             self.collide_enemy()
             self.draw_level2()
             self.check()
+            self.invincibility_frames()
             self.all_sprites_level2.update()
 
             pygame.display.flip()
@@ -118,7 +117,7 @@ class TailsLevel:
         running = True
         while running:
             if self.win:
-                bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_winner.jpg"),
+                bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
@@ -126,7 +125,7 @@ class TailsLevel:
                     True, (0, 0, 0))
                 screen.blit(text_surface, (400, 100))
             else:
-                bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_loser.jpg"),
+                bg = pygame.transform.scale(pygame.image.load("data/tails_loser.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
 
@@ -258,7 +257,8 @@ class TailsLevel:
         for bullet in self.all_bullet_sprites:
             if bullet.x > SCREEN_WIDTH + bullet.width:
                 bullet.kill()
-            if enemy := pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites):
+            if pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites):
+                enemy = pygame.sprite.spritecollideany(bullet, self.all_enemies_level2_sprites)
                 bullet.kill()
                 enemy.health -= bullet.damage
         for ring in self.all_rings_sprites:
@@ -295,14 +295,17 @@ class TailsLevel:
                     upgrade.kill()
 
     def collide_enemy(self):
-        if enemy := pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites):
+        if pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites):
+            enemy = pygame.sprite.spritecollideany(self.plane_character, self.all_enemies_level2_sprites)
             if enemy.__class__.__name__ == "Plane_Enemy":
                 self.score -= 50
                 self.boom_sound.play()
                 enemy.kill()
-                self.plane_character.rings -= (enemy.level + 1)*6
+                self.plane_character.rings -= (enemy.level + 1) * 6
+                self.invincibility_time = 100
             else:
                 if enemy.damage:
+                    self.invincibility_time = 100
                     self.plane_character.rings -= enemy.damage
                     self.score -= 50
                     self.zap_sound.play()
@@ -310,3 +313,14 @@ class TailsLevel:
                     enemy.images = list(
                         map(lambda image: pygame.transform.scale(image, (enemy.width, enemy.height)),
                             self.sad_cloud_sprites))
+
+    def invincibility_frames(self):
+        if self.invincibility_time:
+            self.invincibility_time -= 1
+            if str(self.invincibility_time)[-1] in '98765':
+                self.plane_character.images = [pygame.image.load('data/Sonic Sprites/tile084.png')]
+            else:
+                self.plane_character.images = list(map(lambda image: pygame.transform.scale(image, (
+                self.plane_character.width, self.plane_character.height + 30)), self.plane_sprites))
+            return True
+        return False

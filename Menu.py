@@ -17,7 +17,6 @@ class Menu:
         self.BG2 = pygame.image.load("data/menu_objects/play_background.png")
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
-        self.BG5 = pygame.image.load("data/menu_objects/knuckles_background.png")
         self.start_video_loop()
 
         self.additional_sound = 0.05
@@ -254,8 +253,8 @@ class Menu:
         #         run = False
         #     window.blit(video_surf, (0, 0))
         #     pygame.display.flip()
-
-        pygame.mixer.music.stop()
+        #
+        # pygame.mixer.music.stop()
         self.main_menu()
 
     # def quit(self):
