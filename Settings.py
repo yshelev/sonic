@@ -7,14 +7,14 @@ SCREEN_HEIGHT = 800
 FPS = 60
 GRAVITY = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-LEFT_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
-                       (SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2))
-RIGHT_INVISIBLE_LINE = ((SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3),
-                        (SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT // 3 * 2))
-BOTTOM_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3 * 2),
-                         (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3 * 2))
-TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
-                      (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3))
+LEFT_INVISIBLE_LINE = ((SCREEN_WIDTH // 2.5, SCREEN_HEIGHT // 2.5),
+                       (SCREEN_WIDTH // 2.5, SCREEN_HEIGHT // 1.5))
+RIGHT_INVISIBLE_LINE = ((SCREEN_WIDTH // 1.5, SCREEN_HEIGHT // 2.5),
+                        (SCREEN_WIDTH // 1.5, SCREEN_HEIGHT // 1.5))
+BOTTOM_INVISIBLE_LINE = ((SCREEN_WIDTH // 2.5, SCREEN_HEIGHT // 1.5),
+                         (SCREEN_WIDTH // 1.5, SCREEN_HEIGHT // 1.5))
+TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 2.5, SCREEN_HEIGHT // 2.5),
+                      (SCREEN_WIDTH // 1.5, SCREEN_HEIGHT // 2.5))
 
 
 with open("data/txts/settings.txt") as f:
