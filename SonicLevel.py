@@ -15,7 +15,7 @@ class SonicLevel:
     def __init__(self):
         self.last_screen = None
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
-        self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+        self.background_image = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         running_sonic_right_sprites = [
@@ -76,7 +76,7 @@ class SonicLevel:
         self.all_spikes_sprites = pygame.sprite.Group()
         self.all_enemies_score = pygame.sprite.Group()
 
-        with open("data/map.txt") as f:
+        with open("data/txts/map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
 
         NUM_TALES_X = len(self.map[0])
@@ -195,7 +195,7 @@ class SonicLevel:
         running = True
         while running:
 
-            bg = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+            bg = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(

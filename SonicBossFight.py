@@ -19,7 +19,7 @@ class SonicBossFight:
 
         self.rings_sprites_count = 0
 
-        self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+        self.background_image = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
 
         running_sonic_right_sprites = [
@@ -61,7 +61,7 @@ class SonicBossFight:
         self.tile_image_width = pygame.transform.scale(pygame.image.load("data/GROUND/Platform.png"),
                                                        (SCREEN_WIDTH // 4, 300))
 
-        with open("data/boss_map.txt") as f:
+        with open("data/txts/boss_map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
 
         NUM_TALES_X = len(self.map[0])
@@ -369,7 +369,7 @@ class SonicBossFight:
         running = True
         while running:
 
-            bg = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+            bg = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(

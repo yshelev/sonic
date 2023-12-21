@@ -17,7 +17,7 @@ TOP_INVISIBLE_LINE = ((SCREEN_WIDTH // 3, SCREEN_HEIGHT // 3),
                       (SCREEN_WIDTH * 2 // 3, SCREEN_HEIGHT // 3))
 
 
-with open("data/settings.txt") as f:
+with open("data/txts/settings.txt") as f:
     settings = {i.split(" = ")[0]: i.split(" = ")[1] for i in f.readlines()}
 
 sound = float(settings["sound"])
@@ -78,7 +78,7 @@ exit_codes = {
 
 
 def quit():
-    with open("data/settings.txt", "w") as f:
+    with open("data/txts/settings.txt", "w") as f:
         f.write("\n".join([f"{sound = }",
                            f"{dict_movement_pointer = }",
                            f"{max_score_sonic = }",

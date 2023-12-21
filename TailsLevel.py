@@ -13,10 +13,10 @@ class TailsLevel:
     def __init__(self):
 
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
-        self.background_image = pygame.transform.scale(pygame.image.load("data/background_greenhill.jpg"),
+        self.background_image = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
 
-        self.background_image_level2 = pygame.transform.scale(pygame.image.load("data/background_sky.png"),
+        self.background_image_level2 = pygame.transform.scale(pygame.image.load("data/backgrounds/background_sky.png"),
                                                               (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.enemy_images = [pygame.transform.scale(pygame.image.load(f'data/ENEMY/BUG {i // 3}.2.png'), (1000, 1000))
                              for i in range(3, 12)
@@ -118,7 +118,7 @@ class TailsLevel:
         running = True
         while running:
             if self.win:
-                bg = pygame.transform.scale(pygame.image.load("data/tails_winner.jpg"),
+                bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_winner.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
@@ -126,7 +126,7 @@ class TailsLevel:
                     True, (0, 0, 0))
                 screen.blit(text_surface, (400, 100))
             else:
-                bg = pygame.transform.scale(pygame.image.load("data/tails_loser.jpg"),
+                bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_loser.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))
                 screen.blit(bg, (0, 0))
 
