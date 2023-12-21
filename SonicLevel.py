@@ -75,6 +75,7 @@ class SonicLevel:
         self.all_sprites_wo_mh = pygame.sprite.Group()
         self.all_spikes_sprites = pygame.sprite.Group()
         self.all_enemies_score = pygame.sprite.Group()
+
         with open("data/map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
 
@@ -177,7 +178,7 @@ class SonicLevel:
                 if event.type == pygame.QUIT:
                     quit()
 
-            running = self.movement_of_main_character() * running
+            running = self.movement_of_character() * running
             self.background_image_movement()
             self.all_sprites.update(self.all_tiles_sprites)
             self.draw()
@@ -198,7 +199,8 @@ class SonicLevel:
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * Settings.max_score_sonic == self.main_hero.get_score()) == 1 else "все по старому.."}',
+                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * Settings.max_score_sonic == self.main_hero.get_score()) == 1 
+                else "все по старому.."}',
                 True, (255, 255, 255))
             screen.blit(text_surface, (400, 100))
 
@@ -261,7 +263,7 @@ class SonicLevel:
         text_surface = self.my_font.render(f'score: {self.main_hero.get_score()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 40))
 
-    def movement_of_main_character(self) -> bool:
+    def movement_of_character(self) -> bool:
         print(dict_movement_pointer)
         running = True
         keys = pygame.key.get_pressed()
