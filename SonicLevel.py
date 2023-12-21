@@ -85,13 +85,13 @@ class SonicLevel:
         TALE_WIDTH, TALE_HEIGHT = 8 * SCREEN_WIDTH / NUM_TALES_X, 2 * SCREEN_HEIGHT / NUM_TALES_Y
 
         for i in range(10):
-            Tiles(SCREEN_WIDTH // 60 * 8 * (-NUM_TALES_X // 2 - 2), SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
+            Tiles(-300, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
                   pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 270),
                   self.all_tiles_sprites,
                   self.all_sprites,
                   self.all_sprites_wo_mh)
         for i in range(10):
-            Tiles(SCREEN_WIDTH // 60 * 8 * (NUM_TALES_X // 2), SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
+            Tiles(SCREEN_WIDTH // 60 * 8 * NUM_TALES_X, SCREEN_HEIGHT - (i + 1) * 300, 300, 300,
                   pygame.transform.rotate(pygame.image.load("data/GROUND/Floor.png"), 90),
                   self.all_tiles_sprites,
                   self.all_sprites,
@@ -102,16 +102,16 @@ class SonicLevel:
                   self.all_sprites,
                   self.all_sprites_wo_mh)
         for y in range(NUM_TALES_Y):
-            for x in range(-NUM_TALES_X // 2, NUM_TALES_X // 2):
-                char = self.map[y][x + NUM_TALES_X // 2]
+            for x in range(NUM_TALES_X):
+                char = self.map[y][x]
                 if char == "t":
-                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
+                    Tiles(TALE_WIDTH * x, SCREEN_HEIGHT - (y + 1) * TALE_HEIGHT // 2, TALE_WIDTH,
                           TALE_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
                           self.all_tiles_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh)
                 if char == "e":
-                    Enemy(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6,
+                    Enemy(TALE_WIDTH * x, SCREEN_HEIGHT - (y + 1) * TALE_HEIGHT // 2,
                           self.enemy_images[0],
                           self.enemy_images,
                           self.enemy_images,
@@ -121,7 +121,7 @@ class SonicLevel:
                           self.all_sprites_wo_mh
                           )
                 if char == "s":
-                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10,
+                    Tiles(TALE_WIDTH * x, SCREEN_HEIGHT - y * TALE_HEIGHT // 2 - TALE_HEIGHT // 10,
                           TALE_WIDTH,
                           TALE_HEIGHT // 10, pygame.image.load("data/OBJECTS/SPIKES.png"),
                           self.all_spikes_sprites,
@@ -130,7 +130,7 @@ class SonicLevel:
 
                 if char == "f":
                     self.finish_tale = Tiles(SCREEN_WIDTH // 60 * 8 * x,
-                                             SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 2, TALE_WIDTH,
+                                             SCREEN_HEIGHT - y * TALE_HEIGHT // 2 - TALE_HEIGHT // 2, TALE_WIDTH,
                                              TALE_HEIGHT // 2, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
                                              self.all_sprites,
                                              self.all_sprites_wo_mh,
@@ -195,7 +195,7 @@ class SonicLevel:
         running = True
         while running:
 
-            bg = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
+            bg = pygame.transform.scale(pygame.image.load(f"{"data/backgrounds/sonic_win_background.jpg" if win else "data/backgrounds/sonic_lose_background.jpg"}"),
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
@@ -295,24 +295,29 @@ class SonicLevel:
 
         output_code_x, movement_sprites_speed_x, output_code_y, movement_sprites_speed_y = \
             self.main_hero.movement_by_inertia(self.all_tiles_sprites)
+
         if exit_codes["sonic_movement_x"][output_code_x] in [STOPPED_BY_RIGHT_INVISIBLE_WALL,
                                                              STOPPED_BY_LEFT_INVISIBLE_WALL] * self.main_hero.is_alive():
             for tile in self.all_sprites_wo_mh:
                 tile.move_x(-movement_sprites_speed_x, self.main_hero, self.all_tiles_sprites)
+
         if exit_codes["sonic_movement_y"][output_code_y] in [STOPPED_BY_TOP_INVISIBLE_WALL,
                                                              STOPPED_BY_BOT_INVISIBLE_WALL] * self.main_hero.is_alive():
             for tile in self.all_sprites_wo_mh:
                 tile.move_y(movement_sprites_speed_y, self.main_hero, self.all_tiles_sprites)
+
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
             self.main_hero.get_damage()
         if rings := pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
             self.main_hero.add_rings()
             rings.kill()
+
         if enemies := pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
             if self.main_hero.collide_enemy(enemies):
                 Enemy_score(self.main_hero.get_add_score(), self.my_font,
                             pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
                 self.main_hero.start_jump(self.all_tiles_sprites)
+
         if self.check_exit():
             self.last_screen = screen.copy()
             running = False
@@ -326,12 +331,12 @@ class SonicLevel:
             self.main_hero.dead_jump()
 
         for i in self.all_enemy_sprites:
-            if i.is_alive():
+            if i.is_available() and i.is_alive():
                 i.check(self.all_tiles_sprites)
                 if i.get_is_jumping() or i.get_is_falling():
                     i.jump(self.all_tiles_sprites)
                 i.moveself_x(self.all_tiles_sprites)
-            else:
+            if not i.is_alive():
                 i.dead_jump()
 
         return running

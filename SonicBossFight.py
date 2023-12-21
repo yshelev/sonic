@@ -95,30 +95,19 @@ class SonicBossFight:
             for x in range(NUM_TALES_X):
                 char = self.map[y][x]
                 if char == "t":
-                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
+                    Tiles(TALE_WIDTH * x, SCREEN_HEIGHT - (y + 1) * SCREEN_HEIGHT // 6, TALE_WIDTH,
                           TALE_HEIGHT // 10, pygame.image.load("data/GROUND/Platform.png"),
                           self.all_tiles_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh)
 
                 if char == "s":
-                    Tiles(SCREEN_WIDTH // 60 * 8 * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10,
+                    Tiles(TALE_WIDTH * x, SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 10,
                           TALE_WIDTH,
                           TALE_HEIGHT // 10, pygame.image.load("data/OBJECTS/SPIKES.png"),
                           self.all_spikes_sprites,
                           self.all_sprites,
                           self.all_sprites_wo_mh)
-
-                if char == "f":
-                    self.finish_tale = Tiles(SCREEN_WIDTH // 60 * 8 * x,
-                                             SCREEN_HEIGHT - y * SCREEN_HEIGHT // 6 - TALE_HEIGHT // 2, TALE_WIDTH,
-                                             TALE_HEIGHT // 2, pygame.image.load("data/eggman_signs/eggman_sign_1.png"),
-                                             self.all_sprites,
-                                             self.all_sprites_wo_mh,
-                                             animation_list=list(map(lambda x: pygame.transform.scale(x, (
-                                                 TALE_WIDTH, TALE_HEIGHT // 2)), [pygame.image.load(
-                                                 f"data/eggman_signs/eggman_sign_{i // 3}.png") for i in
-                                                                         range(3, 15)])))
 
 
 
@@ -369,7 +358,7 @@ class SonicBossFight:
         running = True
         while running:
 
-            bg = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
+            bg = pygame.transform.scale(pygame.image.load(f"{"data/backgrounds/sonic_win_background.jpg" if win else "data/backgrounds/sonic_lose_background.jpg"}"),
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
