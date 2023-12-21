@@ -264,7 +264,6 @@ class SonicLevel:
         screen.blit(text_surface, (20, 40))
 
     def movement_of_character(self) -> bool:
-        print(dict_movement_pointer)
         running = True
         keys = pygame.key.get_pressed()
         if self.main_hero.is_alive() * ((keys[pygame.K_SPACE] or keys[dict_movement[Settings.dict_movement_pointer]["top"]]) and not self.main_hero.get_is_jumping()):
@@ -307,12 +306,10 @@ class SonicLevel:
                 tile.move_y(movement_sprites_speed_y, self.main_hero, self.all_tiles_sprites)
         if pygame.sprite.spritecollideany(self.main_hero, self.all_spikes_sprites):
             self.main_hero.get_damage()
-        if pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
-            rings = pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites)
+        if rings := pygame.sprite.spritecollideany(self.main_hero, self.all_rings_sprites):
             self.main_hero.add_rings()
             rings.kill()
-        if pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
-            enemies = pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites)
+        if enemies := pygame.sprite.spritecollideany(self.main_hero, self.all_enemy_sprites):
             if self.main_hero.collide_enemy(enemies):
                 Enemy_score(self.main_hero.get_add_score(), self.my_font,
                             pygame.Rect(enemies.rect.x, enemies.rect.y, 100, 100), self.all_sprites)
