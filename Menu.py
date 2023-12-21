@@ -17,6 +17,7 @@ class Menu:
         self.BG2 = pygame.image.load("data/menu_objects/play_background.png")
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
+        self.BG5 = pygame.image.load("data/menu_objects/knuckles_background.png")
         self.start_video_loop()
 
         self.additional_sound = 0.05
@@ -70,6 +71,34 @@ class Menu:
                         running = False
                         SonicLevel()
                         self.main_menu()
+                    if PLAY_KNUCKLES.checkForInput(PLAY_MOUSE_POS):
+                        running = False
+                        self.knuckles_play()
+
+            pygame.display.update()
+
+    def knuckles_play(self):
+        running = True
+        while running:
+            KNUCKLES_MOUSE_POS = pygame.mouse.get_pos()
+
+            screen.blit(self.BG5, (0, 0))
+
+            KNUCKLES_BACK = Button(image=pygame.image.load("data/menu_objects/back_rect.png"),
+                                   pos=(600, 700),
+                                   text_input="Назад", font=self.get_font(40), base_color="White",
+                                   hovering_color="Green")
+
+            KNUCKLES_BACK.changeColor(KNUCKLES_MOUSE_POS)
+            KNUCKLES_BACK.update(screen)
+
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if KNUCKLES_BACK.checkForInput(KNUCKLES_MOUSE_POS):
+                        running = False
+                        self.play()
 
             pygame.display.update()
 
