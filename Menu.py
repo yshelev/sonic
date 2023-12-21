@@ -126,7 +126,7 @@ class Menu:
                     if MINUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
                         Settings.sound = max(Settings.sound - 0.1, 0)
                     if PLUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
-                        Settings.sound += max(Settings.sound + 0.1, 3)
+                        Settings.sound += min(Settings.sound + 0.1, 3)
 
             pygame.display.update()
 
