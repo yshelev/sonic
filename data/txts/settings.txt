@@ -1,4 +1,4 @@
-sound = 1.0
+sound = 0.0
 dict_movement_pointer = 0
 max_score_sonic = 5500
 max_score_tiles = 2150

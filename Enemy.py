@@ -43,6 +43,10 @@ class Enemy(Character):
         self.is_jumping = True
         self.jump(tiles_sprites)
 
+    def is_available(self):
+        return (-self.height < self.y + self.height and self.y < SCREEN_HEIGHT + self.height and
+                -self.width < self.x + self.width and self.x < SCREEN_WIDTH + self.width)
+
     def start_fall(self, tiles_sprites):
         self.speed_y = 0
         self.is_falling = True
