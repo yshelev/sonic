@@ -6,7 +6,6 @@ import Settings
 from Plane_Level import *
 from Settings import *
 from button import *
-from Menu import *
 
 
 class TailsLevel:

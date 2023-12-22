@@ -93,7 +93,7 @@ class Character(pygame.sprite.Sprite):
         self.is_jumping = True
         self.jump(tiles_sprites)
 
-    def jump(self, tiles_sprites):
+    def jump(self, tiles_sprites) -> None:
         can_move_top, can_move_bottom, ys = self.can_move_y(tiles_sprites)
         self.speed_y += GRAVITY / FPS
         if can_move_bottom:
@@ -104,11 +104,11 @@ class Character(pygame.sprite.Sprite):
             self.is_falling = False
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def start_dead_jump(self):
+    def start_dead_jump(self) -> None:
         self.speed_y = -400
         self.dead_jump()
 
-    def dead_jump(self):
+    def dead_jump(self) -> bool:
         self.speed_y += GRAVITY / FPS
         self.y += self.speed_y / FPS
         self.image = self.dead_image
@@ -125,10 +125,10 @@ class Character(pygame.sprite.Sprite):
     def get_is_jumping(self) -> bool:
         return self.is_jumping
 
-    def set_is_jumping(self, is_jumping) -> None:
+    def set_is_jumping(self, is_jumping: bool) -> None:
         self.is_jumping = is_jumping
 
-    def set_speed_y(self, speed_y) -> None:
+    def set_speed_y(self, speed_y: float) -> None:
         self.speed_y = speed_y
 
     def set_moving_left(self, moving_left) -> None:
@@ -140,7 +140,7 @@ class Character(pygame.sprite.Sprite):
     def get_moving_right(self) -> bool:
         return self.moving_right
 
-    def set_moving_right(self, moving_right) -> None:
+    def set_moving_right(self, moving_right: bool) -> None:
         self.moving_right = moving_right
 
     def can_move_x(self, tiles_sprites) -> (bool, bool):

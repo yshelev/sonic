@@ -309,7 +309,7 @@ class MainHero(Character):
         else:
             self.cur_frame_jump = 0
 
-    def can_move_y(self, tiles_sprites: pygame.sprite.Group) -> (bool, bool, list[int]):
+    def can_move_y(self, tiles_sprites: My_group) -> (bool, bool, list[int]):
         return not any(pygame.rect.Rect(
             self.x + self.padding, self.y, self.width - 2 * self.padding,
             self.height + (GRAVITY + self.speed_y) / FPS

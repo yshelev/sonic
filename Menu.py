@@ -1,10 +1,10 @@
 import sys
+import pygame_widgets
 
 import cv2
-import pygame.font
-
 import Settings
 from Settings import *
+from pygame_widgets.slider import Slider
 from button import Button
 from SonicLevel import SonicLevel
 from TailsLevel import TailsLevel
@@ -14,7 +14,6 @@ class Menu:
     def __init__(self) -> None:
         pygame.init()
         pygame.display.set_caption("[ezrf")
-
         self.BG1 = pygame.image.load("data/menu_objects/menu_background.png")
         self.BG2 = pygame.image.load("data/menu_objects/play_background.png")
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
@@ -24,10 +23,10 @@ class Menu:
 
         self.additional_sound = 0.05
 
-    def get_font(self, size) -> pygame.font.Font:
+    def get_font(self, size):
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
-    def play(self) -> None:
+    def play(self):
         running = True
         while running:
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
@@ -79,7 +78,7 @@ class Menu:
 
             pygame.display.update()
 
-    def knuckles_play(self) -> None:
+    def knuckles_play(self):
         running = True
         while running:
             KNUCKLES_MOUSE_POS = pygame.mouse.get_pos()
@@ -104,25 +103,13 @@ class Menu:
 
             pygame.display.update()
 
-    def options(self) -> None:
+    def options(self):
         running = True
+        self.slider = Slider(screen, SCREEN_WIDTH/4, 250 , SCREEN_WIDTH/2, 40, initial=Settings.sound, min=0, max=3, step=0.1, handleColour=(255, 255, 255), colour=(0, 0, 0))
         while running:
             OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
 
             screen.blit(self.BG3, (0, 0))
-
-            PLUS_VOLUME = Button(image=pygame.image.load("data/menu_objects/plus_rect.png"), pos=(680, 270),
-                                 text_input="+", font=self.get_font(50), base_color="Black", hovering_color="White")
-
-            PLUS_VOLUME.changeColor(OPTIONS_MOUSE_POS)
-            PLUS_VOLUME.update(screen)
-
-            MINUS_VOLUME = Button(image=pygame.image.load("data/menu_objects/minus_rect.png"), pos=(520, 270),
-                                  text_input="-", font=self.get_font(50), base_color="Black", hovering_color="White")
-
-            MINUS_VOLUME.changeColor(OPTIONS_MOUSE_POS)
-            MINUS_VOLUME.update(screen)
-
             SELECT_WASD = Button(image=pygame.image.load("data/menu_objects/select_rect.png"), pos=(420, 635),
                                  text_input="Выбрать", font=self.get_font(30), base_color="White", hovering_color="Red")
 
@@ -154,14 +141,12 @@ class Menu:
                         Settings.dict_movement_pointer = 1
                     if SELECT_WASD.checkForInput(OPTIONS_MOUSE_POS):
                         Settings.dict_movement_pointer = 0
-                    if MINUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
-                        Settings.sound = max(Settings.sound - 0.1, 0)
-                    if PLUS_VOLUME.checkForInput(OPTIONS_MOUSE_POS):
-                        Settings.sound += min(Settings.sound + 0.1, 3)
+            Settings.sound = self.slider.getValue()
 
+            pygame_widgets.update(pygame.event.get())
             pygame.display.update()
 
-    def developers(self) -> None:
+    def developers(self):
         running = True
         while running:
             DEVELOPERS_MOUSE_POS = pygame.mouse.get_pos()
@@ -184,10 +169,10 @@ class Menu:
                         self.main_menu()
 
             pygame.display.update()
-
-    def main_menu(self) -> None:
+    def main_menu(self):
         running = True
         while running:
+
             screen.blit(self.BG1, (0, 0))
 
             MENU_MOUSE_POS = pygame.mouse.get_pos()
@@ -223,7 +208,6 @@ class Menu:
                         self.options()
                     if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                         quit()
-
             pygame.display.update()
 
     def start_video_loop(self) -> None:
@@ -261,6 +245,6 @@ class Menu:
         self.main_menu()
 
     # def quit(self):
-    #     
+    #
     #     pygame.quit()
     #     sys.exit()
