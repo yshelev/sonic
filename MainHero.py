@@ -45,6 +45,8 @@ class MainHero(Character):
         self.number_of_rings = rings
         self.is_falling = False
         self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
+        self.damage_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
+        self.damage_sound.set_volume(Settings.sound)
         self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
         self.score = score
         self.add_score = 0
@@ -457,10 +459,11 @@ class MainHero(Character):
 
     def get_damage(self) -> bool:
         if not self.unavailable_counter:
+            self.damage_sound.play()
             self.unavailable_counter += 1
             self.number_of_rings -= 10
             self.score -= 100
-            if self.number_of_rings <= 0:
+            if self.number_of_rings < 0:
                 self.kill()
             return True
         return False
