@@ -241,7 +241,6 @@ class SonicBossFight:
         keys = pygame.key.get_pressed()
         if self.main_hero.is_alive() * ((keys[pygame.K_SPACE] or keys[
             dict_movement[Settings.dict_movement_pointer]["top"]]) and not self.main_hero.get_is_jumping()) == 1:
-            print("ЙЦУ")
             # self.main_hero.play_sound_start_jump()
             self.main_hero.start_boss_jump(self.all_tiles_sprites)
         if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[
@@ -267,7 +266,7 @@ class SonicBossFight:
             self.main_hero.jump_level_boss(self.all_tiles_sprites)
         if self.main_hero.rect.colliderect(self.eggman.rect):
             if self.eggman.collide_sonic(self.main_hero) * self.main_hero.available():
-                self.main_hero.start_boss_jump(self.all_tiles_sprites)
+                self.main_hero.start_boss_jump_bounce(self.all_tiles_sprites)
         if not self.eggman.is_alive():
             self.last_screen = screen.copy()
             running = False

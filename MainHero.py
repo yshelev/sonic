@@ -227,6 +227,11 @@ class MainHero(Character):
         self.is_jumping = True
         self.jump_level_boss(tiles_sprites)
 
+    def start_boss_jump_bounce(self, tiles_sprites) -> None:
+        self.speed_y = -400
+        self.is_jumping = True
+        self.jump_level_boss(tiles_sprites)
+
     def jump(self, tiles_sprites: pygame.sprite.Group) -> int:
         self.is_jumping = True
         self.speed_y += GRAVITY / FPS
