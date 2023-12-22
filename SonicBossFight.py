@@ -130,7 +130,10 @@ class SonicBossFight:
                              self.all_sprites,
                              self.all_sprites_wo_mh)
 
-        self.background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
+        self.background_music = pygame.mixer.Sound("data/sounds/sonic/10 - Dr Robotnik.mp3")
+
+        self.bump_sound = pygame.mixer.Sound("data/sounds/sonic/fireball-2-101soundboards.mp3")
+        self.bump_sound.set_volume(Settings.sound)
 
         self.sonic_in_animation()
 
@@ -276,6 +279,7 @@ class SonicBossFight:
             self.main_hero.jump_level_boss(self.all_tiles_sprites)
         if self.main_hero.rect.colliderect(self.eggman.rect):
             if self.eggman.collide_sonic(self.main_hero) * self.main_hero.available():
+                self.bump_sound.play()
                 self.main_hero.start_boss_jump_bounce(self.all_tiles_sprites)
         if not self.eggman.is_alive():
             self.last_screen = screen.copy()
