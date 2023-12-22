@@ -225,7 +225,7 @@ class MainHero(Character):
         self.jump_sound.play()
 
     def start_boss_jump(self, tiles_sprites) -> None:
-        self.speed_y = -600
+        self.speed_y = -550
         self.is_jumping = True
         self.jump_level_boss(tiles_sprites)
 
@@ -295,7 +295,7 @@ class MainHero(Character):
             self.image = self.start_image
 
         if self.unavailable_counter:
-            if (self.unavailable_counter % 20) // 10 < 1:
+            if (self.unavailable_counter % 6) // 3 < 1:
                 self.image = self.unavailable_image
 
     def update_counters(self) -> None:

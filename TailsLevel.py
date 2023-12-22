@@ -122,7 +122,7 @@ class TailsLevel:
                 text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
                     f'ХОРОШ! {"Новый рекорд!" if Settings.max_score_tiles == self.score else "Но не лучше всех!"}',
                     True, (0, 0, 0))
-                screen.blit(text_surface, (400, 100))
+                screen.blit(text_surface, (20, 20))
             else:
                 bg = pygame.transform.scale(pygame.image.load("data/backgrounds/tails_loser.jpg"),
                                             (SCREEN_WIDTH, SCREEN_HEIGHT))

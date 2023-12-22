@@ -5,6 +5,8 @@ import cv2
 import Settings
 from Settings import *
 from pygame_widgets.slider import Slider
+
+from SonicBossFight import SonicBossFight
 from button import Button
 from SonicLevel import SonicLevel
 from TailsLevel import TailsLevel
@@ -242,6 +244,7 @@ class Menu:
         clock = pygame.time.Clock()
         pygame.mixer.init()
         pygame.mixer.music.load('data/MUSIC/INTRO_MUSIC.mp3')
+        pygame.mixer.music.set_volume(Settings.sound)
         pygame.mixer.music.play(-1)
 
         run = success

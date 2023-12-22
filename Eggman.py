@@ -11,7 +11,7 @@ class Eggman(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, *sprite_group):
         super().__init__(*sprite_group)
 
-        self.shot_cooldown = 0
+        self.shot_cooldown = 150
         self.x = x
         self.y = y
         self.alive = True
@@ -177,7 +177,7 @@ class Eggman(pygame.sprite.Sprite):
             self.types["robot_shoot_left" if args[0] else "robot_shoot_right"][0]
 
     def shoot(self, *groups):
-        self.shot_cooldown = 300
+        self.shot_cooldown = 150
         start_x, start_y = self.x + self.width // 2, self.y + self.height // 2
         shoot_length = SCREEN_WIDTH
         for i in range(8):

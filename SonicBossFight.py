@@ -1,3 +1,4 @@
+import random
 import sys
 
 import pygame.event
@@ -8,6 +9,7 @@ import Settings
 from Settings import *
 from Tiles import Tiles
 from button import Button
+from fireBall import FireBall
 
 
 class SonicBossFight:
@@ -18,9 +20,18 @@ class SonicBossFight:
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
 
         self.rings_sprites_count = 0
+        self.fireball_timer = 250
 
         self.background_image = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
                                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
+
+        self.fireball_images = [
+            pygame.image.load("data/eggman/robot/eggmans_bullet.png"),
+            pygame.transform.flip(pygame.image.load("data/eggman/robot/eggmans_bullet.png"), True, False),
+            pygame.transform.rotate(pygame.image.load("data/eggman/robot/eggmans_bullet.png"), 90),
+            pygame.transform.rotate(pygame.image.load("data/eggman/robot/eggmans_bullet.png"), 270),
+        ]
+        self.fireball_types = ["r", "l", "t", "b"]
 
         running_sonic_right_sprites = [
             pygame.image.load(f"data/Sonic Sprites/tile00{i // 5}.png")
@@ -55,6 +66,7 @@ class SonicBossFight:
         self.all_sprites_wo_mh = pygame.sprite.Group()
         self.all_bullets_sprites = pygame.sprite.Group()
         self.all_spikes_sprites = pygame.sprite.Group()
+        self.all_sprites_fireball = pygame.sprite.Group()
 
         self.clock = pygame.time.Clock()
 
@@ -342,6 +354,8 @@ class SonicBossFight:
         screen.blit(text_surface, (20, 0))
 
     def update(self):
+        if self.can_shoot_fireballs():
+            self.spawn_fireballs()
         if self.eggman.can_shoot():
             self.eggman.shoot(self.all_sprites, self.all_bullets_sprites)
 
@@ -349,10 +363,11 @@ class SonicBossFight:
             if self.main_hero.get_damage():
                 bullets.kill()
 
-        for bullet in self.all_bullets_sprites:
-            bullet.move_self()
-        self.main_hero.update()
-        self.eggman.update(self.main_hero.x < self.eggman.x)
+        if fireballs := pygame.sprite.spritecollideany(self.main_hero, self.all_sprites_fireball):
+            if self.main_hero.get_damage():
+                fireballs.kill()
+
+        self.all_sprites.update(self.main_hero.x < self.eggman.x)
 
     def movement(self, running):
         running = self.movement_of_main_character() * running
@@ -412,3 +427,25 @@ class SonicBossFight:
                     if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                         running = False
             pygame.display.update()
+
+    def spawn_fireballs(self):
+        spawn_points_x_list = [0, SCREEN_WIDTH, random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_WIDTH - 20)]
+        spawn_points_y_list = [random.randint(20, SCREEN_HEIGHT - 20), random.randint(20, SCREEN_HEIGHT - 20), 0, SCREEN_HEIGHT]
+        for i in range(4):
+            FireBall(spawn_points_x_list[i],
+                     spawn_points_y_list[i],
+                     self.fireball_images[i],
+                     self.fireball_types[i],
+                     self.all_sprites, self.all_sprites_wo_mh, self.all_sprites_fireball
+            )
+
+    def can_shoot_fireballs(self):
+        if self.fireball_timer:
+            self.fireball_timer -= 1
+            return False
+        else:
+            self.fireball_timer = 300
+            return True
+
+
+
