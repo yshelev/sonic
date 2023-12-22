@@ -223,7 +223,7 @@ class MainHero(Character):
         self.jump_sound.play()
 
     def start_boss_jump(self, tiles_sprites) -> None:
-        self.speed_y = -350
+        self.speed_y = -600
         self.is_jumping = True
         self.jump_level_boss(tiles_sprites)
 

@@ -199,9 +199,9 @@ class SonicLevel:
                                         (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * Settings.max_score_sonic == self.main_hero.get_score()) == 1 else "все по старому.."}',
-                True, (255, 255, 255))
-            screen.blit(text_surface, (400, 100))
+                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * (Settings.max_score_sonic == self.main_hero.get_score())) else "все по старому.."}',
+                True, (0, 0, 0))
+            screen.blit(text_surface, (75, 30))
 
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
             RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
@@ -223,7 +223,7 @@ class SonicLevel:
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
                 f'ОЧКИ: {self.main_hero.score}',
                 True, (0, 0, 0))
-            screen.blit(text_surface, (20, 100))
+            screen.blit(text_surface, (100, 125))
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:

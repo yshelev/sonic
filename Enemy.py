@@ -72,18 +72,19 @@ class Enemy(Character):
         return [i for i in tiles if i.rect.colliderect(self.rect)]
 
     def update(self, *args, **kwargs) -> None:
-        self.jump_counter += 1
-        self.movement_counter += 1
-        if self.can_move_y(args[0]):
-            self.is_falling = True
-        if self.jump_counter > self.jump_cooldown:
-            self.start_jump(args[0])
-            self.jump_cooldown = random.randint(300, 900)
-            self.jump_counter = 0
-        if self.movement_counter > self.movement_cooldown:
-            self.speed_x = 180 * random.randint(-1000, 1000) / 500.0
-            self.movement_cooldown = random.randint(300, 900)
-            self.movement_counter = 0
+        if self.is_available():
+            self.jump_counter += 1
+            self.movement_counter += 1
+            if self.can_move_y(args[0]):
+                self.is_falling = True
+            if self.jump_counter > self.jump_cooldown:
+                self.start_jump(args[0])
+                self.jump_cooldown = random.randint(300, 900)
+                self.jump_counter = 0
+            if self.movement_counter > self.movement_cooldown:
+                self.speed_x = 180 * random.randint(-1000, 1000) / 500.0
+                self.movement_cooldown = random.randint(300, 900)
+                self.movement_counter = 0
 
         super().update()
 

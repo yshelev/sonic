@@ -29,10 +29,17 @@ class Tiles(pygame.sprite.Sprite):
         return not self.rect.move(0, speed / FPS).colliderect(mh.rect), not self.rect.move(0, speed / FPS).colliderect(mh.rect)
 
     def animation_finish_tale(self):
-        print(self.counter)
         if self.counter >= 0:
             self.counter += self.animation_speed
         if self.counter > 12 - 0.1 - self.animation_speed:
             self.counter = -12
         self.image = self.animation_images[int(self.counter)]
+    
+    def is_available(self):
+        return (-self.height < self.y + self.height and self.y < SCREEN_HEIGHT + self.height and
+                -self.width < self.x + self.width and self.x < SCREEN_WIDTH + self.width)
+
+    def draw(self, surface):
+        if self.is_available():
+            super().draw(surface)
 

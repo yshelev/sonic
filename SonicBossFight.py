@@ -239,8 +239,9 @@ class SonicBossFight:
     def movement_of_main_character(self) -> bool:
         running = True
         keys = pygame.key.get_pressed()
-        if self.main_hero.is_alive() * (keys[pygame.K_SPACE] or keys[
-            dict_movement[Settings.dict_movement_pointer]["top"]] and not self.main_hero.get_is_jumping()):
+        if self.main_hero.is_alive() * ((keys[pygame.K_SPACE] or keys[
+            dict_movement[Settings.dict_movement_pointer]["top"]]) and not self.main_hero.get_is_jumping()) == 1:
+            print("ЙЦУ")
             # self.main_hero.play_sound_start_jump()
             self.main_hero.start_boss_jump(self.all_tiles_sprites)
         if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[
@@ -349,52 +350,53 @@ class SonicBossFight:
         return running
 
     def end_screen(self, win):
-        if win:
-            Settings.max_score_sonic = max(Settings.max_score_sonic, self.main_hero.get_score())
-        dct_win_phrases = {
-            True: "победа",
-            False: "поражение"
-        }
-        running = True
-        while running:
+            if win:
+                Settings.max_score = max(Settings.max_score_sonic, self.main_hero.get_score())
+            dct_win_phrases = {
+                True: "победа",
+                False: "поражение"
+            }
+            running = True
+            while running:
 
-            bg = pygame.transform.scale(pygame.image.load(f"{"data/backgrounds/sonic_win_background.jpg" if win else "data/backgrounds/sonic_lose_background.jpg"}"),
-                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
-            screen.blit(bg, (0, 0))
-            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * Settings.max_score_sonic == self.main_hero.get_score()) == 1 else None}',
-                True, (255, 255, 255))
-            screen.blit(text_surface, (400, 100))
+                bg = pygame.transform.scale(pygame.image.load(
+                    f"{"data/backgrounds/sonic_win_background.jpg" if win else "data/backgrounds/sonic_lose_background.jpg"}"),
+                                            (SCREEN_WIDTH, SCREEN_HEIGHT))
+                screen.blit(bg, (0, 0))
+                text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                    f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * (Settings.max_score_sonic == self.main_hero.get_score())) else "все по старому.."}',
+                    True, (0, 0, 0))
+                screen.blit(text_surface, (75, 30) if not win else (10, 0))
 
-            PLAY_MOUSE_POS = pygame.mouse.get_pos()
-            RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
-                           pos=(SCREEN_WIDTH // 1.2, 650),
-                           text_input="ЗАНОВО", font=self.get_font(50), base_color="White",
-                           hovering_color="Orange")
+                PLAY_MOUSE_POS = pygame.mouse.get_pos()
+                RETRY = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                               pos=(SCREEN_WIDTH // 1.2, 650),
+                               text_input="ЗАНОВО", font=self.get_font(50), base_color="White",
+                               hovering_color="Orange")
 
-            RETRY.changeColor(pygame.mouse.get_pos())
-            RETRY.update(screen)
+                RETRY.changeColor(pygame.mouse.get_pos())
+                RETRY.update(screen)
 
-            RETURN_TO_MAIN_MENU = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
-                                         pos=(SCREEN_WIDTH // 1.2, 750),
-                                         text_input="В МЕНЮ", font=self.get_font(50), base_color="White",
-                                         hovering_color="Orange")
+                RETURN_TO_MAIN_MENU = Button(image=pygame.image.load("data/menu_objects/character_rect.png"),
+                                             pos=(SCREEN_WIDTH // 1.2, 750),
+                                             text_input="В МЕНЮ", font=self.get_font(50), base_color="White",
+                                             hovering_color="Orange")
 
-            RETURN_TO_MAIN_MENU.changeColor(pygame.mouse.get_pos())
-            RETURN_TO_MAIN_MENU.update(screen)
+                RETURN_TO_MAIN_MENU.changeColor(pygame.mouse.get_pos())
+                RETURN_TO_MAIN_MENU.update(screen)
 
-            text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
-                f'ОЧКИ: {self.main_hero.score}',
-                True, (0, 0, 0))
-            screen.blit(text_surface, (20, 100))
+                text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
+                    f'ОЧКИ: {self.main_hero.score}',
+                    True, (0, 0, 0))
+                screen.blit(text_surface, (100, 125) if not win else (50, 100))
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    quit()
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if RETRY.checkForInput(PLAY_MOUSE_POS):
-                        running = False
-                        SonicBossFight(self.score, self.rings)
-                    if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
-                        running = False
-            pygame.display.update()
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        quit()
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if RETRY.checkForInput(PLAY_MOUSE_POS):
+                            running = False
+                            SonicBossFight(self.score, self.rings)
+                        if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
+                            running = False
+                pygame.display.update()
