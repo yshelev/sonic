@@ -40,8 +40,8 @@ class Eggman(pygame.sprite.Sprite):
         self.speed_x_multiplier = 10
         self.speed_x = 300
 
-        self.hp = 100
-        self.max_hp = 100
+        self.hp = 10
+        self.max_hp = 10
 
         self.types = {
             "robot_dies_right": list(

@@ -295,6 +295,7 @@ class SonicBossFight:
                 self.main_hero.start_boss_jump_bounce(self.all_tiles_sprites)
         if not self.eggman.is_alive():
             self.last_screen = screen.copy()
+            self.main_hero.set_win()
             running = False
             self.eggman.reset_counter()
             self.eggman.eggman_death()

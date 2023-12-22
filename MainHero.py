@@ -44,12 +44,16 @@ class MainHero(Character):
         self.stop_boost = self.boost * 3
         self.number_of_rings = rings
         self.is_falling = False
+        self.win = False
         self.jump_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
         self.damage_sound = pygame.mixer.Sound('data/sounds/sonic/jump.mp3')
         self.damage_sound.set_volume(Settings.sound)
         self.enemy_death_sound = pygame.mixer.Sound('data/sounds/sonic/ring_collect.mp3')
         self.score = score
         self.add_score = 0
+
+    def set_win(self):
+        self.win = True
 
     def move_left_level_boss(self, tiles) -> None:
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
@@ -219,6 +223,8 @@ class MainHero(Character):
 
         if mc != STOPPED_BY_BOT_WALL_OUTSIDE * self.is_alive():
             self.jump_level_boss(tiles)
+        elif self.win:
+            self.image = self.start_image
 
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
