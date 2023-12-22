@@ -1,6 +1,8 @@
 import sys
 
 import cv2
+import pygame.font
+
 import Settings
 from Settings import *
 from button import Button
@@ -22,10 +24,10 @@ class Menu:
 
         self.additional_sound = 0.05
 
-    def get_font(self, size):
+    def get_font(self, size) -> pygame.font.Font:
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
-    def play(self):
+    def play(self) -> None:
         running = True
         while running:
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
@@ -77,7 +79,7 @@ class Menu:
 
             pygame.display.update()
 
-    def knuckles_play(self):
+    def knuckles_play(self) -> None:
         running = True
         while running:
             KNUCKLES_MOUSE_POS = pygame.mouse.get_pos()
@@ -102,7 +104,7 @@ class Menu:
 
             pygame.display.update()
 
-    def options(self):
+    def options(self) -> None:
         running = True
         while running:
             OPTIONS_MOUSE_POS = pygame.mouse.get_pos()
@@ -159,7 +161,7 @@ class Menu:
 
             pygame.display.update()
 
-    def developers(self):
+    def developers(self) -> None:
         running = True
         while running:
             DEVELOPERS_MOUSE_POS = pygame.mouse.get_pos()
@@ -183,7 +185,7 @@ class Menu:
 
             pygame.display.update()
 
-    def main_menu(self):
+    def main_menu(self) -> None:
         running = True
         while running:
             screen.blit(self.BG1, (0, 0))

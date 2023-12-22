@@ -396,6 +396,7 @@ class SonicBossFight:
                         if RETRY.checkForInput(PLAY_MOUSE_POS):
                             running = False
                             SonicBossFight(self.score, self.rings)
+                            del self
                         if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                             running = False
                 pygame.display.update()

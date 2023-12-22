@@ -3,6 +3,8 @@ from Character import Character
 from Settings import *
 import pygame
 
+from my_group import My_group
+
 
 class MainHero(Character):
     def __init__(
@@ -47,7 +49,7 @@ class MainHero(Character):
         self.score = score
         self.add_score = 0
 
-    def move_left_level_boss(self, tiles):
+    def move_left_level_boss(self, tiles) -> None:
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
         self.additional_speed -= self.boost / FPS
         self.moving_left = True
@@ -59,7 +61,7 @@ class MainHero(Character):
             self.x -= (self.speed_x - self.additional_speed) / FPS
             self.additional_speed = max(self.additional_speed - self.stop_boost / FPS, 0)
 
-    def move_right_level_boss(self, tiles):
+    def move_right_level_boss(self, tiles) -> None:
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
         self.additional_speed += self.boost / FPS
         self.moving_right = True
@@ -70,7 +72,7 @@ class MainHero(Character):
             self.x += (self.speed_x + self.additional_speed) / FPS
             self.additional_speed = min(self.additional_speed + self.stop_boost / FPS, 0)
 
-    def jump_level_boss(self, tiles_sprites):
+    def jump_level_boss(self, tiles_sprites) -> None:
         self.is_jumping = True
         self.speed_y += GRAVITY / FPS
         can_move_bottom, can_move_top, point_y = self.can_move_y(tiles_sprites)
@@ -86,7 +88,7 @@ class MainHero(Character):
             self.y += self.speed_y / FPS
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
-    def move_left(self, tiles) -> (int, float):
+    def move_left(self, tiles: My_group) -> (int, float):
         can_move_left, can_move_right, _ = self.can_move_x(tiles)
         can_move_invisible_left, can_move_invisible_right = self.can_move_invisible_wall_x()
         self.moving_left = True
@@ -108,7 +110,7 @@ class MainHero(Character):
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
         return exit_codes["sonic_movement_x"][move_code], self.speed_x - self.additional_speed
 
-    def move_right(self, tiles: pygame.sprite.Group) -> (int, float):
+    def move_right(self, tiles: My_group) -> (int, float):
         """
         """
         can_move_left, can_move_right, point_x = self.can_move_x(tiles)
@@ -362,7 +364,7 @@ class MainHero(Character):
                 RIGHT_INVISIBLE_LINE[1][1] - RIGHT_INVISIBLE_LINE[0][1]))
         )
 
-    def can_move_x(self, tiles_sprites: pygame.sprite.Group) -> (bool, bool, list):
+    def can_move_x(self, tiles_sprites: My_group) -> (bool, bool, list):
         direction = self.move_direction()[0]
         return (not (any(
             pygame.rect.Rect(self.rect.x - (self.speed_x - self.additional_speed) / FPS,
@@ -405,7 +407,7 @@ class MainHero(Character):
     def get_number_of_rings(self) -> int:
         return self.number_of_rings
 
-    def set_y(self, y):
+    def set_y(self, y: float) -> None:
         self.y = y
         self.rect = pygame.Rect(self.x, self.y, self.width, self.height)
 
@@ -453,7 +455,7 @@ class MainHero(Character):
             move_code = exit_codes["sonic_movement_y"].index(OK)
         return move_code
 
-    def get_damage(self):
+    def get_damage(self) -> bool:
         if not self.unavailable_counter:
             self.unavailable_counter += 1
             self.number_of_rings -= 10
@@ -463,18 +465,18 @@ class MainHero(Character):
             return True
         return False
 
-    def add_rings(self):
+    def add_rings(self) -> None:
         self.play_collect_ring()
         self.number_of_rings += 1
         self.score += 100
 
-    def get_score(self):
+    def get_score(self) -> int:
         return self.score
 
-    def is_alive(self):
+    def is_alive(self) -> bool:
         return self.number_of_rings > 0
 
-    def collide_enemy(self, enemies):
+    def collide_enemy(self, enemies) -> bool:
         if (self.speed_y > 0) * (enemies.is_alive()):
             self.add_score += 100
             self.score += self.add_score
@@ -490,10 +492,10 @@ class MainHero(Character):
         self.enemy_death_sound.set_volume(Settings.sound)
         self.enemy_death_sound.play()
 
-    def get_add_score(self):
+    def get_add_score(self) -> int:
         return self.add_score
 
-    def animation_next_level(self):
+    def animation_next_level(self) -> bool:
         self.is_jumping = False
         self.moving_left = False
         self.moving_right = True
@@ -504,7 +506,7 @@ class MainHero(Character):
         self.moving_right = False
         return False
 
-    def animation_boss_fight_in(self):
+    def animation_boss_fight_in(self) -> bool:
         self.moving_right = True
         self.additional_speed = 5 * FPS
         if self.x + self.width <= SCREEN_WIDTH // 3:
@@ -514,5 +516,5 @@ class MainHero(Character):
         self.moving_right = False
         return False
 
-    def available(self):
+    def available(self) -> bool:
         return not self.unavailable_counter

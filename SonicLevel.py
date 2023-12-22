@@ -1,5 +1,7 @@
 import sys
 
+import pygame.font
+
 from Enemy import Enemy
 from Enemy_score import Enemy_score
 from MainHero import MainHero
@@ -13,7 +15,7 @@ from my_group import My_group
 
 
 class SonicLevel:
-    def __init__(self):
+    def __init__(self) -> None:
         self.last_screen = None
         self.my_font = pygame.font.SysFont('Bauhaus 93', 30)
         self.background_image = pygame.transform.scale(pygame.image.load("data/backgrounds/background_greenhill.jpg"),
@@ -171,7 +173,7 @@ class SonicLevel:
         self.background_music.set_volume(Settings.sound)
         self.background_music.play(-1)
 
-    def game_loop(self):
+    def game_loop(self) -> None:
         running = True
         while running:
             self.clock.tick(FPS)
@@ -186,7 +188,7 @@ class SonicLevel:
             pygame.display.flip()
         self.background_music.stop()
 
-    def end_screen(self, win):
+    def end_screen(self, win) -> None:
         if win:
             Settings.max_score = max(Settings.max_score_sonic, self.main_hero.get_score())
         dct_win_phrases = {
@@ -233,11 +235,12 @@ class SonicLevel:
                     if RETRY.checkForInput(PLAY_MOUSE_POS):
                         running = False
                         SonicLevel()
+                        del self
                     if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                         running = False
             pygame.display.update()
 
-    def get_font(self, size):
+    def get_font(self, size) -> pygame.font.Font:
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
     def draw_lines(self) -> None:
@@ -259,7 +262,7 @@ class SonicLevel:
         text_surface = self.my_font.render(f'X{self.main_hero.get_number_of_rings()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 0))
 
-    def draw_score(self):
+    def draw_score(self) -> None:
         text_surface = self.my_font.render(f'score: {self.main_hero.get_score()}', True, (255, 255, 255))
         screen.blit(text_surface, (20, 40))
 
@@ -342,7 +345,7 @@ class SonicLevel:
 
         return running
 
-    def play_mh_death(self):
+    def play_mh_death(self) -> None:
         running = True
         while running:
             for event in pygame.event.get():
@@ -385,19 +388,15 @@ class SonicLevel:
         # self.draw_lines()
         self.all_sprites.draw(screen)
 
-    def next_level(self):
+    def next_level(self) -> None:
         self.last_animation()
         self.all_sprites.empty()
         SonicBossFight(self.main_hero.get_score(), self.main_hero.get_number_of_rings())
 
-    def quit(self):
-        pygame.quit()
-        sys.exit()
-
-    def check_exit(self):
+    def check_exit(self) -> bool:
         return self.main_hero.rect.colliderect(self.finish_tale)
 
-    def last_animation(self):
+    def last_animation(self) -> None:
         running = True
         while running:
             self.clock.tick(FPS)
