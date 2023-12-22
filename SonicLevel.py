@@ -9,6 +9,7 @@ from Settings import *
 from SonicBossFight import SonicBossFight
 from Tiles import Tiles
 from button import Button
+from my_group import My_group
 
 
 class SonicLevel:
@@ -68,13 +69,13 @@ class SonicLevel:
         self.immune_timer = pygame.time.Clock()
 
         self.clock = pygame.time.Clock()
-        self.all_sprites = pygame.sprite.Group()
-        self.all_rings_sprites = pygame.sprite.Group()
-        self.all_tiles_sprites = pygame.sprite.Group()
-        self.all_enemy_sprites = pygame.sprite.Group()
-        self.all_sprites_wo_mh = pygame.sprite.Group()
-        self.all_spikes_sprites = pygame.sprite.Group()
-        self.all_enemies_score = pygame.sprite.Group()
+        self.all_sprites = My_group()
+        self.all_rings_sprites = My_group()
+        self.all_tiles_sprites = My_group()
+        self.all_enemy_sprites = My_group()
+        self.all_sprites_wo_mh = My_group()
+        self.all_spikes_sprites = My_group()
+        self.all_enemies_score = My_group()
 
         with open("data/txts/map.txt") as f:
             self.map = [i.split() for i in f.readlines()[::-1]]
