@@ -293,10 +293,6 @@ class SonicBossFight:
 
         return running
 
-    def quit(self):
-        pygame.quit()
-        sys.exit()
-
     def play_mh_death(self):
         running = True
         while running:
@@ -316,10 +312,11 @@ class SonicBossFight:
 
     def draw(self) -> None:
 
-        self.draw_num_of_rings()
-        self.draw_score()
-        self.draw_lines()
         self.all_sprites.draw(screen)
+        self.draw_score()
+        self.draw_num_of_rings()
+        self.draw_lines()
+
 
     def get_font(self, size):
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
