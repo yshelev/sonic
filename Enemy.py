@@ -2,6 +2,7 @@ import random
 
 import pygame
 
+import Settings
 from Character import Character
 from MainHero import MainHero
 from Settings import *
@@ -96,7 +97,7 @@ class Enemy(Character):
         return self.alive
 
     def play_enemy_death(self) -> None:
-        self.enemy_death_sound.set_volume(0.1)
+        self.enemy_death_sound.set_volume(Settings.sound)
         self.enemy_death_sound.play()
 
     def moveself_x(self, tiles_sprite):

@@ -4,7 +4,7 @@ import pygame
 
 SCREEN_WIDTH = 1200
 SCREEN_HEIGHT = 800
-FPS = 50
+FPS = 60
 GRAVITY = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 LEFT_INVISIBLE_LINE = ((SCREEN_WIDTH // 2.5, SCREEN_HEIGHT // 2.5),

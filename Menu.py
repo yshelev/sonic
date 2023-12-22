@@ -19,6 +19,11 @@ class Menu:
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
         self.BG5 = pygame.image.load("data/menu_objects/knuckles_background.png")
+
+        self.background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
+
+        self.playing = True
+
         self.start_video_loop()
 
         self.additional_sound = 0.05
@@ -26,7 +31,15 @@ class Menu:
     def get_font(self, size) -> pygame.font.Font:
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
+    def play_music(self) -> None:
+        self.background_music.set_volume(Settings.sound)
+        self.background_music.play(-1)
+
+    def stop_music(self) -> None:
+        self.background_music.stop()
+
     def play(self) -> None:
+
         running = True
         while running:
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
@@ -66,10 +79,14 @@ class Menu:
                         self.main_menu()
                     if PLAY_TAILS.checkForInput(PLAY_MOUSE_POS):
                         running = False
+                        self.stop_music()
+                        self.playing = False
                         TailsLevel()
                         self.main_menu()
                     if PLAY_SONIC.checkForInput(PLAY_MOUSE_POS):
                         running = False
+                        self.stop_music()
+                        self.playing = False
                         SonicLevel()
                         self.main_menu()
                     if PLAY_KNUCKLES.checkForInput(PLAY_MOUSE_POS):
@@ -136,6 +153,7 @@ class Menu:
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if OPTIONS_BACK.checkForInput(OPTIONS_MOUSE_POS):
                         running = False
+                        self.background_music.set_volume(Settings.sound)
                         self.main_menu()
                     if SELECT_ARROW.checkForInput(OPTIONS_MOUSE_POS):
                         Settings.dict_movement_pointer = 1
@@ -169,7 +187,12 @@ class Menu:
                         self.main_menu()
 
             pygame.display.update()
+
     def main_menu(self) -> None:
+        if not self.playing:
+            self.play_music()
+            self.playing = True
+
         running = True
         while running:
 
@@ -211,40 +234,36 @@ class Menu:
             pygame.display.update()
 
     def start_video_loop(self) -> None:
-        # video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
-        # success, video_image = video.read()
-        # fps = video.get(cv2.CAP_PROP_FPS)
-        #
-        # window = pygame.display.set_mode(video_image.shape[1::-1])
-        # clock = pygame.time.Clock()
-        # pygame.mixer.init()
-        # pygame.mixer.music.load('data/MUSIC/INTRO_MUSIC.mp3')
-        # pygame.mixer.music.play(-1)
-        #
-        # run = success
-        # while run:
-        #     clock.tick(fps)
-        #     for event in pygame.event.get():
-        #         if event.type == pygame.QUIT:
-        #             quit()
-        #
-        #
-        #     success, video_image = video.read()
-        #     if success:
-        #         video_surf = pygame.image.frombuffer(
-        #             video_image.tobytes(),
-        #             video_image.shape[1::-1],
-        #             "BGR"
-        #         )
-        #     else:
-        #         run = False
-        #     window.blit(video_surf, (0, 0))
-        #     pygame.display.flip()
-        #
-        # pygame.mixer.music.stop()
-        self.main_menu()
+        video = cv2.VideoCapture("data/VIDEO/INTRO.mp4")
+        success, video_image = video.read()
+        fps = video.get(cv2.CAP_PROP_FPS)
 
-    # def quit(self):
-    #
-    #     pygame.quit()
-    #     sys.exit()
+        window = pygame.display.set_mode(video_image.shape[1::-1])
+        clock = pygame.time.Clock()
+        pygame.mixer.init()
+        pygame.mixer.music.load('data/MUSIC/INTRO_MUSIC.mp3')
+        pygame.mixer.music.play(-1)
+
+        run = success
+        while run:
+            clock.tick(fps)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    quit()
+
+
+            success, video_image = video.read()
+            if success:
+                video_surf = pygame.image.frombuffer(
+                    video_image.tobytes(),
+                    video_image.shape[1::-1],
+                    "BGR"
+                )
+            else:
+                run = False
+            window.blit(video_surf, (0, 0))
+            pygame.display.flip()
+
+        pygame.mixer.music.stop()
+        self.play_music()
+        self.main_menu()

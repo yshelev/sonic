@@ -221,7 +221,7 @@ class MainHero(Character):
         return move_code_x, self.additional_speed, move_code_y, self.speed_y if not self.is_jumping else 0
 
     def play_sound_start_jump(self) -> None:
-        self.jump_sound.set_volume(Settings.sound)
+        self.jump_sound.set_volume(Settings.sound // 2)
         self.jump_sound.play()
 
     def start_boss_jump(self, tiles_sprites) -> None:

@@ -166,12 +166,15 @@ class SonicLevel:
 
         self.background_music = pygame.mixer.Sound('data/MUSIC/Bg_Music.mp3')
 
-        # self.play_music()
+        self.play_music()
         self.game_loop()
 
     def play_music(self) -> None:
         self.background_music.set_volume(Settings.sound)
         self.background_music.play(-1)
+
+    def stop_music(self) -> None:
+        self.background_music.stop()
 
     def game_loop(self) -> None:
         running = True
@@ -186,9 +189,11 @@ class SonicLevel:
             self.all_sprites.update(self.all_tiles_sprites)
             self.draw()
             pygame.display.flip()
-        self.background_music.stop()
+        self.stop_music()
 
     def end_screen(self, win) -> None:
+        self.stop_music()
+
         if win:
             Settings.max_score = max(Settings.max_score_sonic, self.main_hero.get_score())
         dct_win_phrases = {
@@ -238,6 +243,7 @@ class SonicLevel:
                         del self
                     if RETURN_TO_MAIN_MENU.checkForInput(PLAY_MOUSE_POS):
                         running = False
+                        self.play_music()
             pygame.display.update()
 
     def get_font(self, size) -> pygame.font.Font:
@@ -270,7 +276,7 @@ class SonicLevel:
         running = True
         keys = pygame.key.get_pressed()
         if self.main_hero.is_alive() * ((keys[pygame.K_SPACE] or keys[dict_movement[Settings.dict_movement_pointer]["top"]]) and not self.main_hero.get_is_jumping()):
-            # self.main_hero.play_sound_start_jump()
+            self.main_hero.play_sound_start_jump()
             self.main_hero.start_jump(self.all_tiles_sprites)
         if self.main_hero.is_alive() * (not (keys[dict_movement[Settings.dict_movement_pointer]["left"]] and keys[dict_movement[Settings.dict_movement_pointer]["right"]])):
             if keys[dict_movement[Settings.dict_movement_pointer]["left"]]:
@@ -391,6 +397,7 @@ class SonicLevel:
     def next_level(self) -> None:
         self.last_animation()
         self.all_sprites.empty()
+        self.stop_music()
         SonicBossFight(self.main_hero.get_score(), self.main_hero.get_number_of_rings())
 
     def check_exit(self) -> bool:
