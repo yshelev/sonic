@@ -23,10 +23,10 @@ class Menu:
 
         self.additional_sound = 0.05
 
-    def get_font(self, size):
+    def get_font(self, size) -> pygame.font.Font:
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
-    def play(self):
+    def play(self) -> None:
         running = True
         while running:
             PLAY_MOUSE_POS = pygame.mouse.get_pos()
@@ -78,7 +78,7 @@ class Menu:
 
             pygame.display.update()
 
-    def knuckles_play(self):
+    def knuckles_play(self) -> None:
         running = True
         while running:
             KNUCKLES_MOUSE_POS = pygame.mouse.get_pos()
@@ -103,7 +103,7 @@ class Menu:
 
             pygame.display.update()
 
-    def options(self):
+    def options(self) -> None:
         running = True
         self.slider = Slider(screen, SCREEN_WIDTH/4, 250 , SCREEN_WIDTH/2, 40, initial=Settings.sound, min=0, max=3, step=0.1, handleColour=(255, 255, 255), colour=(0, 0, 0))
         while running:
@@ -146,7 +146,7 @@ class Menu:
             pygame_widgets.update(pygame.event.get())
             pygame.display.update()
 
-    def developers(self):
+    def developers(self) -> None:
         running = True
         while running:
             DEVELOPERS_MOUSE_POS = pygame.mouse.get_pos()
@@ -169,7 +169,7 @@ class Menu:
                         self.main_menu()
 
             pygame.display.update()
-    def main_menu(self):
+    def main_menu(self) -> None:
         running = True
         while running:
 
