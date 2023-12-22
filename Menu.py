@@ -18,6 +18,7 @@ class Menu:
         self.BG2 = pygame.image.load("data/menu_objects/play_background.png")
         self.BG3 = pygame.image.load("data/menu_objects/settings_background.png")
         self.BG4 = pygame.image.load("data/menu_objects/developers_background.png")
+        self.BG5 = pygame.image.load("data/menu_objects/knuckles_background.png")
         self.start_video_loop()
 
         self.additional_sound = 0.05
