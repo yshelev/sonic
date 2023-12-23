@@ -40,7 +40,7 @@ class MainHero(Character):
         self.padding = 15
         self.cur_fast_frame = 0
         self.additional_speed = 0
-        self.boost = 300
+        self.boost = 600
         self.stop_boost = self.boost * 3
         self.number_of_rings = rings
         self.is_falling = False
