@@ -2,6 +2,8 @@ import random
 import sys
 import pygame
 
+from PIL import Image
+
 import Settings
 from Plane_Level import *
 from Settings import *
@@ -80,7 +82,7 @@ class TailsLevel:
 
         self.background_image_x = 0
 
-        self.output = self.game_loop()
+        self.game_loop()
 
     def game_loop(self):
         self.ot_vinta.play(-1)

@@ -1,11 +1,10 @@
 import random
-import sys
 
 import pygame.event
 
+import Settings
 from Eggman import Eggman
 from MainHero import MainHero
-import Settings
 from Settings import *
 from Tiles import Tiles
 from button import Button
@@ -121,8 +120,6 @@ class SonicBossFight:
                           self.all_sprites,
                           self.all_sprites_wo_mh)
 
-
-
         self.main_hero = MainHero(
             0,
             SCREEN_HEIGHT - 105,
@@ -136,7 +133,6 @@ class SonicBossFight:
             self.score,
             self.all_sprites
         )
-
 
         self.eggman = Eggman(SCREEN_WIDTH // 3 * 2, SCREEN_HEIGHT - 105, 100, 100,
                              self.all_sprites,
@@ -330,7 +326,6 @@ class SonicBossFight:
         self.draw_num_of_rings()
         self.draw_lines()
 
-
     def get_font(self, size):
         return pygame.font.Font("data/menu_objects/menu_font.ttf", size)
 
@@ -388,7 +383,7 @@ class SonicBossFight:
 
             bg = pygame.transform.scale(pygame.image.load(
                 f"{"data/backgrounds/sonic_win_background.jpg" if win else "data/backgrounds/sonic_lose_background.jpg"}"),
-                                        (SCREEN_WIDTH, SCREEN_HEIGHT))
+                (SCREEN_WIDTH, SCREEN_HEIGHT))
             screen.blit(bg, (0, 0))
             text_surface = pygame.font.Font("data/menu_objects/menu_font.ttf", 50).render(
                 f'{dct_win_phrases[win]}. {"Новый рекорд!" if (win * (Settings.max_score_sonic == self.main_hero.get_score())) else "все по старому.."}',
@@ -430,15 +425,17 @@ class SonicBossFight:
             pygame.display.update()
 
     def spawn_fireballs(self):
-        spawn_points_x_list = [0, SCREEN_WIDTH, random.randint(20, SCREEN_WIDTH - 20), random.randint(20, SCREEN_WIDTH - 20)]
-        spawn_points_y_list = [random.randint(20, SCREEN_HEIGHT - 20), random.randint(20, SCREEN_HEIGHT - 20), 0, SCREEN_HEIGHT]
+        spawn_points_x_list = [0, SCREEN_WIDTH, random.randint(20, SCREEN_WIDTH - 20),
+                               random.randint(20, SCREEN_WIDTH - 20)]
+        spawn_points_y_list = [random.randint(20, SCREEN_HEIGHT - 20), random.randint(20, SCREEN_HEIGHT - 20), 0,
+                               SCREEN_HEIGHT]
         for i in range(4):
             FireBall(spawn_points_x_list[i],
                      spawn_points_y_list[i],
                      self.fireball_images[i],
                      self.fireball_types[i],
                      self.all_sprites, self.all_sprites_wo_mh, self.all_sprites_fireball
-            )
+                     )
 
     def can_shoot_fireballs(self):
         if self.fireball_timer:
@@ -447,6 +444,3 @@ class SonicBossFight:
         else:
             self.fireball_timer = 300
             return True
-
-
-
